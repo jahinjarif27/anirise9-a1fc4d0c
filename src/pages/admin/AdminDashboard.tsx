@@ -558,11 +558,14 @@ const AdminDashboard = () => {
 
           {/* PAGES */}
           <TabsContent value="pages" className="space-y-6">
-            <div className="grid lg:grid-cols-[260px_1fr] gap-4">
-              <Card className="p-3 h-fit lg:sticky lg:top-20">
-                <div className="flex items-center justify-between mb-2 px-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Section groups</span>
-                  <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => {
+            <div className="grid lg:grid-cols-[280px_1fr] gap-5">
+              <Card className="p-0 h-fit lg:sticky lg:top-20 overflow-hidden">
+                <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Layers className="h-4 w-4 text-accent" />
+                    <span className="text-sm font-bold">Site structure</span>
+                  </div>
+                  <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => {
                     const label = prompt("Section group name?");
                     if (!label) return;
                     const k = addSectionGroup(label);
@@ -572,52 +575,58 @@ const AdminDashboard = () => {
                     <Plus className="h-3.5 w-3.5" /> Group
                   </Button>
                 </div>
-                <ul className="space-y-2">
+
+                <div className="p-2 space-y-1">
                   {sectionGroups.map((grp) => {
                     const isOpen = openGroups[grp.key] ?? false;
                     const builtins = SITE_PAGES.filter((p) => (pageLocation[p.key] ?? "home") === grp.key);
                     const customs = customPages.filter((p) => (p.groupKey ?? "") === grp.key);
                     const homesecs = grp.isHome ? homeSections : homeSections.filter((s) => s.groupKey === grp.key);
+                    const total = builtins.length + customs.length + homesecs.length;
                     return (
-                      <li key={grp.key}>
+                      <Collapsible key={grp.key} open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, [grp.key]: v }))}>
                         <div className="flex items-center gap-1">
-                          <button onClick={() => setOpenGroups((p) => ({ ...p, [grp.key]: !isOpen }))}
-                            className="flex-1 text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center justify-between hover:bg-secondary">
-                            <span>{grp.label}</span>
-                            <ArrowRight className={`h-4 w-4 transition-transform ${isOpen ? "rotate-90" : ""}`} />
-                          </button>
+                          <CollapsibleTrigger className="group flex-1 text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                            <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
+                            {grp.isHome ? <Home className="h-3.5 w-3.5 text-accent" /> : <Layers className="h-3.5 w-3.5 text-accent" />}
+                            <span className="flex-1 truncate">{grp.label}</span>
+                            <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{total}</Badge>
+                          </CollapsibleTrigger>
                           {!grp.isHome && (
                             <button title="Delete group" onClick={() => { if (confirm(`Delete group "${grp.label}"?`)) { deleteSectionGroup(grp.id); toast.success("Group deleted"); } }}
-                              className="h-8 w-8 grid place-items-center rounded-lg hover:bg-secondary text-muted-foreground">
+                              className="h-8 w-8 grid place-items-center rounded-lg hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors">
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
                           )}
                         </div>
-                        {isOpen && (
-                          <ul className="ml-3 pl-3 border-l border-border space-y-1 mt-1">
+                        <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                          <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
                             {builtins.map((p) => (
                               <li key={p.key}>
                                 <button onClick={() => setActivePage(p.key)}
-                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-muted-foreground"}`}>
-                                  {p.label}
+                                  className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm transition-colors flex items-center gap-2 ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                  <FileText className="h-3 w-3 opacity-60" />
+                                  <span className="truncate">{p.label}</span>
                                 </button>
                               </li>
                             ))}
                             {homesecs.map((s) => (
                               <li key={s.id}>
                                 <button onClick={() => setActivePage(`homesec:${s.id}`)}
-                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-sm flex items-center justify-between gap-2 transition-colors ${activePage === `homesec:${s.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-muted-foreground"}`}>
-                                  <span className="truncate">{s.title || "Untitled"}</span>
-                                  {!s.enabled && <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted">Off</span>}
+                                  className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `homesec:${s.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                  <FileEdit className="h-3 w-3 opacity-60" />
+                                  <span className="truncate flex-1">{s.title || "Untitled"}</span>
+                                  {!s.enabled && <Badge variant="outline" className="h-4 px-1 text-[9px]">Off</Badge>}
                                 </button>
                               </li>
                             ))}
                             {customs.map((p) => (
                               <li key={p.id}>
                                 <button onClick={() => setActivePage(`custom:${p.id}`)}
-                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-sm flex items-center justify-between gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-muted-foreground"}`}>
-                                  <span className="truncate">{p.title || p.slug}</span>
-                                  {!p.published && <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted">Draft</span>}
+                                  className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                  <FileText className="h-3 w-3 opacity-60" />
+                                  <span className="truncate flex-1">{p.title || p.slug}</span>
+                                  {!p.published && <Badge variant="outline" className="h-4 px-1 text-[9px]">Draft</Badge>}
                                 </button>
                               </li>
                             ))}
@@ -633,42 +642,45 @@ const AdminDashboard = () => {
                                 setTimeout(() => setActivePage(`custom:${id}`), 0);
                                 toast.success("Page added to " + grp.label);
                               }}
-                                className="w-full text-left px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:bg-secondary inline-flex items-center gap-1">
+                                className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 transition-colors">
                                 <Plus className="h-3 w-3" /> Add page
                               </button>
                             </li>
                           </ul>
-                        )}
-                      </li>
+                        </CollapsibleContent>
+                      </Collapsible>
                     );
                   })}
-                </ul>
+                </div>
 
-                <div className="mt-4 pt-3 border-t border-border">
-                  <div className="flex items-center justify-between mb-2 px-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Standalone</span>
+                <div className="border-t border-border bg-secondary/20 p-2">
+                  <div className="flex items-center justify-between px-2 py-1.5">
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Standalone</span>
+                    </div>
                   </div>
-                  <ul className="space-y-1">
+                  <ul className="space-y-0.5">
                     {SITE_PAGES.filter((p) => (pageLocation[p.key] ?? "home") === "").map((p) => (
                       <li key={p.key}>
                         <button onClick={() => setActivePage(p.key)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between gap-2 transition-colors ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary"}`}>
-                          <span className="truncate">{p.label}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">/{p.key}</span>
+                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                          <span className="truncate flex-1">{p.label}</span>
+                          <span className="text-[10px] font-mono text-muted-foreground">/{p.key}</span>
                         </button>
                       </li>
                     ))}
                     {customPages.filter((p) => (p.groupKey ?? "") === "").map((p) => (
                       <li key={p.id}>
                         <button onClick={() => setActivePage(`custom:${p.id}`)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary"}`}>
-                          <span className="truncate">{p.title || p.slug}</span>
-                          {!p.published && <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">Draft</span>}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                          <span className="truncate flex-1">{p.title || p.slug}</span>
+                          {!p.published && <Badge variant="outline" className="h-4 px-1 text-[9px]">Draft</Badge>}
                         </button>
                       </li>
                     ))}
                   </ul>
-                  <Button size="sm" variant="ghost" className="h-7 px-2 mt-2 w-full justify-start" onClick={() => {
+                  <Button size="sm" variant="ghost" className="h-8 px-2 mt-1 w-full justify-start text-xs" onClick={() => {
                     const id = Date.now().toString();
                     addCustomPage({
                       title: "New Page", slug: `new-page-${id.slice(-4)}`, parent: "",
