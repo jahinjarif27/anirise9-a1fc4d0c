@@ -1,0 +1,44 @@
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { services, Service } from "@/data/services";
+import { useAdmin } from "@/context/AdminContext";
+
+const ServiceCard = ({ service }: { service: Service }) => (
+  <Link
+    to={`/services/${service.slug}`}
+    className="group block bg-card rounded-2xl p-6 shadow-card hover:shadow-elegant transition-smooth border border-border/40"
+  >
+    <div className="h-12 w-12 rounded-xl bg-accent/10 text-accent grid place-items-center mb-5 group-hover:bg-gradient-accent group-hover:text-accent-foreground transition-smooth">
+      <service.icon className="h-6 w-6" />
+    </div>
+    <h3 className="text-xl font-bold text-foreground mb-2">{service.title}</h3>
+    <p className="text-sm text-muted-foreground leading-relaxed mb-4">{service.desc}</p>
+    <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent group-hover:gap-2 transition-all">
+      Learn more <ArrowRight className="h-4 w-4" />
+    </span>
+  </Link>
+);
+
+export const Services = () => {
+  const { content } = useAdmin();
+
+  return (
+    <section id="services" className="bg-background py-20 lg:py-24">
+      <div className="container">
+        <div className="max-w-2xl mb-12">
+          <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase mb-3">Services</p>
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-foreground">{content.servicesTitle}</h2>
+          <p className="mt-3 text-muted-foreground text-base max-w-2xl">
+            {content.servicesBlurb}
+          </p>
+        </div>
+      </div>
+
+      <div className="container grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {services.map((service) => (
+          <ServiceCard key={service.slug} service={service} />
+        ))}
+      </div>
+    </section>
+  );
+};
