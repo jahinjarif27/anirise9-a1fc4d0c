@@ -431,18 +431,22 @@ const AdminDashboard = () => {
       if (!sec) return <p className="text-sm text-muted-foreground">Section not found.</p>;
       return (
         <div className="space-y-4">
-          <Card className="p-5 sm:p-6 space-y-3">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <h3 className="font-bold">Custom home section</h3>
-              <div className="flex items-center gap-2">
-                <Switch checked={sec.enabled} onCheckedChange={(v) => updateHomeSection(sec.id, { enabled: v })} />
-                <span className="text-sm">{sec.enabled ? "Visible" : "Hidden"}</span>
-              </div>
-            </div>
-            <Input placeholder="Section title" value={sec.title} onChange={(e) => updateHomeSection(sec.id, { title: e.target.value })} />
-            <Textarea rows={4} placeholder="Section content / body" value={sec.body} onChange={(e) => updateHomeSection(sec.id, { body: e.target.value })} />
+          <Card className="p-5 sm:p-6 space-y-5">
+            <SectionHeader
+              icon={FileEdit}
+              title="Custom home section"
+              subtitle="Free-form content block"
+              action={
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
+                  <Switch checked={sec.enabled} onCheckedChange={(v) => updateHomeSection(sec.id, { enabled: v })} />
+                  <span className="text-sm font-medium">{sec.enabled ? "Visible" : "Hidden"}</span>
+                </div>
+              }
+            />
+            <Field label="Section title"><Input value={sec.title} onChange={(e) => updateHomeSection(sec.id, { title: e.target.value })} /></Field>
+            <Field label="Section content"><Textarea rows={4} value={sec.body} onChange={(e) => updateHomeSection(sec.id, { body: e.target.value })} /></Field>
             <ImageUpload label="Section image" value={sec.image} onChange={(v) => updateHomeSection(sec.id, { image: v })} aspect="aspect-[16/9]" altValue={sec.imageAlt} onAltChange={(v) => updateHomeSection(sec.id, { imageAlt: v })} />
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteHomeSection(sec.id); setActivePage("home"); toast.success("Section removed"); }}>
                 <Trash2 className="h-4 w-4 text-destructive" /> Delete section
               </Button>
@@ -454,20 +458,40 @@ const AdminDashboard = () => {
     // Home overview
     return (
       <div className="space-y-4">
-        <Card className="p-5 sm:p-6 space-y-3">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <h3 className="font-bold">Home page</h3>
-              <p className="text-sm text-muted-foreground">All the sections below appear on the homepage. Click any sub-section in the sidebar to edit, or add a brand-new custom section.</p>
-            </div>
-            <Button variant="hero" size="sm" onClick={() => {
-              const id = Date.now().toString();
-              addHomeSection({ title: "New section", body: "", image: "", imageAlt: "", enabled: true });
-              setTimeout(() => setActivePage(`homesec:${id}`), 0);
-              toast.success("Section added");
-            }}>
-              <Plus className="h-4 w-4" /> Add new section
-            </Button>
+        <Card className="p-5 sm:p-6 space-y-4">
+          <SectionHeader
+            icon={Home}
+            title="Pages overview"
+            subtitle="Pick a page from the sidebar to edit, or add a custom block to the homepage."
+            action={
+              <Button variant="hero" size="sm" onClick={() => {
+                const id = Date.now().toString();
+                addHomeSection({ title: "New section", body: "", image: "", imageAlt: "", enabled: true });
+                setTimeout(() => setActivePage(`homesec:${id}`), 0);
+                toast.success("Section added");
+              }}>
+                <Plus className="h-4 w-4" /> Add home block
+              </Button>
+            }
+          />
+          <div className="grid sm:grid-cols-2 gap-3">
+            {SITE_PAGES.map((p) => {
+              const loc = pageLocation[p.key] ?? "home";
+              const grp = sectionGroups.find((g) => g.key === loc);
+              return (
+                <button key={p.key} onClick={() => setActivePage(p.key)}
+                  className="text-left p-3 rounded-lg border border-border hover:border-accent hover:bg-secondary/40 transition-colors flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-secondary grid place-items-center shrink-0">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm truncate">{p.label}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{grp ? grp.label : "Standalone"}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </button>
+              );
+            })}
           </div>
         </Card>
         <SeoBlock pageKey="home" />
