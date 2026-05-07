@@ -120,26 +120,39 @@ const AdminDashboard = () => {
   const LocationSelector = ({ pageKey, optional = false }: { pageKey: string; optional?: boolean }) => {
     const current = pageLocation[pageKey] ?? (optional ? "" : "home");
     return (
-      <Card className="p-4 sm:p-5 flex items-center justify-between gap-3 flex-wrap bg-secondary/40">
-        <div>
-          <p className="font-bold text-sm">Location</p>
-          <p className="text-xs text-muted-foreground">
-            Choose which section group this page belongs to. {optional && "Leave as Standalone for a direct URL only."}
-          </p>
+      <Card className="p-4 sm:p-5 flex items-start sm:items-center justify-between gap-3 flex-col sm:flex-row bg-gradient-to-br from-secondary/40 to-secondary/10 border-dashed">
+        <div className="flex items-start gap-3">
+          <div className="h-9 w-9 rounded-lg bg-accent/15 text-accent grid place-items-center shrink-0">
+            <MapPin className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="font-bold text-sm">Page location</p>
+            <p className="text-xs text-muted-foreground">
+              Where this page lives in the site structure.
+            </p>
+          </div>
         </div>
-        <select
-          className="flex h-10 rounded-md border border-input bg-background px-3 text-sm min-w-[180px]"
-          value={current}
-          onChange={(e) => {
-            setPageLocation(pageKey, e.target.value);
-            toast.success("Location updated");
-          }}
-        >
-          {sectionGroups.map((g) => (
-            <option key={g.key} value={g.key}>{g.label}</option>
-          ))}
-          <option value="">— Standalone route —</option>
-        </select>
+        <Select value={current || "__standalone"} onValueChange={(v) => {
+          setPageLocation(pageKey, v === "__standalone" ? "" : v);
+          toast.success("Location updated");
+        }}>
+          <SelectTrigger className="w-full sm:w-[220px] h-10 bg-background">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {sectionGroups.map((g) => (
+              <SelectItem key={g.key} value={g.key}>
+                <span className="inline-flex items-center gap-2">
+                  {g.isHome ? <Home className="h-3.5 w-3.5" /> : <Layers className="h-3.5 w-3.5" />}
+                  {g.label}
+                </span>
+              </SelectItem>
+            ))}
+            <SelectItem value="__standalone">
+              <span className="inline-flex items-center gap-2"><Globe className="h-3.5 w-3.5" /> Standalone route</span>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </Card>
     );
   };
