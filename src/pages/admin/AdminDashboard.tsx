@@ -273,136 +273,158 @@ const AdminDashboard = () => {
       );
     }
 
-    if (activePage === "hero") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="hero" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Hero section</h3>
-            <Input placeholder="Eyebrow" value={content.heroEyebrow} onChange={(e) => updateContent({ heroEyebrow: e.target.value })} />
-            <Input placeholder="Headline" value={content.heroHeadline} onChange={(e) => updateContent({ heroHeadline: e.target.value })} />
-            <Textarea rows={3} placeholder="Tagline" value={content.heroTagline} onChange={(e) => updateContent({ heroTagline: e.target.value })} />
-            <ImageUpload label="Hero image" value={content.heroImage} onChange={(v) => updateContent({ heroImage: v })} aspect="aspect-square" altValue={content.heroImageAlt} onAltChange={(v) => updateContent({ heroImageAlt: v })} />
-          </Card>
-          <SeoBlock pageKey="hero" />
+    const SectionHeader = ({ icon: Icon, title, subtitle, action }: { icon: any; title: string; subtitle: string; action?: React.ReactNode }) => (
+      <div className="flex items-center justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
+            <Icon className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="font-bold leading-tight">{title}</h3>
+            <p className="text-xs text-muted-foreground">{subtitle}</p>
+          </div>
         </div>
-      );
-    }
-    if (activePage === "services") {
+        {action}
+      </div>
+    );
+
+    const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+      <div>
+        <label className="text-xs font-semibold mb-1.5 block text-foreground/80">{label}</label>
+        {children}
+      </div>
+    );
+
+    const builtInPages: Record<string, { icon: any; title: string; subtitle: string; fields: { label: string; key: string; multiline?: boolean }[]; image?: { label: string; key: string; altKey: string; aspect: string } }> = {
+      hero: {
+        icon: Sparkles, title: "Hero section", subtitle: "Top-of-page headline and intro",
+        fields: [
+          { label: "Eyebrow", key: "heroEyebrow" },
+          { label: "Headline", key: "heroHeadline" },
+          { label: "Tagline", key: "heroTagline", multiline: true },
+        ],
+        image: { label: "Hero image", key: "heroImage", altKey: "heroImageAlt", aspect: "aspect-square" },
+      },
+      services: {
+        icon: Layers, title: "Services section", subtitle: "What we offer",
+        fields: [
+          { label: "Title", key: "servicesTitle" },
+          { label: "Intro", key: "servicesBlurb", multiline: true },
+        ],
+        image: { label: "Section image", key: "servicesImage", altKey: "servicesImageAlt", aspect: "aspect-[16/9]" },
+      },
+      about: {
+        icon: Users, title: "About section", subtitle: "Who we are",
+        fields: [
+          { label: "Headline", key: "aboutHeadline" },
+          { label: "Blurb", key: "aboutBlurb", multiline: true },
+        ],
+        image: { label: "About image", key: "aboutImage", altKey: "aboutImageAlt", aspect: "aspect-square" },
+      },
+      portfolio: {
+        icon: ImgIcon, title: "Portfolio section", subtitle: "Recent work intro",
+        fields: [
+          { label: "Title", key: "portfolioTitle" },
+          { label: "Blurb", key: "portfolioBlurb", multiline: true },
+        ],
+        image: { label: "Section image", key: "portfolioImage", altKey: "portfolioImageAlt", aspect: "aspect-[16/9]" },
+      },
+      blog: {
+        icon: FileText, title: "Blog section copy", subtitle: "Intro shown above blog cards",
+        fields: [
+          { label: "Title", key: "blogTitle" },
+          { label: "Blurb", key: "blogBlurb", multiline: true },
+        ],
+        image: { label: "Section image", key: "blogImage", altKey: "blogImageAlt", aspect: "aspect-[16/9]" },
+      },
+      testimonials: {
+        icon: Sparkles, title: "Testimonials", subtitle: "What clients say",
+        fields: [{ label: "Title", key: "testimonialsTitle" }],
+        image: { label: "Section image", key: "testimonialsImage", altKey: "testimonialsImageAlt", aspect: "aspect-[16/9]" },
+      },
+      contact: {
+        icon: Phone, title: "Contact section", subtitle: "Form intro and headline",
+        fields: [
+          { label: "Headline", key: "contactHeadline" },
+          { label: "Blurb", key: "contactBlurb", multiline: true },
+        ],
+        image: { label: "Section image", key: "contactImage", altKey: "contactImageAlt", aspect: "aspect-[16/9]" },
+      },
+    };
+
+    if (builtInPages[activePage]) {
+      const cfg = builtInPages[activePage];
+      const c: any = content;
       return (
         <div className="space-y-4">
-          <LocationSelector pageKey="services" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Services section</h3>
-            <Input placeholder="Title" value={content.servicesTitle} onChange={(e) => updateContent({ servicesTitle: e.target.value })} />
-            <Textarea rows={3} placeholder="Intro" value={content.servicesBlurb} onChange={(e) => updateContent({ servicesBlurb: e.target.value })} />
-            <ImageUpload label="Section image" value={content.servicesImage} onChange={(v) => updateContent({ servicesImage: v })} aspect="aspect-[16/9]" altValue={content.servicesImageAlt} onAltChange={(v) => updateContent({ servicesImageAlt: v })} />
-          </Card>
-          <SeoBlock pageKey="services" />
-        </div>
-      );
-    }
-    if (activePage === "about") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="about" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">About section</h3>
-            <Input placeholder="Headline" value={content.aboutHeadline} onChange={(e) => updateContent({ aboutHeadline: e.target.value })} />
-            <Textarea rows={3} placeholder="Blurb" value={content.aboutBlurb} onChange={(e) => updateContent({ aboutBlurb: e.target.value })} />
-            <ImageUpload label="About image" value={content.aboutImage} onChange={(v) => updateContent({ aboutImage: v })} aspect="aspect-square" altValue={content.aboutImageAlt} onAltChange={(v) => updateContent({ aboutImageAlt: v })} />
-          </Card>
-          <SeoBlock pageKey="about" />
-        </div>
-      );
-    }
-    if (activePage === "portfolio") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="portfolio" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Portfolio section</h3>
-            <Input placeholder="Title" value={content.portfolioTitle} onChange={(e) => updateContent({ portfolioTitle: e.target.value })} />
-            <Textarea rows={3} placeholder="Blurb" value={content.portfolioBlurb} onChange={(e) => updateContent({ portfolioBlurb: e.target.value })} />
-            <ImageUpload label="Section image" value={content.portfolioImage} onChange={(v) => updateContent({ portfolioImage: v })} aspect="aspect-[16/9]" altValue={content.portfolioImageAlt} onAltChange={(v) => updateContent({ portfolioImageAlt: v })} />
-          </Card>
-          <Card className="p-5 sm:p-6 space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="font-bold">Portfolio items</h4>
-              <Button variant="hero" size="sm" onClick={() => addPortfolioItem({ image: "", imageAlt: "", tag: "New tag", title: "New project" })}>
-                <Plus className="h-4 w-4" /> Add item
-              </Button>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {portfolio.map((it) => (
-                <Card key={it.id} className="p-4 space-y-3 bg-secondary/30">
-                  <ImageUpload label="Cover image" value={it.image} onChange={(v) => updatePortfolioItem(it.id, { image: v })} aspect="aspect-[4/3]" altValue={it.imageAlt} onAltChange={(v) => updatePortfolioItem(it.id, { imageAlt: v })} />
-                  <Input value={it.tag} onChange={(e) => updatePortfolioItem(it.id, { tag: e.target.value })} placeholder="Tag" />
-                  <Input value={it.title} onChange={(e) => updatePortfolioItem(it.id, { title: e.target.value })} placeholder="Title" />
-                  <Button variant="outline" size="sm" className="w-full" onClick={() => { deletePortfolioItem(it.id); toast.success("Removed"); }}>
-                    <Trash2 className="h-4 w-4 text-destructive" /> Remove
-                  </Button>
-                </Card>
+          <LocationSelector pageKey={activePage} />
+          <Card className="p-5 sm:p-6 space-y-5">
+            <SectionHeader icon={cfg.icon} title={cfg.title} subtitle={cfg.subtitle} />
+            <div className="space-y-4">
+              {cfg.fields.map((f) => (
+                <Field key={f.key} label={f.label}>
+                  {f.multiline
+                    ? <Textarea rows={3} value={c[f.key]} onChange={(e) => updateContent({ [f.key]: e.target.value } as any)} />
+                    : <Input value={c[f.key]} onChange={(e) => updateContent({ [f.key]: e.target.value } as any)} />}
+                </Field>
               ))}
+              {cfg.image && (
+                <ImageUpload
+                  label={cfg.image.label}
+                  value={c[cfg.image.key]}
+                  onChange={(v) => updateContent({ [cfg.image!.key]: v } as any)}
+                  aspect={cfg.image.aspect}
+                  altValue={c[cfg.image.altKey]}
+                  onAltChange={(v) => updateContent({ [cfg.image!.altKey]: v } as any)}
+                />
+              )}
             </div>
           </Card>
-          <SeoBlock pageKey="portfolio" />
+          {activePage === "portfolio" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader
+                icon={ImgIcon}
+                title="Portfolio items"
+                subtitle={`${portfolio.length} item${portfolio.length === 1 ? "" : "s"}`}
+                action={
+                  <Button variant="hero" size="sm" onClick={() => addPortfolioItem({ image: "", imageAlt: "", tag: "New tag", title: "New project" })}>
+                    <Plus className="h-4 w-4" /> Add item
+                  </Button>
+                }
+              />
+              <div className="grid sm:grid-cols-2 gap-4">
+                {portfolio.map((it) => (
+                  <Card key={it.id} className="p-4 space-y-3 bg-secondary/30">
+                    <ImageUpload label="Cover image" value={it.image} onChange={(v) => updatePortfolioItem(it.id, { image: v })} aspect="aspect-[4/3]" altValue={it.imageAlt} onAltChange={(v) => updatePortfolioItem(it.id, { imageAlt: v })} />
+                    <Input value={it.tag} onChange={(e) => updatePortfolioItem(it.id, { tag: e.target.value })} placeholder="Tag" />
+                    <Input value={it.title} onChange={(e) => updatePortfolioItem(it.id, { title: e.target.value })} placeholder="Title" />
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => { deletePortfolioItem(it.id); toast.success("Removed"); }}>
+                      <Trash2 className="h-4 w-4 text-destructive" /> Remove
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+            </Card>
+          )}
+          {activePage === "contact" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader icon={Phone} title="Contact details" subtitle="Visible across the site" />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="WhatsApp digits"><Input value={contact.whatsapp} onChange={(e) => updateContact({ whatsapp: e.target.value.replace(/[^0-9]/g, "") })} /></Field>
+                <Field label="Phone display"><Input value={contact.phoneDisplay} onChange={(e) => updateContact({ phoneDisplay: e.target.value })} /></Field>
+                <Field label="Phone tel"><Input value={contact.phoneTel} onChange={(e) => updateContact({ phoneTel: e.target.value })} /></Field>
+                <Field label="Email"><Input type="email" value={contact.email} onChange={(e) => updateContact({ email: e.target.value })} /></Field>
+                <Field label="Facebook URL"><Input value={contact.facebook} onChange={(e) => updateContact({ facebook: e.target.value })} /></Field>
+                <Field label="Instagram URL"><Input value={contact.instagram} onChange={(e) => updateContact({ instagram: e.target.value })} /></Field>
+                <div className="sm:col-span-2"><Field label="Address"><Input value={contact.address} onChange={(e) => updateContact({ address: e.target.value })} /></Field></div>
+              </div>
+            </Card>
+          )}
+          <SeoBlock pageKey={activePage} />
         </div>
       );
     }
-    if (activePage === "blog") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="blog" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Blog section copy</h3>
-            <Input placeholder="Title" value={content.blogTitle} onChange={(e) => updateContent({ blogTitle: e.target.value })} />
-            <Textarea rows={3} placeholder="Blurb" value={content.blogBlurb} onChange={(e) => updateContent({ blogBlurb: e.target.value })} />
-            <ImageUpload label="Section image" value={content.blogImage} onChange={(v) => updateContent({ blogImage: v })} aspect="aspect-[16/9]" altValue={content.blogImageAlt} onAltChange={(v) => updateContent({ blogImageAlt: v })} />
-          </Card>
-          <SeoBlock pageKey="blog" />
-        </div>
-      );
-    }
-    if (activePage === "testimonials") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="testimonials" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Testimonials</h3>
-            <Input placeholder="Title" value={content.testimonialsTitle} onChange={(e) => updateContent({ testimonialsTitle: e.target.value })} />
-            <ImageUpload label="Section image" value={content.testimonialsImage} onChange={(v) => updateContent({ testimonialsImage: v })} aspect="aspect-[16/9]" altValue={content.testimonialsImageAlt} onAltChange={(v) => updateContent({ testimonialsImageAlt: v })} />
-          </Card>
-          <SeoBlock pageKey="testimonials" />
-        </div>
-      );
-    }
-    if (activePage === "contact") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="contact" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Contact section</h3>
-            <Input placeholder="Headline" value={content.contactHeadline} onChange={(e) => updateContent({ contactHeadline: e.target.value })} />
-            <Textarea rows={3} placeholder="Blurb" value={content.contactBlurb} onChange={(e) => updateContent({ contactBlurb: e.target.value })} />
-            <ImageUpload label="Section image" value={content.contactImage} onChange={(v) => updateContent({ contactImage: v })} aspect="aspect-[16/9]" altValue={content.contactImageAlt} onAltChange={(v) => updateContent({ contactImageAlt: v })} />
-          </Card>
-          <Card className="p-5 sm:p-6 space-y-4">
-            <h3 className="font-bold flex items-center gap-2"><Phone className="h-4 w-4" /> Contact details</h3>
-            <div className="grid sm:grid-cols-2 gap-3">
-              <Input placeholder="WhatsApp digits" value={contact.whatsapp} onChange={(e) => updateContact({ whatsapp: e.target.value.replace(/[^0-9]/g, "") })} />
-              <Input placeholder="Phone display" value={contact.phoneDisplay} onChange={(e) => updateContact({ phoneDisplay: e.target.value })} />
-              <Input placeholder="Phone tel" value={contact.phoneTel} onChange={(e) => updateContact({ phoneTel: e.target.value })} />
-              <Input type="email" placeholder="Email" value={contact.email} onChange={(e) => updateContact({ email: e.target.value })} />
-              <Input placeholder="Facebook URL" value={contact.facebook} onChange={(e) => updateContact({ facebook: e.target.value })} />
-              <Input placeholder="Instagram URL" value={contact.instagram} onChange={(e) => updateContact({ instagram: e.target.value })} />
-              <Input className="sm:col-span-2" placeholder="Address" value={contact.address} onChange={(e) => updateContact({ address: e.target.value })} />
-            </div>
-          </Card>
-          <SeoBlock pageKey="contact" />
-        </div>
-      );
-    }
+
     if (activePage.startsWith("homesec:")) {
       const id = activePage.slice(8);
       const sec = homeSections.find((x) => x.id === id);
