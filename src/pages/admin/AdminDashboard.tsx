@@ -10,8 +10,11 @@ import {
   LogOut, Users, FileText, Settings, Eye, MousePointerClick, TrendingUp, Plus, Trash2, Pencil,
   Save, X, Home, Search, Type, Copy, Phone, RefreshCw, Download, Image as ImageIcon, Bot,
   FolderOpen, FolderX, ArrowRight, Check, Code2, Link2, Monitor, Tablet, Smartphone, Layout,
-  Sparkles, FileCog,
+  Sparkles, FileCog, ChevronRight, Layers, Globe, MapPin, FileEdit, Image as ImgIcon,
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { BlogPost } from "@/data/blog";
@@ -117,26 +120,39 @@ const AdminDashboard = () => {
   const LocationSelector = ({ pageKey, optional = false }: { pageKey: string; optional?: boolean }) => {
     const current = pageLocation[pageKey] ?? (optional ? "" : "home");
     return (
-      <Card className="p-4 sm:p-5 flex items-center justify-between gap-3 flex-wrap bg-secondary/40">
-        <div>
-          <p className="font-bold text-sm">Location</p>
-          <p className="text-xs text-muted-foreground">
-            Choose which section group this page belongs to. {optional && "Leave as Standalone for a direct URL only."}
-          </p>
+      <Card className="p-4 sm:p-5 flex items-start sm:items-center justify-between gap-3 flex-col sm:flex-row bg-gradient-to-br from-secondary/40 to-secondary/10 border-dashed">
+        <div className="flex items-start gap-3">
+          <div className="h-9 w-9 rounded-lg bg-accent/15 text-accent grid place-items-center shrink-0">
+            <MapPin className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="font-bold text-sm">Page location</p>
+            <p className="text-xs text-muted-foreground">
+              Where this page lives in the site structure.
+            </p>
+          </div>
         </div>
-        <select
-          className="flex h-10 rounded-md border border-input bg-background px-3 text-sm min-w-[180px]"
-          value={current}
-          onChange={(e) => {
-            setPageLocation(pageKey, e.target.value);
-            toast.success("Location updated");
-          }}
-        >
-          {sectionGroups.map((g) => (
-            <option key={g.key} value={g.key}>{g.label}</option>
-          ))}
-          <option value="">— Standalone route —</option>
-        </select>
+        <Select value={current || "__standalone"} onValueChange={(v) => {
+          setPageLocation(pageKey, v === "__standalone" ? "" : v);
+          toast.success("Location updated");
+        }}>
+          <SelectTrigger className="w-full sm:w-[220px] h-10 bg-background">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {sectionGroups.map((g) => (
+              <SelectItem key={g.key} value={g.key}>
+                <span className="inline-flex items-center gap-2">
+                  {g.isHome ? <Home className="h-3.5 w-3.5" /> : <Layers className="h-3.5 w-3.5" />}
+                  {g.label}
+                </span>
+              </SelectItem>
+            ))}
+            <SelectItem value="__standalone">
+              <span className="inline-flex items-center gap-2"><Globe className="h-3.5 w-3.5" /> Standalone route</span>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </Card>
     );
   };
@@ -180,55 +196,72 @@ const AdminDashboard = () => {
       const cpSeoKey = `custom:${cp.id}`;
       return (
         <div className="space-y-4">
-          <Card className="p-5 sm:p-6 space-y-4">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <h3 className="font-bold flex items-center gap-2"><FileCog className="h-4 w-4" /> Page settings</h3>
-              <div className="flex gap-2">
+          <Card className="p-5 sm:p-6 space-y-5">
+            <div className="flex items-center justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
+                  <FileCog className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold leading-tight">Page settings</h3>
+                  <p className="text-xs text-muted-foreground">Title, URL & visibility</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
                 <Switch checked={cp.published} onCheckedChange={(v) => updateCustomPage(cp.id, { published: v })} />
-                <span className="text-sm">{cp.published ? "Published" : "Draft"}</span>
+                <span className="text-sm font-medium">{cp.published ? "Published" : "Draft"}</span>
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 gap-3">
+            <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-medium mb-1 block">Page title</label>
+                <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Page title</label>
                 <Input value={cp.title} onChange={(e) => updateCustomPage(cp.id, { title: e.target.value })} />
               </div>
               <div>
-                <label className="text-xs font-medium mb-1 block">URL slug</label>
+                <label className="text-xs font-semibold mb-1.5 block text-foreground/80">URL slug</label>
                 <Input value={cp.slug} onChange={(e) => updateCustomPage(cp.id, { slug: e.target.value.replace(/[^a-z0-9-/]/gi, "-").toLowerCase() })} />
               </div>
               <div>
-                <label className="text-xs font-medium mb-1 block">Parent page</label>
-                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  value={cp.parent} onChange={(e) => updateCustomPage(cp.id, { parent: e.target.value })}>
-                  {parentOptions.map((o) => <option key={o || "_root"} value={o}>{o || "— Root —"}</option>)}
-                </select>
+                <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Parent page</label>
+                <Select value={cp.parent || "__root"} onValueChange={(v) => updateCustomPage(cp.id, { parent: v === "__root" ? "" : v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__root">— Root —</SelectItem>
+                    {parentOptions.filter(Boolean).map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
-                <label className="text-xs font-medium mb-1 block">Show in</label>
-                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  value={cp.navLocation} onChange={(e) => updateCustomPage(cp.id, { navLocation: e.target.value as any })}>
-                  <option value="navbar">Top navbar</option>
-                  <option value="menu">3-dot menu</option>
-                  <option value="none">Hidden (direct URL only)</option>
-                </select>
+                <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Show in</label>
+                <Select value={cp.navLocation} onValueChange={(v) => updateCustomPage(cp.id, { navLocation: v as any })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="navbar">Top navbar</SelectItem>
+                    <SelectItem value="menu">3-dot menu</SelectItem>
+                    <SelectItem value="none">Hidden (direct URL only)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div>
-                <label className="text-xs font-medium mb-1 block">Section group (optional)</label>
-                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  value={cp.groupKey ?? ""} onChange={(e) => updateCustomPage(cp.id, { groupKey: e.target.value })}>
-                  <option value="">— Standalone route —</option>
-                  {sectionGroups.map((g) => <option key={g.key} value={g.key}>{g.label}</option>)}
-                </select>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Section group</label>
+                <Select value={cp.groupKey || "__standalone"} onValueChange={(v) => updateCustomPage(cp.id, { groupKey: v === "__standalone" ? "" : v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__standalone">— Standalone route —</SelectItem>
+                    {sectionGroups.map((g) => <SelectItem key={g.key} value={g.key}>{g.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">Final URL: <span className="font-mono">{seo.canonicalUrl}/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span></p>
+            <div className="rounded-lg bg-secondary/40 px-3 py-2 text-xs text-muted-foreground">
+              Final URL: <span className="font-mono text-foreground">{seo.canonicalUrl}/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span>
+            </div>
             <ImageUpload label="Page image" value={cp.image} onChange={(v) => updateCustomPage(cp.id, { image: v })} aspect="aspect-[16/9]" altValue={cp.imageAlt} onAltChange={(v) => updateCustomPage(cp.id, { imageAlt: v })} />
             <div>
-              <label className="text-xs font-medium mb-1 block">Body content</label>
+              <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Body content</label>
               <Textarea rows={6} value={cp.body} onChange={(e) => updateCustomPage(cp.id, { body: e.target.value })} />
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteCustomPage(cp.id); setActivePage("hero"); toast.success("Page deleted"); }}>
                 <Trash2 className="h-4 w-4 text-destructive" /> Delete page
               </Button>
@@ -240,154 +273,180 @@ const AdminDashboard = () => {
       );
     }
 
-    if (activePage === "hero") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="hero" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Hero section</h3>
-            <Input placeholder="Eyebrow" value={content.heroEyebrow} onChange={(e) => updateContent({ heroEyebrow: e.target.value })} />
-            <Input placeholder="Headline" value={content.heroHeadline} onChange={(e) => updateContent({ heroHeadline: e.target.value })} />
-            <Textarea rows={3} placeholder="Tagline" value={content.heroTagline} onChange={(e) => updateContent({ heroTagline: e.target.value })} />
-            <ImageUpload label="Hero image" value={content.heroImage} onChange={(v) => updateContent({ heroImage: v })} aspect="aspect-square" altValue={content.heroImageAlt} onAltChange={(v) => updateContent({ heroImageAlt: v })} />
-          </Card>
-          <SeoBlock pageKey="hero" />
+    const SectionHeader = ({ icon: Icon, title, subtitle, action }: { icon: any; title: string; subtitle: string; action?: React.ReactNode }) => (
+      <div className="flex items-center justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
+            <Icon className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="font-bold leading-tight">{title}</h3>
+            <p className="text-xs text-muted-foreground">{subtitle}</p>
+          </div>
         </div>
-      );
-    }
-    if (activePage === "services") {
+        {action}
+      </div>
+    );
+
+    const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+      <div>
+        <label className="text-xs font-semibold mb-1.5 block text-foreground/80">{label}</label>
+        {children}
+      </div>
+    );
+
+    const builtInPages: Record<string, { icon: any; title: string; subtitle: string; fields: { label: string; key: string; multiline?: boolean }[]; image?: { label: string; key: string; altKey: string; aspect: string } }> = {
+      hero: {
+        icon: Sparkles, title: "Hero section", subtitle: "Top-of-page headline and intro",
+        fields: [
+          { label: "Eyebrow", key: "heroEyebrow" },
+          { label: "Headline", key: "heroHeadline" },
+          { label: "Tagline", key: "heroTagline", multiline: true },
+        ],
+        image: { label: "Hero image", key: "heroImage", altKey: "heroImageAlt", aspect: "aspect-square" },
+      },
+      services: {
+        icon: Layers, title: "Services section", subtitle: "What we offer",
+        fields: [
+          { label: "Title", key: "servicesTitle" },
+          { label: "Intro", key: "servicesBlurb", multiline: true },
+        ],
+        image: { label: "Section image", key: "servicesImage", altKey: "servicesImageAlt", aspect: "aspect-[16/9]" },
+      },
+      about: {
+        icon: Users, title: "About section", subtitle: "Who we are",
+        fields: [
+          { label: "Headline", key: "aboutHeadline" },
+          { label: "Blurb", key: "aboutBlurb", multiline: true },
+        ],
+        image: { label: "About image", key: "aboutImage", altKey: "aboutImageAlt", aspect: "aspect-square" },
+      },
+      portfolio: {
+        icon: ImgIcon, title: "Portfolio section", subtitle: "Recent work intro",
+        fields: [
+          { label: "Title", key: "portfolioTitle" },
+          { label: "Blurb", key: "portfolioBlurb", multiline: true },
+        ],
+        image: { label: "Section image", key: "portfolioImage", altKey: "portfolioImageAlt", aspect: "aspect-[16/9]" },
+      },
+      blog: {
+        icon: FileText, title: "Blog section copy", subtitle: "Intro shown above blog cards",
+        fields: [
+          { label: "Title", key: "blogTitle" },
+          { label: "Blurb", key: "blogBlurb", multiline: true },
+        ],
+        image: { label: "Section image", key: "blogImage", altKey: "blogImageAlt", aspect: "aspect-[16/9]" },
+      },
+      testimonials: {
+        icon: Sparkles, title: "Testimonials", subtitle: "What clients say",
+        fields: [{ label: "Title", key: "testimonialsTitle" }],
+        image: { label: "Section image", key: "testimonialsImage", altKey: "testimonialsImageAlt", aspect: "aspect-[16/9]" },
+      },
+      contact: {
+        icon: Phone, title: "Contact section", subtitle: "Form intro and headline",
+        fields: [
+          { label: "Headline", key: "contactHeadline" },
+          { label: "Blurb", key: "contactBlurb", multiline: true },
+        ],
+        image: { label: "Section image", key: "contactImage", altKey: "contactImageAlt", aspect: "aspect-[16/9]" },
+      },
+    };
+
+    if (builtInPages[activePage]) {
+      const cfg = builtInPages[activePage];
+      const c: any = content;
       return (
         <div className="space-y-4">
-          <LocationSelector pageKey="services" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Services section</h3>
-            <Input placeholder="Title" value={content.servicesTitle} onChange={(e) => updateContent({ servicesTitle: e.target.value })} />
-            <Textarea rows={3} placeholder="Intro" value={content.servicesBlurb} onChange={(e) => updateContent({ servicesBlurb: e.target.value })} />
-            <ImageUpload label="Section image" value={content.servicesImage} onChange={(v) => updateContent({ servicesImage: v })} aspect="aspect-[16/9]" altValue={content.servicesImageAlt} onAltChange={(v) => updateContent({ servicesImageAlt: v })} />
-          </Card>
-          <SeoBlock pageKey="services" />
-        </div>
-      );
-    }
-    if (activePage === "about") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="about" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">About section</h3>
-            <Input placeholder="Headline" value={content.aboutHeadline} onChange={(e) => updateContent({ aboutHeadline: e.target.value })} />
-            <Textarea rows={3} placeholder="Blurb" value={content.aboutBlurb} onChange={(e) => updateContent({ aboutBlurb: e.target.value })} />
-            <ImageUpload label="About image" value={content.aboutImage} onChange={(v) => updateContent({ aboutImage: v })} aspect="aspect-square" altValue={content.aboutImageAlt} onAltChange={(v) => updateContent({ aboutImageAlt: v })} />
-          </Card>
-          <SeoBlock pageKey="about" />
-        </div>
-      );
-    }
-    if (activePage === "portfolio") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="portfolio" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Portfolio section</h3>
-            <Input placeholder="Title" value={content.portfolioTitle} onChange={(e) => updateContent({ portfolioTitle: e.target.value })} />
-            <Textarea rows={3} placeholder="Blurb" value={content.portfolioBlurb} onChange={(e) => updateContent({ portfolioBlurb: e.target.value })} />
-            <ImageUpload label="Section image" value={content.portfolioImage} onChange={(v) => updateContent({ portfolioImage: v })} aspect="aspect-[16/9]" altValue={content.portfolioImageAlt} onAltChange={(v) => updateContent({ portfolioImageAlt: v })} />
-          </Card>
-          <Card className="p-5 sm:p-6 space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="font-bold">Portfolio items</h4>
-              <Button variant="hero" size="sm" onClick={() => addPortfolioItem({ image: "", imageAlt: "", tag: "New tag", title: "New project" })}>
-                <Plus className="h-4 w-4" /> Add item
-              </Button>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {portfolio.map((it) => (
-                <Card key={it.id} className="p-4 space-y-3 bg-secondary/30">
-                  <ImageUpload label="Cover image" value={it.image} onChange={(v) => updatePortfolioItem(it.id, { image: v })} aspect="aspect-[4/3]" altValue={it.imageAlt} onAltChange={(v) => updatePortfolioItem(it.id, { imageAlt: v })} />
-                  <Input value={it.tag} onChange={(e) => updatePortfolioItem(it.id, { tag: e.target.value })} placeholder="Tag" />
-                  <Input value={it.title} onChange={(e) => updatePortfolioItem(it.id, { title: e.target.value })} placeholder="Title" />
-                  <Button variant="outline" size="sm" className="w-full" onClick={() => { deletePortfolioItem(it.id); toast.success("Removed"); }}>
-                    <Trash2 className="h-4 w-4 text-destructive" /> Remove
-                  </Button>
-                </Card>
+          <LocationSelector pageKey={activePage} />
+          <Card className="p-5 sm:p-6 space-y-5">
+            <SectionHeader icon={cfg.icon} title={cfg.title} subtitle={cfg.subtitle} />
+            <div className="space-y-4">
+              {cfg.fields.map((f) => (
+                <Field key={f.key} label={f.label}>
+                  {f.multiline
+                    ? <Textarea rows={3} value={c[f.key]} onChange={(e) => updateContent({ [f.key]: e.target.value } as any)} />
+                    : <Input value={c[f.key]} onChange={(e) => updateContent({ [f.key]: e.target.value } as any)} />}
+                </Field>
               ))}
+              {cfg.image && (
+                <ImageUpload
+                  label={cfg.image.label}
+                  value={c[cfg.image.key]}
+                  onChange={(v) => updateContent({ [cfg.image!.key]: v } as any)}
+                  aspect={cfg.image.aspect}
+                  altValue={c[cfg.image.altKey]}
+                  onAltChange={(v) => updateContent({ [cfg.image!.altKey]: v } as any)}
+                />
+              )}
             </div>
           </Card>
-          <SeoBlock pageKey="portfolio" />
+          {activePage === "portfolio" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader
+                icon={ImgIcon}
+                title="Portfolio items"
+                subtitle={`${portfolio.length} item${portfolio.length === 1 ? "" : "s"}`}
+                action={
+                  <Button variant="hero" size="sm" onClick={() => addPortfolioItem({ image: "", imageAlt: "", tag: "New tag", title: "New project" })}>
+                    <Plus className="h-4 w-4" /> Add item
+                  </Button>
+                }
+              />
+              <div className="grid sm:grid-cols-2 gap-4">
+                {portfolio.map((it) => (
+                  <Card key={it.id} className="p-4 space-y-3 bg-secondary/30">
+                    <ImageUpload label="Cover image" value={it.image} onChange={(v) => updatePortfolioItem(it.id, { image: v })} aspect="aspect-[4/3]" altValue={it.imageAlt} onAltChange={(v) => updatePortfolioItem(it.id, { imageAlt: v })} />
+                    <Input value={it.tag} onChange={(e) => updatePortfolioItem(it.id, { tag: e.target.value })} placeholder="Tag" />
+                    <Input value={it.title} onChange={(e) => updatePortfolioItem(it.id, { title: e.target.value })} placeholder="Title" />
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => { deletePortfolioItem(it.id); toast.success("Removed"); }}>
+                      <Trash2 className="h-4 w-4 text-destructive" /> Remove
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+            </Card>
+          )}
+          {activePage === "contact" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader icon={Phone} title="Contact details" subtitle="Visible across the site" />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="WhatsApp digits"><Input value={contact.whatsapp} onChange={(e) => updateContact({ whatsapp: e.target.value.replace(/[^0-9]/g, "") })} /></Field>
+                <Field label="Phone display"><Input value={contact.phoneDisplay} onChange={(e) => updateContact({ phoneDisplay: e.target.value })} /></Field>
+                <Field label="Phone tel"><Input value={contact.phoneTel} onChange={(e) => updateContact({ phoneTel: e.target.value })} /></Field>
+                <Field label="Email"><Input type="email" value={contact.email} onChange={(e) => updateContact({ email: e.target.value })} /></Field>
+                <Field label="Facebook URL"><Input value={contact.facebook} onChange={(e) => updateContact({ facebook: e.target.value })} /></Field>
+                <Field label="Instagram URL"><Input value={contact.instagram} onChange={(e) => updateContact({ instagram: e.target.value })} /></Field>
+                <div className="sm:col-span-2"><Field label="Address"><Input value={contact.address} onChange={(e) => updateContact({ address: e.target.value })} /></Field></div>
+              </div>
+            </Card>
+          )}
+          <SeoBlock pageKey={activePage} />
         </div>
       );
     }
-    if (activePage === "blog") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="blog" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Blog section copy</h3>
-            <Input placeholder="Title" value={content.blogTitle} onChange={(e) => updateContent({ blogTitle: e.target.value })} />
-            <Textarea rows={3} placeholder="Blurb" value={content.blogBlurb} onChange={(e) => updateContent({ blogBlurb: e.target.value })} />
-            <ImageUpload label="Section image" value={content.blogImage} onChange={(v) => updateContent({ blogImage: v })} aspect="aspect-[16/9]" altValue={content.blogImageAlt} onAltChange={(v) => updateContent({ blogImageAlt: v })} />
-          </Card>
-          <SeoBlock pageKey="blog" />
-        </div>
-      );
-    }
-    if (activePage === "testimonials") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="testimonials" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Testimonials</h3>
-            <Input placeholder="Title" value={content.testimonialsTitle} onChange={(e) => updateContent({ testimonialsTitle: e.target.value })} />
-            <ImageUpload label="Section image" value={content.testimonialsImage} onChange={(v) => updateContent({ testimonialsImage: v })} aspect="aspect-[16/9]" altValue={content.testimonialsImageAlt} onAltChange={(v) => updateContent({ testimonialsImageAlt: v })} />
-          </Card>
-          <SeoBlock pageKey="testimonials" />
-        </div>
-      );
-    }
-    if (activePage === "contact") {
-      return (
-        <div className="space-y-4">
-          <LocationSelector pageKey="contact" />
-          <Card className="p-5 sm:p-6 space-y-3">
-            <h3 className="font-bold">Contact section</h3>
-            <Input placeholder="Headline" value={content.contactHeadline} onChange={(e) => updateContent({ contactHeadline: e.target.value })} />
-            <Textarea rows={3} placeholder="Blurb" value={content.contactBlurb} onChange={(e) => updateContent({ contactBlurb: e.target.value })} />
-            <ImageUpload label="Section image" value={content.contactImage} onChange={(v) => updateContent({ contactImage: v })} aspect="aspect-[16/9]" altValue={content.contactImageAlt} onAltChange={(v) => updateContent({ contactImageAlt: v })} />
-          </Card>
-          <Card className="p-5 sm:p-6 space-y-4">
-            <h3 className="font-bold flex items-center gap-2"><Phone className="h-4 w-4" /> Contact details</h3>
-            <div className="grid sm:grid-cols-2 gap-3">
-              <Input placeholder="WhatsApp digits" value={contact.whatsapp} onChange={(e) => updateContact({ whatsapp: e.target.value.replace(/[^0-9]/g, "") })} />
-              <Input placeholder="Phone display" value={contact.phoneDisplay} onChange={(e) => updateContact({ phoneDisplay: e.target.value })} />
-              <Input placeholder="Phone tel" value={contact.phoneTel} onChange={(e) => updateContact({ phoneTel: e.target.value })} />
-              <Input type="email" placeholder="Email" value={contact.email} onChange={(e) => updateContact({ email: e.target.value })} />
-              <Input placeholder="Facebook URL" value={contact.facebook} onChange={(e) => updateContact({ facebook: e.target.value })} />
-              <Input placeholder="Instagram URL" value={contact.instagram} onChange={(e) => updateContact({ instagram: e.target.value })} />
-              <Input className="sm:col-span-2" placeholder="Address" value={contact.address} onChange={(e) => updateContact({ address: e.target.value })} />
-            </div>
-          </Card>
-          <SeoBlock pageKey="contact" />
-        </div>
-      );
-    }
+
     if (activePage.startsWith("homesec:")) {
       const id = activePage.slice(8);
       const sec = homeSections.find((x) => x.id === id);
       if (!sec) return <p className="text-sm text-muted-foreground">Section not found.</p>;
       return (
         <div className="space-y-4">
-          <Card className="p-5 sm:p-6 space-y-3">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <h3 className="font-bold">Custom home section</h3>
-              <div className="flex items-center gap-2">
-                <Switch checked={sec.enabled} onCheckedChange={(v) => updateHomeSection(sec.id, { enabled: v })} />
-                <span className="text-sm">{sec.enabled ? "Visible" : "Hidden"}</span>
-              </div>
-            </div>
-            <Input placeholder="Section title" value={sec.title} onChange={(e) => updateHomeSection(sec.id, { title: e.target.value })} />
-            <Textarea rows={4} placeholder="Section content / body" value={sec.body} onChange={(e) => updateHomeSection(sec.id, { body: e.target.value })} />
+          <Card className="p-5 sm:p-6 space-y-5">
+            <SectionHeader
+              icon={FileEdit}
+              title="Custom home section"
+              subtitle="Free-form content block"
+              action={
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
+                  <Switch checked={sec.enabled} onCheckedChange={(v) => updateHomeSection(sec.id, { enabled: v })} />
+                  <span className="text-sm font-medium">{sec.enabled ? "Visible" : "Hidden"}</span>
+                </div>
+              }
+            />
+            <Field label="Section title"><Input value={sec.title} onChange={(e) => updateHomeSection(sec.id, { title: e.target.value })} /></Field>
+            <Field label="Section content"><Textarea rows={4} value={sec.body} onChange={(e) => updateHomeSection(sec.id, { body: e.target.value })} /></Field>
             <ImageUpload label="Section image" value={sec.image} onChange={(v) => updateHomeSection(sec.id, { image: v })} aspect="aspect-[16/9]" altValue={sec.imageAlt} onAltChange={(v) => updateHomeSection(sec.id, { imageAlt: v })} />
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteHomeSection(sec.id); setActivePage("home"); toast.success("Section removed"); }}>
                 <Trash2 className="h-4 w-4 text-destructive" /> Delete section
               </Button>
@@ -399,20 +458,40 @@ const AdminDashboard = () => {
     // Home overview
     return (
       <div className="space-y-4">
-        <Card className="p-5 sm:p-6 space-y-3">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <h3 className="font-bold">Home page</h3>
-              <p className="text-sm text-muted-foreground">All the sections below appear on the homepage. Click any sub-section in the sidebar to edit, or add a brand-new custom section.</p>
-            </div>
-            <Button variant="hero" size="sm" onClick={() => {
-              const id = Date.now().toString();
-              addHomeSection({ title: "New section", body: "", image: "", imageAlt: "", enabled: true });
-              setTimeout(() => setActivePage(`homesec:${id}`), 0);
-              toast.success("Section added");
-            }}>
-              <Plus className="h-4 w-4" /> Add new section
-            </Button>
+        <Card className="p-5 sm:p-6 space-y-4">
+          <SectionHeader
+            icon={Home}
+            title="Pages overview"
+            subtitle="Pick a page from the sidebar to edit, or add a custom block to the homepage."
+            action={
+              <Button variant="hero" size="sm" onClick={() => {
+                const id = Date.now().toString();
+                addHomeSection({ title: "New section", body: "", image: "", imageAlt: "", enabled: true });
+                setTimeout(() => setActivePage(`homesec:${id}`), 0);
+                toast.success("Section added");
+              }}>
+                <Plus className="h-4 w-4" /> Add home block
+              </Button>
+            }
+          />
+          <div className="grid sm:grid-cols-2 gap-3">
+            {SITE_PAGES.map((p) => {
+              const loc = pageLocation[p.key] ?? "home";
+              const grp = sectionGroups.find((g) => g.key === loc);
+              return (
+                <button key={p.key} onClick={() => setActivePage(p.key)}
+                  className="text-left p-3 rounded-lg border border-border hover:border-accent hover:bg-secondary/40 transition-colors flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-secondary grid place-items-center shrink-0">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm truncate">{p.label}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{grp ? grp.label : "Standalone"}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </button>
+              );
+            })}
           </div>
         </Card>
         <SeoBlock pageKey="home" />
@@ -525,11 +604,14 @@ const AdminDashboard = () => {
 
           {/* PAGES */}
           <TabsContent value="pages" className="space-y-6">
-            <div className="grid lg:grid-cols-[260px_1fr] gap-4">
-              <Card className="p-3 h-fit lg:sticky lg:top-20">
-                <div className="flex items-center justify-between mb-2 px-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Section groups</span>
-                  <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => {
+            <div className="grid lg:grid-cols-[280px_1fr] gap-5">
+              <Card className="p-0 h-fit lg:sticky lg:top-20 overflow-hidden">
+                <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Layers className="h-4 w-4 text-accent" />
+                    <span className="text-sm font-bold">Site structure</span>
+                  </div>
+                  <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => {
                     const label = prompt("Section group name?");
                     if (!label) return;
                     const k = addSectionGroup(label);
@@ -539,52 +621,58 @@ const AdminDashboard = () => {
                     <Plus className="h-3.5 w-3.5" /> Group
                   </Button>
                 </div>
-                <ul className="space-y-2">
+
+                <div className="p-2 space-y-1">
                   {sectionGroups.map((grp) => {
                     const isOpen = openGroups[grp.key] ?? false;
                     const builtins = SITE_PAGES.filter((p) => (pageLocation[p.key] ?? "home") === grp.key);
                     const customs = customPages.filter((p) => (p.groupKey ?? "") === grp.key);
                     const homesecs = grp.isHome ? homeSections : homeSections.filter((s) => s.groupKey === grp.key);
+                    const total = builtins.length + customs.length + homesecs.length;
                     return (
-                      <li key={grp.key}>
+                      <Collapsible key={grp.key} open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, [grp.key]: v }))}>
                         <div className="flex items-center gap-1">
-                          <button onClick={() => setOpenGroups((p) => ({ ...p, [grp.key]: !isOpen }))}
-                            className="flex-1 text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center justify-between hover:bg-secondary">
-                            <span>{grp.label}</span>
-                            <ArrowRight className={`h-4 w-4 transition-transform ${isOpen ? "rotate-90" : ""}`} />
-                          </button>
+                          <CollapsibleTrigger className="group flex-1 text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                            <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
+                            {grp.isHome ? <Home className="h-3.5 w-3.5 text-accent" /> : <Layers className="h-3.5 w-3.5 text-accent" />}
+                            <span className="flex-1 truncate">{grp.label}</span>
+                            <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{total}</Badge>
+                          </CollapsibleTrigger>
                           {!grp.isHome && (
                             <button title="Delete group" onClick={() => { if (confirm(`Delete group "${grp.label}"?`)) { deleteSectionGroup(grp.id); toast.success("Group deleted"); } }}
-                              className="h-8 w-8 grid place-items-center rounded-lg hover:bg-secondary text-muted-foreground">
+                              className="h-8 w-8 grid place-items-center rounded-lg hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors">
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
                           )}
                         </div>
-                        {isOpen && (
-                          <ul className="ml-3 pl-3 border-l border-border space-y-1 mt-1">
+                        <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                          <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
                             {builtins.map((p) => (
                               <li key={p.key}>
                                 <button onClick={() => setActivePage(p.key)}
-                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-muted-foreground"}`}>
-                                  {p.label}
+                                  className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm transition-colors flex items-center gap-2 ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                  <FileText className="h-3 w-3 opacity-60" />
+                                  <span className="truncate">{p.label}</span>
                                 </button>
                               </li>
                             ))}
                             {homesecs.map((s) => (
                               <li key={s.id}>
                                 <button onClick={() => setActivePage(`homesec:${s.id}`)}
-                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-sm flex items-center justify-between gap-2 transition-colors ${activePage === `homesec:${s.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-muted-foreground"}`}>
-                                  <span className="truncate">{s.title || "Untitled"}</span>
-                                  {!s.enabled && <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted">Off</span>}
+                                  className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `homesec:${s.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                  <FileEdit className="h-3 w-3 opacity-60" />
+                                  <span className="truncate flex-1">{s.title || "Untitled"}</span>
+                                  {!s.enabled && <Badge variant="outline" className="h-4 px-1 text-[9px]">Off</Badge>}
                                 </button>
                               </li>
                             ))}
                             {customs.map((p) => (
                               <li key={p.id}>
                                 <button onClick={() => setActivePage(`custom:${p.id}`)}
-                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-sm flex items-center justify-between gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-muted-foreground"}`}>
-                                  <span className="truncate">{p.title || p.slug}</span>
-                                  {!p.published && <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted">Draft</span>}
+                                  className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                  <FileText className="h-3 w-3 opacity-60" />
+                                  <span className="truncate flex-1">{p.title || p.slug}</span>
+                                  {!p.published && <Badge variant="outline" className="h-4 px-1 text-[9px]">Draft</Badge>}
                                 </button>
                               </li>
                             ))}
@@ -600,42 +688,45 @@ const AdminDashboard = () => {
                                 setTimeout(() => setActivePage(`custom:${id}`), 0);
                                 toast.success("Page added to " + grp.label);
                               }}
-                                className="w-full text-left px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:bg-secondary inline-flex items-center gap-1">
+                                className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 transition-colors">
                                 <Plus className="h-3 w-3" /> Add page
                               </button>
                             </li>
                           </ul>
-                        )}
-                      </li>
+                        </CollapsibleContent>
+                      </Collapsible>
                     );
                   })}
-                </ul>
+                </div>
 
-                <div className="mt-4 pt-3 border-t border-border">
-                  <div className="flex items-center justify-between mb-2 px-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Standalone</span>
+                <div className="border-t border-border bg-secondary/20 p-2">
+                  <div className="flex items-center justify-between px-2 py-1.5">
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Standalone</span>
+                    </div>
                   </div>
-                  <ul className="space-y-1">
+                  <ul className="space-y-0.5">
                     {SITE_PAGES.filter((p) => (pageLocation[p.key] ?? "home") === "").map((p) => (
                       <li key={p.key}>
                         <button onClick={() => setActivePage(p.key)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between gap-2 transition-colors ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary"}`}>
-                          <span className="truncate">{p.label}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">/{p.key}</span>
+                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                          <span className="truncate flex-1">{p.label}</span>
+                          <span className="text-[10px] font-mono text-muted-foreground">/{p.key}</span>
                         </button>
                       </li>
                     ))}
                     {customPages.filter((p) => (p.groupKey ?? "") === "").map((p) => (
                       <li key={p.id}>
                         <button onClick={() => setActivePage(`custom:${p.id}`)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary"}`}>
-                          <span className="truncate">{p.title || p.slug}</span>
-                          {!p.published && <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">Draft</span>}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                          <span className="truncate flex-1">{p.title || p.slug}</span>
+                          {!p.published && <Badge variant="outline" className="h-4 px-1 text-[9px]">Draft</Badge>}
                         </button>
                       </li>
                     ))}
                   </ul>
-                  <Button size="sm" variant="ghost" className="h-7 px-2 mt-2 w-full justify-start" onClick={() => {
+                  <Button size="sm" variant="ghost" className="h-8 px-2 mt-1 w-full justify-start text-xs" onClick={() => {
                     const id = Date.now().toString();
                     addCustomPage({
                       title: "New Page", slug: `new-page-${id.slice(-4)}`, parent: "",
