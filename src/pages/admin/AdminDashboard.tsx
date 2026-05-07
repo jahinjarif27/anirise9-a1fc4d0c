@@ -196,55 +196,72 @@ const AdminDashboard = () => {
       const cpSeoKey = `custom:${cp.id}`;
       return (
         <div className="space-y-4">
-          <Card className="p-5 sm:p-6 space-y-4">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <h3 className="font-bold flex items-center gap-2"><FileCog className="h-4 w-4" /> Page settings</h3>
-              <div className="flex gap-2">
+          <Card className="p-5 sm:p-6 space-y-5">
+            <div className="flex items-center justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
+                  <FileCog className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold leading-tight">Page settings</h3>
+                  <p className="text-xs text-muted-foreground">Title, URL & visibility</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
                 <Switch checked={cp.published} onCheckedChange={(v) => updateCustomPage(cp.id, { published: v })} />
-                <span className="text-sm">{cp.published ? "Published" : "Draft"}</span>
+                <span className="text-sm font-medium">{cp.published ? "Published" : "Draft"}</span>
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 gap-3">
+            <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-medium mb-1 block">Page title</label>
+                <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Page title</label>
                 <Input value={cp.title} onChange={(e) => updateCustomPage(cp.id, { title: e.target.value })} />
               </div>
               <div>
-                <label className="text-xs font-medium mb-1 block">URL slug</label>
+                <label className="text-xs font-semibold mb-1.5 block text-foreground/80">URL slug</label>
                 <Input value={cp.slug} onChange={(e) => updateCustomPage(cp.id, { slug: e.target.value.replace(/[^a-z0-9-/]/gi, "-").toLowerCase() })} />
               </div>
               <div>
-                <label className="text-xs font-medium mb-1 block">Parent page</label>
-                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  value={cp.parent} onChange={(e) => updateCustomPage(cp.id, { parent: e.target.value })}>
-                  {parentOptions.map((o) => <option key={o || "_root"} value={o}>{o || "— Root —"}</option>)}
-                </select>
+                <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Parent page</label>
+                <Select value={cp.parent || "__root"} onValueChange={(v) => updateCustomPage(cp.id, { parent: v === "__root" ? "" : v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__root">— Root —</SelectItem>
+                    {parentOptions.filter(Boolean).map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
-                <label className="text-xs font-medium mb-1 block">Show in</label>
-                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  value={cp.navLocation} onChange={(e) => updateCustomPage(cp.id, { navLocation: e.target.value as any })}>
-                  <option value="navbar">Top navbar</option>
-                  <option value="menu">3-dot menu</option>
-                  <option value="none">Hidden (direct URL only)</option>
-                </select>
+                <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Show in</label>
+                <Select value={cp.navLocation} onValueChange={(v) => updateCustomPage(cp.id, { navLocation: v as any })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="navbar">Top navbar</SelectItem>
+                    <SelectItem value="menu">3-dot menu</SelectItem>
+                    <SelectItem value="none">Hidden (direct URL only)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div>
-                <label className="text-xs font-medium mb-1 block">Section group (optional)</label>
-                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  value={cp.groupKey ?? ""} onChange={(e) => updateCustomPage(cp.id, { groupKey: e.target.value })}>
-                  <option value="">— Standalone route —</option>
-                  {sectionGroups.map((g) => <option key={g.key} value={g.key}>{g.label}</option>)}
-                </select>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Section group</label>
+                <Select value={cp.groupKey || "__standalone"} onValueChange={(v) => updateCustomPage(cp.id, { groupKey: v === "__standalone" ? "" : v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__standalone">— Standalone route —</SelectItem>
+                    {sectionGroups.map((g) => <SelectItem key={g.key} value={g.key}>{g.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">Final URL: <span className="font-mono">{seo.canonicalUrl}/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span></p>
+            <div className="rounded-lg bg-secondary/40 px-3 py-2 text-xs text-muted-foreground">
+              Final URL: <span className="font-mono text-foreground">{seo.canonicalUrl}/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span>
+            </div>
             <ImageUpload label="Page image" value={cp.image} onChange={(v) => updateCustomPage(cp.id, { image: v })} aspect="aspect-[16/9]" altValue={cp.imageAlt} onAltChange={(v) => updateCustomPage(cp.id, { imageAlt: v })} />
             <div>
-              <label className="text-xs font-medium mb-1 block">Body content</label>
+              <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Body content</label>
               <Textarea rows={6} value={cp.body} onChange={(e) => updateCustomPage(cp.id, { body: e.target.value })} />
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteCustomPage(cp.id); setActivePage("hero"); toast.success("Page deleted"); }}>
                 <Trash2 className="h-4 w-4 text-destructive" /> Delete page
               </Button>
