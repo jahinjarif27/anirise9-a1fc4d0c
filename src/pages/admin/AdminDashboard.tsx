@@ -788,34 +788,42 @@ const AdminDashboard = () => {
 
           {/* SETTINGS */}
           <TabsContent value="settings" className="space-y-6">
-            <Tabs defaultValue="seo" className="space-y-4">
-              <TabsList className="h-auto flex-wrap">
-                <TabsTrigger value="seo">Global SEO</TabsTrigger>
-                <TabsTrigger value="schema">Schema</TabsTrigger>
-                <TabsTrigger value="sitemap">Sitemap</TabsTrigger>
-                <TabsTrigger value="robots">Robots.txt</TabsTrigger>
-                <TabsTrigger value="redirects">Redirects</TabsTrigger>
-                <TabsTrigger value="canonical">Canonical</TabsTrigger>
-                <TabsTrigger value="appearance">Appearance</TabsTrigger>
-              </TabsList>
+            <Tabs defaultValue="seo" className="space-y-5">
+              <Card className="p-2 bg-secondary/40 border-dashed">
+                <TabsList className="h-auto flex-wrap justify-start gap-1 bg-transparent p-0">
+                  <TabsTrigger value="seo" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Search className="h-3.5 w-3.5" /> Global SEO</TabsTrigger>
+                  <TabsTrigger value="schema" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Code2 className="h-3.5 w-3.5" /> Schema</TabsTrigger>
+                  <TabsTrigger value="sitemap" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><FileText className="h-3.5 w-3.5" /> Sitemap</TabsTrigger>
+                  <TabsTrigger value="robots" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Bot className="h-3.5 w-3.5" /> Robots</TabsTrigger>
+                  <TabsTrigger value="redirects" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Link2 className="h-3.5 w-3.5" /> Redirects</TabsTrigger>
+                  <TabsTrigger value="canonical" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Globe className="h-3.5 w-3.5" /> Canonical</TabsTrigger>
+                  <TabsTrigger value="appearance" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Type className="h-3.5 w-3.5" /> Appearance</TabsTrigger>
+                </TabsList>
+              </Card>
 
-              <TabsContent value="seo" className="space-y-4">
-                <Card className="p-5 sm:p-6 space-y-3">
-                  <h3 className="font-bold flex items-center gap-2"><Search className="h-4 w-4" /> Site-wide meta</h3>
+              <TabsContent value="seo" className="space-y-4 mt-0">
+                <Card className="p-5 sm:p-6 space-y-5">
+                  <div className="flex items-center gap-3 pb-3 border-b border-border/60">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><Search className="h-5 w-5" /></div>
+                    <div>
+                      <h3 className="font-bold leading-tight">Site-wide meta</h3>
+                      <p className="text-xs text-muted-foreground">Default title & description for the whole site</p>
+                    </div>
+                  </div>
                   <div>
-                    <label className="text-sm font-medium mb-1 block">Meta title <span className="text-muted-foreground">({seo.metaTitle.length}/60)</span></label>
+                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Meta title <span className="text-muted-foreground font-normal">({seo.metaTitle.length}/60)</span></label>
                     <Input value={seo.metaTitle} onChange={(e) => updateSeo({ metaTitle: e.target.value })} />
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-1 block">Meta description <span className="text-muted-foreground">({seo.metaDescription.length}/160)</span></label>
+                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Meta description <span className="text-muted-foreground font-normal">({seo.metaDescription.length}/160)</span></label>
                     <Textarea rows={3} value={seo.metaDescription} onChange={(e) => updateSeo({ metaDescription: e.target.value })} />
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-1 block">Meta keywords</label>
+                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Meta keywords</label>
                     <Input value={seo.metaKeywords} onChange={(e) => updateSeo({ metaKeywords: e.target.value })} />
                   </div>
                   <div className="rounded-xl border border-border p-4 bg-secondary/40">
-                    <p className="text-xs font-semibold text-muted-foreground mb-2">Google preview</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Google preview</p>
                     <div className="flex items-start gap-3">
                       <img src={logo} alt="favicon" className="h-7 w-7 rounded-full mt-1 ring-1 ring-border" />
                       <div className="min-w-0 flex-1">
@@ -828,37 +836,46 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="schema" className="space-y-4">
-                <Card className="p-5 sm:p-6 space-y-4">
-                  <div className="flex items-start justify-between gap-3 flex-wrap">
-                    <div>
-                      <h3 className="font-bold flex items-center gap-2"><Code2 className="h-4 w-4" /> Schema.org / JSON-LD</h3>
-                      <p className="text-sm text-muted-foreground mt-1">Injected live into &lt;head&gt;.</p>
+              <TabsContent value="schema" className="space-y-4 mt-0">
+                <Card className="p-5 sm:p-6 space-y-5">
+                  <div className="flex items-start justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><Code2 className="h-5 w-5" /></div>
+                      <div>
+                        <h3 className="font-bold leading-tight">Schema.org / JSON-LD</h3>
+                        <p className="text-xs text-muted-foreground">Structured data injected live into &lt;head&gt;</p>
+                      </div>
                     </div>
-                    <select className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                      onChange={(e) => {
-                        const t = e.target.value as any; if (!t) return;
-                        const templates: Record<string, any> = {
-                          Organization: { name: "AniRise", url: seo.canonicalUrl, logo: `${seo.canonicalUrl}/favicon.jpg` },
-                          LocalBusiness: { name: "AniRise", address: { "@type": "PostalAddress", addressCountry: "BD" }, telephone: "+8801337744727", url: seo.canonicalUrl },
-                          WebSite: { name: "AniRise", url: seo.canonicalUrl },
-                          WebPage: { name: "Page title", url: seo.canonicalUrl },
-                          Article: { headline: "Article", author: { "@type": "Person", name: "AniRise" }, datePublished: new Date().toISOString().slice(0, 10) },
-                          BlogPosting: { headline: "Post", author: { "@type": "Person", name: "AniRise" }, datePublished: new Date().toISOString().slice(0, 10) },
-                          BreadcrumbList: { itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: seo.canonicalUrl }] },
-                          Product: { name: "Product", offers: { "@type": "Offer", priceCurrency: "USD", price: "0.00" } },
-                          Service: { serviceType: "SEO", provider: { "@type": "Organization", name: "AniRise" } },
-                          FAQPage: { mainEntity: [{ "@type": "Question", name: "Q?", acceptedAnswer: { "@type": "Answer", text: "A." } }] },
-                          Person: { name: "Name", jobTitle: "Founder" },
-                          Event: { name: "Event", startDate: new Date().toISOString() },
-                        };
-                        addSchema({ type: t, name: `${t} — new`, enabled: true, json: JSON.stringify(templates[t], null, 2) });
-                        toast.success(`${t} added`); e.target.value = "";
-                      }} defaultValue="">
-                      <option value="">+ Add schema…</option>
-                      {["Organization","LocalBusiness","WebSite","WebPage","Article","BlogPosting","BreadcrumbList","Product","Service","FAQPage","Person","Event"].map((t) => <option key={t} value={t}>{t}</option>)}
-                    </select>
+                    <Select onValueChange={(t) => {
+                      if (!t) return;
+                      const templates: Record<string, any> = {
+                        Organization: { name: "AniRise", url: seo.canonicalUrl, logo: `${seo.canonicalUrl}/favicon.jpg` },
+                        LocalBusiness: { name: "AniRise", address: { "@type": "PostalAddress", addressCountry: "BD" }, telephone: "+8801337744727", url: seo.canonicalUrl },
+                        WebSite: { name: "AniRise", url: seo.canonicalUrl },
+                        WebPage: { name: "Page title", url: seo.canonicalUrl },
+                        Article: { headline: "Article", author: { "@type": "Person", name: "AniRise" }, datePublished: new Date().toISOString().slice(0, 10) },
+                        BlogPosting: { headline: "Post", author: { "@type": "Person", name: "AniRise" }, datePublished: new Date().toISOString().slice(0, 10) },
+                        BreadcrumbList: { itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: seo.canonicalUrl }] },
+                        Product: { name: "Product", offers: { "@type": "Offer", priceCurrency: "USD", price: "0.00" } },
+                        Service: { serviceType: "SEO", provider: { "@type": "Organization", name: "AniRise" } },
+                        FAQPage: { mainEntity: [{ "@type": "Question", name: "Q?", acceptedAnswer: { "@type": "Answer", text: "A." } }] },
+                        Person: { name: "Name", jobTitle: "Founder" },
+                        Event: { name: "Event", startDate: new Date().toISOString() },
+                      };
+                      addSchema({ type: t as any, name: `${t} — new`, enabled: true, json: JSON.stringify(templates[t], null, 2) });
+                      toast.success(`${t} added`);
+                    }}>
+                      <SelectTrigger className="w-[200px] h-10"><SelectValue placeholder="+ Add schema…" /></SelectTrigger>
+                      <SelectContent>
+                        {["Organization","LocalBusiness","WebSite","WebPage","Article","BlogPosting","BreadcrumbList","Product","Service","FAQPage","Person","Event"].map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
                   </div>
+                  {seo.schemas.length === 0 && (
+                    <div className="text-center py-8 text-sm text-muted-foreground border border-dashed border-border rounded-xl">
+                      No schemas yet. Add one above to get started.
+                    </div>
+                  )}
                   <div className="space-y-3">
                     {seo.schemas.map((s) => {
                       let valid = true;
@@ -867,9 +884,9 @@ const AdminDashboard = () => {
                         <div key={s.id} className={`rounded-xl border p-4 space-y-3 ${valid ? "border-border bg-secondary/20" : "border-destructive/40 bg-destructive/5"}`}>
                           <div className="flex flex-wrap items-center gap-3 justify-between">
                             <div className="flex items-center gap-2 min-w-0">
-                              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-accent/15 text-accent">{s.type}</span>
+                              <Badge variant="secondary" className="bg-accent/15 text-accent">{s.type}</Badge>
                               <Input className="h-9 max-w-xs" value={s.name} onChange={(e) => updateSchema(s.id, { name: e.target.value })} />
-                              {!valid && <span className="text-xs font-semibold text-destructive">Invalid JSON</span>}
+                              {!valid && <Badge variant="destructive">Invalid JSON</Badge>}
                             </div>
                             <div className="flex items-center gap-2">
                               <Switch checked={s.enabled} onCheckedChange={(v) => updateSchema(s.id, { enabled: v })} />
@@ -884,14 +901,17 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="sitemap" className="space-y-4">
-                <Card className="p-5 sm:p-6 space-y-4">
-                  <div className="flex items-start justify-between gap-3 flex-wrap">
-                    <div>
-                      <h3 className="font-bold">Sitemap.xml</h3>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Switch checked={seo.autoSitemap} onCheckedChange={(v) => updateSeo({ autoSitemap: v })} />
-                        <span className="text-sm font-medium">Auto-sync on publish</span>
+              <TabsContent value="sitemap" className="space-y-4 mt-0">
+                <Card className="p-5 sm:p-6 space-y-5">
+                  <div className="flex items-start justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><FileText className="h-5 w-5" /></div>
+                      <div>
+                        <h3 className="font-bold leading-tight">Sitemap.xml</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Switch checked={seo.autoSitemap} onCheckedChange={(v) => updateSeo({ autoSitemap: v })} />
+                          <span className="text-xs text-muted-foreground">Auto-sync on publish</span>
+                        </div>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -913,7 +933,7 @@ const AdminDashboard = () => {
                     const items = urls.map(u => ({ ...u, on: true }));
                     return (
                       <div className="rounded-xl border border-border overflow-hidden">
-                        <div className="px-4 py-2 bg-secondary/40 text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+                        <div className="px-4 py-2.5 bg-secondary/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
                           <span>URL entries ({items.length})</span>
                           <Button size="sm" variant="ghost" className="h-7" onClick={() => writeBack([...items, { loc: `${seo.canonicalUrl}/new-page`, pr: "0.5", on: true }])}>
                             <Plus className="h-3.5 w-3.5" /> Add URL
@@ -925,10 +945,12 @@ const AdminDashboard = () => {
                               <Switch checked={u.on} onCheckedChange={(v) => { const next = [...items]; next[i] = { ...u, on: v }; writeBack(next); }} />
                               <Input className="h-9 flex-1 min-w-[180px] font-mono text-xs" value={u.loc}
                                 onChange={(e) => { const next = [...items]; next[i] = { ...u, loc: e.target.value }; writeBack(next); }} />
-                              <select className="h-9 rounded-md border border-input bg-background px-2 text-xs" value={u.pr}
-                                onChange={(e) => { const next = [...items]; next[i] = { ...u, pr: e.target.value }; writeBack(next); }}>
-                                {["1.0","0.9","0.8","0.7","0.6","0.5","0.3","0.1"].map(p => <option key={p} value={p}>Priority {p}</option>)}
-                              </select>
+                              <Select value={u.pr} onValueChange={(v) => { const next = [...items]; next[i] = { ...u, pr: v }; writeBack(next); }}>
+                                <SelectTrigger className="h-9 w-[130px]"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  {["1.0","0.9","0.8","0.7","0.6","0.5","0.3","0.1"].map(p => <SelectItem key={p} value={p}>Priority {p}</SelectItem>)}
+                                </SelectContent>
+                              </Select>
                               <Button variant="ghost" size="sm" onClick={() => { const next = items.filter((_, j) => j !== i); writeBack(next); toast.success("Removed"); }}>
                                 <Trash2 className="h-4 w-4 text-destructive" />
                               </Button>
@@ -938,16 +960,22 @@ const AdminDashboard = () => {
                       </div>
                     );
                   })()}
-                  <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value })} />
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
+                    <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value })} />
+                  </div>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="robots" className="space-y-4">
-                <Card className="p-5 sm:p-6 space-y-4">
-                  <div className="flex items-start justify-between gap-3 flex-wrap">
-                    <div>
-                      <h3 className="font-bold">Robots.txt</h3>
-                      <p className="text-sm text-muted-foreground mt-1">Tell crawlers what to index.</p>
+              <TabsContent value="robots" className="space-y-4 mt-0">
+                <Card className="p-5 sm:p-6 space-y-5">
+                  <div className="flex items-start justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><Bot className="h-5 w-5" /></div>
+                      <div>
+                        <h3 className="font-bold leading-tight">Robots.txt</h3>
+                        <p className="text-xs text-muted-foreground">Tell crawlers what to index</p>
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(seo.robotsTxt); toast.success("Copied"); }}><Copy className="h-4 w-4" /> Copy</Button>
@@ -990,24 +1018,27 @@ const AdminDashboard = () => {
                     };
                     return (
                       <div className="rounded-xl border border-border overflow-hidden">
-                        <div className="px-4 py-2 bg-secondary/40 flex flex-wrap items-center gap-2">
-                          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">User-agent</span>
-                          <Input className="h-8 max-w-[160px]" value={ua} onChange={(e) => write(e.target.value, rules, sm)} />
-                          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-auto">Sitemap</span>
-                          <Input className="h-8 max-w-[280px] font-mono text-xs" placeholder="https://…/sitemap.xml" value={sm} onChange={(e) => write(ua, rules, e.target.value)} />
+                        <div className="px-4 py-3 bg-secondary/40 grid sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">User-agent</label>
+                            <Input className="h-8" value={ua} onChange={(e) => write(e.target.value, rules, sm)} />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">Sitemap URL</label>
+                            <Input className="h-8 font-mono text-xs" placeholder="https://…/sitemap.xml" value={sm} onChange={(e) => write(ua, rules, e.target.value)} />
+                          </div>
                         </div>
                         <ul className="divide-y divide-border">
                           {rules.map((r, i) => (
                             <li key={i} className="p-3 flex flex-wrap items-center gap-2">
                               <Switch checked={r.on} onCheckedChange={(v) => { const next = [...rules]; next[i] = { ...r, on: v }; write(ua, next, sm); }} />
-                              <select className="h-9 rounded-md border border-input bg-background px-2 text-xs" value={r.kind}
-                                onChange={(e) => { const next = [...rules]; next[i] = { ...r, kind: e.target.value as Rule["kind"] }; write(ua, next, sm); }}>
-                                <option value="Allow">Allow</option>
-                                <option value="Disallow">Disallow</option>
-                              </select>
-                              {r.kind === "Allow"
-                                ? <FolderOpen className="h-4 w-4 text-accent" />
-                                : <FolderX className="h-4 w-4 text-destructive" />}
+                              <Select value={r.kind} onValueChange={(v) => { const next = [...rules]; next[i] = { ...r, kind: v as Rule["kind"] }; write(ua, next, sm); }}>
+                                <SelectTrigger className="h-9 w-[120px]"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Allow"><span className="inline-flex items-center gap-2"><FolderOpen className="h-3.5 w-3.5 text-accent" /> Allow</span></SelectItem>
+                                  <SelectItem value="Disallow"><span className="inline-flex items-center gap-2"><FolderX className="h-3.5 w-3.5 text-destructive" /> Disallow</span></SelectItem>
+                                </SelectContent>
+                              </Select>
                               <Input className="h-9 flex-1 min-w-[160px] font-mono text-xs" value={r.path}
                                 onChange={(e) => { const next = [...rules]; next[i] = { ...r, path: e.target.value }; write(ua, next, sm); }} />
                               <Button variant="ghost" size="sm" onClick={() => { const next = rules.filter((_, j) => j !== i); write(ua, next, sm); toast.success("Removed"); }}>
@@ -1027,92 +1058,132 @@ const AdminDashboard = () => {
                       </div>
                     );
                   })()}
-                  <Textarea rows={8} className="font-mono text-xs" value={seo.robotsTxt} onChange={(e) => updateSeo({ robotsTxt: e.target.value })} />
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw text</label>
+                    <Textarea rows={8} className="font-mono text-xs" value={seo.robotsTxt} onChange={(e) => updateSeo({ robotsTxt: e.target.value })} />
+                  </div>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="redirects" className="space-y-4">
-                <Card className="p-5 sm:p-6 space-y-4">
-                  <div className="flex items-start justify-between gap-3 flex-wrap">
-                    <h3 className="font-bold flex items-center gap-2"><Link2 className="h-4 w-4" /> URL Redirects</h3>
+              <TabsContent value="redirects" className="space-y-4 mt-0">
+                <Card className="p-5 sm:p-6 space-y-5">
+                  <div className="flex items-start justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><Link2 className="h-5 w-5" /></div>
+                      <div>
+                        <h3 className="font-bold leading-tight">URL Redirects</h3>
+                        <p className="text-xs text-muted-foreground">Send old URLs to new locations</p>
+                      </div>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       <Button variant="outline" size="sm" onClick={() => {
                         const json = JSON.stringify({ redirects: seo.redirects.filter(r => r.enabled).map(r => ({ source: r.from, destination: r.to, permanent: r.code === 301 || r.code === 308, statusCode: r.code })) }, null, 2);
                         navigator.clipboard.writeText(json); toast.success("vercel.json copied");
                       }}><Copy className="h-4 w-4" /> Copy vercel.json</Button>
                       <Button variant="hero" size="sm" onClick={() => addRedirect({ from: "/old-path", to: "/new-path", code: 301, enabled: true })}>
-                        <Plus className="h-4 w-4" /> Add
+                        <Plus className="h-4 w-4" /> Add redirect
                       </Button>
                     </div>
                   </div>
-                  <div className="overflow-x-auto rounded-lg border border-border">
-                    <table className="w-full text-sm">
-                      <thead className="bg-secondary/50 text-xs uppercase tracking-wider">
-                        <tr>
-                          <th className="text-left p-3">From</th><th className="text-left p-3">To</th>
-                          <th className="text-center p-3">Code</th><th className="text-center p-3">On</th><th className="p-3"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {seo.redirects.map((r) => (
-                          <tr key={r.id} className="border-t border-border">
-                            <td className="p-2"><Input className="h-9" value={r.from} onChange={(e) => updateRedirect(r.id, { from: e.target.value })} /></td>
-                            <td className="p-2"><Input className="h-9" value={r.to} onChange={(e) => updateRedirect(r.id, { to: e.target.value })} /></td>
-                            <td className="p-2 text-center">
-                              <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={r.code} onChange={(e) => updateRedirect(r.id, { code: Number(e.target.value) as any })}>
-                                <option value={301}>301</option><option value={302}>302</option><option value={307}>307</option><option value={308}>308</option>
-                              </select>
-                            </td>
-                            <td className="p-2 text-center"><Switch checked={r.enabled} onCheckedChange={(v) => updateRedirect(r.id, { enabled: v })} /></td>
-                            <td className="p-2 text-right"><Button variant="ghost" size="sm" onClick={() => { deleteRedirect(r.id); toast.success("Removed"); }}><Trash2 className="h-4 w-4 text-destructive" /></Button></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  {seo.redirects.length === 0 ? (
+                    <div className="text-center py-8 text-sm text-muted-foreground border border-dashed border-border rounded-xl">
+                      No redirects yet. Add one to get started.
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {seo.redirects.map((r) => (
+                        <div key={r.id} className="rounded-xl border border-border bg-secondary/20 p-3 space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Switch checked={r.enabled} onCheckedChange={(v) => updateRedirect(r.id, { enabled: v })} />
+                            <Badge variant={r.enabled ? "default" : "outline"}>{r.code}</Badge>
+                            <Button variant="ghost" size="sm" className="ml-auto" onClick={() => { deleteRedirect(r.id); toast.success("Removed"); }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                          </div>
+                          <div className="grid sm:grid-cols-[1fr_auto_1fr_auto] gap-2 items-center">
+                            <Input className="h-9 font-mono text-xs" placeholder="/from" value={r.from} onChange={(e) => updateRedirect(r.id, { from: e.target.value })} />
+                            <ArrowRight className="h-4 w-4 text-muted-foreground hidden sm:block" />
+                            <Input className="h-9 font-mono text-xs" placeholder="/to" value={r.to} onChange={(e) => updateRedirect(r.id, { to: e.target.value })} />
+                            <Select value={String(r.code)} onValueChange={(v) => updateRedirect(r.id, { code: Number(v) as any })}>
+                              <SelectTrigger className="h-9 w-[90px]"><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="301">301</SelectItem>
+                                <SelectItem value="302">302</SelectItem>
+                                <SelectItem value="307">307</SelectItem>
+                                <SelectItem value="308">308</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </Card>
               </TabsContent>
 
-              <TabsContent value="canonical" className="space-y-4">
-                <Card className="p-5 sm:p-6 space-y-3">
-                  <h3 className="font-bold">Canonical URL</h3>
-                  <Input value={seo.canonicalUrl} onChange={(e) => updateSeo({ canonicalUrl: e.target.value })} />
-                  <div className="flex items-center gap-2">
-                    <Switch checked={seo.canonicalAuto} onCheckedChange={(v) => updateSeo({ canonicalAuto: v })} />
-                    <span className="text-sm">Auto-generate per-page canonical from base + path</span>
+              <TabsContent value="canonical" className="space-y-4 mt-0">
+                <Card className="p-5 sm:p-6 space-y-5">
+                  <div className="flex items-center gap-3 pb-3 border-b border-border/60">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><Globe className="h-5 w-5" /></div>
+                    <div>
+                      <h3 className="font-bold leading-tight">Canonical URL</h3>
+                      <p className="text-xs text-muted-foreground">The site's authoritative base URL</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Base URL</label>
+                    <Input value={seo.canonicalUrl} onChange={(e) => updateSeo({ canonicalUrl: e.target.value })} className="font-mono text-sm" />
+                  </div>
+                  <div className="flex items-start gap-3 rounded-xl border border-border bg-secondary/30 p-4">
+                    <Switch checked={seo.canonicalAuto} onCheckedChange={(v) => updateSeo({ canonicalAuto: v })} className="mt-1" />
+                    <div>
+                      <p className="text-sm font-medium">Auto per-page canonical</p>
+                      <p className="text-xs text-muted-foreground">Generate canonical from base URL + current path automatically.</p>
+                    </div>
                   </div>
                   <p className="text-xs text-muted-foreground">Per-page overrides are managed inside each page editor under <span className="font-semibold">Pages</span>.</p>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="appearance" className="space-y-4">
+              <TabsContent value="appearance" className="space-y-4 mt-0">
                 <Card className="p-5 sm:p-6 space-y-5">
-                  <h3 className="font-bold flex items-center gap-2"><Type className="h-4 w-4" /> Typography</h3>
+                  <div className="flex items-center gap-3 pb-3 border-b border-border/60">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><Type className="h-5 w-5" /></div>
+                    <div>
+                      <h3 className="font-bold leading-tight">Typography</h3>
+                      <p className="text-xs text-muted-foreground">Choose fonts and base size for the site</p>
+                    </div>
+                  </div>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium mb-1 block">Heading font</label>
-                      <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                        value={appearance.headingFont} onChange={(e) => updateAppearance({ headingFont: e.target.value })}>
-                        {fontChoices.map((f) => <option key={f} value={f}>{f}</option>)}
-                      </select>
+                      <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Heading font</label>
+                      <Select value={appearance.headingFont} onValueChange={(v) => updateAppearance({ headingFont: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {fontChoices.map((f) => <SelectItem key={f} value={f}><span style={{ fontFamily: `'${f}', sans-serif` }}>{f}</span></SelectItem>)}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">Body font</label>
-                      <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                        value={appearance.bodyFont} onChange={(e) => updateAppearance({ bodyFont: e.target.value })}>
-                        {fontChoices.map((f) => <option key={f} value={f}>{f}</option>)}
-                      </select>
+                      <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Body font</label>
+                      <Select value={appearance.bodyFont} onValueChange={(v) => updateAppearance({ bodyFont: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {fontChoices.map((f) => <SelectItem key={f} value={f}><span style={{ fontFamily: `'${f}', sans-serif` }}>{f}</span></SelectItem>)}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="text-sm font-medium mb-1 block">Base font size: {appearance.baseFontSize}px</label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-semibold text-foreground/80">Base font size</label>
+                        <Badge variant="secondary">{appearance.baseFontSize}px</Badge>
+                      </div>
                       <input type="range" min={14} max={20} step={1}
                         value={appearance.baseFontSize}
                         onChange={(e) => updateAppearance({ baseFontSize: Number(e.target.value) })}
-                        className="w-full" />
+                        className="w-full accent-accent" />
                     </div>
                   </div>
-                  <div className="rounded-xl border border-border p-5 bg-secondary/40">
-                    <p className="text-xs font-semibold text-muted-foreground mb-3">Live preview</p>
+                  <div className="rounded-xl border border-border p-5 bg-gradient-to-br from-secondary/40 to-secondary/10">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Live preview</p>
                     <h2 style={{ fontFamily: `'${appearance.headingFont}', sans-serif` }} className="text-3xl font-extrabold mb-2">We Help Your Brand Rise</h2>
                     <p style={{ fontFamily: `'${appearance.bodyFont}', sans-serif` }} className="text-foreground/80">AniRise drives Visibility, fuels Growth, Success.</p>
                   </div>
