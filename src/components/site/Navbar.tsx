@@ -20,10 +20,9 @@ export const Navbar = () => {
 
   const sectionKeys = ["hero", "services", "about", "portfolio", "blog", "testimonials", "contact"];
   const links = sectionKeys.map((k) => {
-    const loc = pageLocation[k] ?? "home";
     const label = SECTION_LABELS[k];
+    if (k === "hero") return { label, href: "/" };
     if (k === "blog") return { label, href: "/blog" };
-    if (loc === "home") return { label, href: k === "hero" ? "/#home" : `/#${k}` };
     return { label, href: `/${k}` };
   });
   const customLinks = customPages
