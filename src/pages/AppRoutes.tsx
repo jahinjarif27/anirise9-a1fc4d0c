@@ -17,24 +17,16 @@ import { Portfolio } from "@/components/site/Portfolio";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Contact } from "@/components/site/Contact";
 import { Blog as BlogSection } from "@/components/site/Blog";
-import { useAdmin } from "@/context/AdminContext";
 
-const SECTION_COMPONENTS: Record<string, React.ComponentType> = {
-  hero: Hero,
-  services: Services,
-  about: About,
-  portfolio: Portfolio,
-  blog: BlogSection,
-  testimonials: Testimonials,
-  contact: Contact,
+const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title: string }> = {
+  services: { Component: Services, title: "Services" },
+  about: { Component: About, title: "About" },
+  portfolio: { Component: Portfolio, title: "Portfolio" },
+  testimonials: { Component: Testimonials, title: "Testimonials" },
+  contact: { Component: Contact, title: "Contact" },
 };
 
 export const AppRoutes = () => {
-  const { pageLocation } = useAdmin();
-  const standaloneSections = Object.keys(SECTION_COMPONENTS).filter(
-    (k) => k !== "hero" && pageLocation[k] && pageLocation[k] !== "home"
-  );
-
   return (
     <Routes>
       <Route path="/" element={<Index />} />
@@ -44,8 +36,12 @@ export const AppRoutes = () => {
       <Route path="/services/ecommerce-seo" element={<EcommerceSEOPage />} />
       <Route path="/services/graphics-design" element={<GraphicsDesignPage />} />
       <Route path="/services/:slug" element={<ComingSoonService />} />
-      {standaloneSections.map((k) => (
-        <Route key={k} path={`/${k}`} element={<SectionPage Section={SECTION_COMPONENTS[k]} />} />
+      {Object.entries(SECTION_COMPONENTS).map(([key, { Component, title }]) => (
+        <Route
+          key={key}
+          path={`/${key}`}
+          element={<SectionPage Section={Component} title={title} sectionKey={key} />}
+        />
       ))}
       <Route path="/p/:slug" element={<CustomPageView />} />
       <Route path="/admin" element={<AdminDashboard />} />
