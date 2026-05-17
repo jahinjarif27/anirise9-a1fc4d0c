@@ -142,6 +142,16 @@ type Appearance = {
   baseFontSize: number; // px
 };
 
+export type Lead = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  service: string;
+  message: string;
+  createdAt: number; // ms epoch
+};
+
 export type SectionKey = "hero" | "services" | "about" | "portfolio" | "blog" | "testimonials" | "contact";
 export const SECTION_KEYS: SectionKey[] = ["hero", "services", "about", "portfolio", "blog", "testimonials", "contact"];
 
