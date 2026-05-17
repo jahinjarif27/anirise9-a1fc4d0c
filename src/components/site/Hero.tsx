@@ -73,6 +73,8 @@ export const Hero = () => {
             alt={content.heroImageAlt}
             width={1024}
             height={1024}
+            fetchPriority="high"
+            decoding="async"
             className="relative rounded-[2rem] shadow-elegant w-full"
           />
           <div className="absolute -bottom-6 -left-6 bg-card shadow-elegant rounded-2xl px-5 py-4 hidden sm:flex items-center gap-3">

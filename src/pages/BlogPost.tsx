@@ -1,9 +1,9 @@
-import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
+import { useSEO } from "@/hooks/useSEO";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 
 const BlogPostPage = () => {
@@ -11,7 +11,30 @@ const BlogPostPage = () => {
   const { posts } = useAdmin();
   const post = posts.find((p) => p.slug === slug);
 
-  useEffect(() => { document.title = post ? `${post.title} — AniRise` : "Article — AniRise"; }, [post]);
+  useSEO({
+    title: post ? `${post.title} — AniRise` : "Article — AniRise",
+    description: post?.excerpt?.slice(0, 158) ?? "Article from the AniRise blog.",
+    path: `/blog/${slug ?? ""}`,
+    image: post?.cover,
+    type: "article",
+    jsonLd: post
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: post.title,
+          description: post.excerpt,
+          image: post.cover,
+          datePublished: post.date,
+          author: { "@type": "Person", name: post.author },
+          publisher: {
+            "@type": "Organization",
+            name: "AniRise",
+            logo: { "@type": "ImageObject", url: "https://anirise9.vercel.app/favicon.jpg" },
+          },
+          mainEntityOfPage: `https://anirise9.vercel.app/blog/${slug ?? ""}`,
+        }
+      : undefined,
+  });
 
   if (!post) {
     return (

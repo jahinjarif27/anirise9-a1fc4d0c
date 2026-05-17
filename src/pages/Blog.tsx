@@ -1,14 +1,19 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
+import { useSEO } from "@/hooks/useSEO";
 import { Calendar, Clock } from "lucide-react";
 
 const BlogPage = () => {
   const { posts } = useAdmin();
-  useEffect(() => { document.title = "Blog — AniRise"; }, []);
+  useSEO({
+    title: "Blog — SEO, Marketing & Growth Insights | AniRise",
+    description:
+      "Practical SEO, marketing, and growth tactics from the AniRise team. Read our latest articles to grow your traffic, leads, and revenue.",
+    path: "/blog",
+  });
 
   return (
     <div className="min-h-screen bg-background">
