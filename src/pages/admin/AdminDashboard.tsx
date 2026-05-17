@@ -77,6 +77,7 @@ const AdminDashboard = () => {
     ctaEnabled: false, ctaLabel: "", ctaUrl: "", body: "",
   });
   const [device, setDevice] = useState<DeviceKey>("desktop");
+  const [blogMode, setBlogMode] = useState<"simple" | "editor">("simple");
   const [activePage, setActivePage] = useState<string>("hero");
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ home: true });
   const previewWrapRef = useRef<HTMLDivElement>(null);
