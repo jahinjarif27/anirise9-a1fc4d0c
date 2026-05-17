@@ -236,14 +236,31 @@ const AdminDashboard = () => {
               </div>
               <div>
                 <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Show in</label>
-                <Select value={cp.navLocation} onValueChange={(v) => updateCustomPage(cp.id, { navLocation: v as any })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="navbar">Top navbar</SelectItem>
-                    <SelectItem value="menu">3-dot menu</SelectItem>
-                    <SelectItem value="none">Hidden (direct URL only)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-wrap gap-2">
+                  {([
+                    { v: "navbar", label: "Top navbar" },
+                    { v: "menu", label: "3-dot menu" },
+                  ] as const).map((opt) => {
+                    const checked = (cp.navLocation || []).includes(opt.v);
+                    return (
+                      <button
+                        type="button"
+                        key={opt.v}
+                        onClick={() => {
+                          const current = cp.navLocation || [];
+                          const next = checked ? current.filter((x) => x !== opt.v) : [...current, opt.v];
+                          updateCustomPage(cp.id, { navLocation: next });
+                        }}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                          checked ? "bg-accent text-accent-foreground border-accent" : "bg-background border-border text-foreground/70 hover:border-accent/40"
+                        }`}
+                      >
+                        {checked ? "✓ " : ""}{opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1.5">Select none = hidden (direct URL only). Select both to show everywhere.</p>
               </div>
               <div className="sm:col-span-2">
                 <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Section group</label>
