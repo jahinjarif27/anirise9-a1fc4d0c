@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Home, LayoutGrid, Briefcase, Menu as MenuIcon, Sparkles, Phone, Search, Facebook, Instagram } from "lucide-react";
+import { Home, LayoutGrid, Briefcase, Menu as MenuIcon, Phone, Facebook, Instagram } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
