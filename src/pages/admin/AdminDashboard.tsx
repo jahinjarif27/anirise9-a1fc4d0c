@@ -938,6 +938,24 @@ const AdminDashboard = () => {
               <div className="mt-3">
                 <ImageUpload label="Cover image" value={draft.cover} onChange={(v) => setDraft({ ...draft, cover: v })} aspect="aspect-[16/9]" altValue={draft.coverAlt} onAltChange={(v) => setDraft({ ...draft, coverAlt: v })} />
               </div>
+              <div className="mt-4 rounded-xl border border-border bg-secondary/30 p-4 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-bold">Call-to-action button</p>
+                    <p className="text-xs text-muted-foreground">Optional. Shows below the article body when enabled.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Switch checked={!!draft.ctaEnabled} onCheckedChange={(v) => setDraft({ ...draft, ctaEnabled: v })} />
+                    <span className="text-xs font-medium">{draft.ctaEnabled ? "On" : "Off"}</span>
+                  </div>
+                </div>
+                {draft.ctaEnabled && (
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Input placeholder="Button label (e.g. Book a free SEO audit)" value={draft.ctaLabel || ""} onChange={(e) => setDraft({ ...draft, ctaLabel: e.target.value })} />
+                    <Input placeholder="Link URL (https://… or /contact)" value={draft.ctaUrl || ""} onChange={(e) => setDraft({ ...draft, ctaUrl: e.target.value })} />
+                  </div>
+                )}
+              </div>
               <div className="mt-4 flex gap-2">
                 <Button onClick={saveDraft} variant="hero"><Save className="h-4 w-4" /> {editingId ? "Update" : "Publish"}</Button>
                 {editingId && <Button variant="outline" onClick={() => setEditingId(null)}><X className="h-4 w-4" /> Cancel</Button>}
