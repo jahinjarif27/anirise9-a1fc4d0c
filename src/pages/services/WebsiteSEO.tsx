@@ -30,13 +30,6 @@ const deliverables = [
   "Google Search Console & Analytics setup",
 ];
 
-const faqs = [
-  { q: "How long until I see results?", a: "Most clients see ranking improvements in 60–90 days, with significant traffic growth by month 4–6. SEO compounds — the longer we work, the bigger the gains." },
-  { q: "Do you guarantee #1 rankings?", a: "No reputable agency does. We guarantee a documented, ethical process and measurable progress on rankings, traffic, and conversions." },
-  { q: "What makes AniRise different?", a: "We combine technical depth with conversion-focused content. Rankings without revenue is vanity — we optimize for both." },
-  { q: "Do you work with small businesses?", a: "Absolutely. We tailor scope to your stage and budget, from local SEO to enterprise campaigns." },
-];
-
 const WebsiteSEOPage = () => {
   return (
     <ServiceLayout
