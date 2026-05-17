@@ -152,9 +152,13 @@ export type Database = {
       site_settings: {
         Row: {
           appearance: Json
+          case_studies: Json
           contact: Json
           content: Json
           custom_pages: Json
+          final_cta: Json
+          home_blocks: Json
+          home_faqs: Json
           home_membership: Json
           home_sections: Json
           id: number
@@ -162,13 +166,20 @@ export type Database = {
           portfolio: Json
           section_groups: Json
           seo: Json
+          service_faqs: Json
+          stats: Json
+          trust_logos: Json
           updated_at: string
         }
         Insert: {
           appearance?: Json
+          case_studies?: Json
           contact?: Json
           content?: Json
           custom_pages?: Json
+          final_cta?: Json
+          home_blocks?: Json
+          home_faqs?: Json
           home_membership?: Json
           home_sections?: Json
           id?: number
@@ -176,13 +187,20 @@ export type Database = {
           portfolio?: Json
           section_groups?: Json
           seo?: Json
+          service_faqs?: Json
+          stats?: Json
+          trust_logos?: Json
           updated_at?: string
         }
         Update: {
           appearance?: Json
+          case_studies?: Json
           contact?: Json
           content?: Json
           custom_pages?: Json
+          final_cta?: Json
+          home_blocks?: Json
+          home_faqs?: Json
           home_membership?: Json
           home_sections?: Json
           id?: number
@@ -190,6 +208,9 @@ export type Database = {
           portfolio?: Json
           section_groups?: Json
           seo?: Json
+          service_faqs?: Json
+          stats?: Json
+          trust_logos?: Json
           updated_at?: string
         }
         Relationships: []
