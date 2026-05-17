@@ -14,13 +14,150 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blog_posts: {
+        Row: {
+          author: string
+          category: string
+          cover: string
+          cover_alt: string
+          created_at: string
+          date: string
+          excerpt: string
+          id: string
+          read_time: string
+          slug: string
+          title: string
+        }
+        Insert: {
+          author?: string
+          category?: string
+          cover?: string
+          cover_alt?: string
+          created_at?: string
+          date?: string
+          excerpt?: string
+          id?: string
+          read_time?: string
+          slug: string
+          title: string
+        }
+        Update: {
+          author?: string
+          category?: string
+          cover?: string
+          cover_alt?: string
+          created_at?: string
+          date?: string
+          excerpt?: string
+          id?: string
+          read_time?: string
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string
+          service: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message?: string
+          name: string
+          phone: string
+          service?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string
+          service?: string
+        }
+        Relationships: []
+      }
+      page_visits: {
+        Row: {
+          created_at: string
+          id: string
+          path: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          path: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          path?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          appearance: Json
+          contact: Json
+          content: Json
+          custom_pages: Json
+          home_membership: Json
+          home_sections: Json
+          id: number
+          page_location: Json
+          portfolio: Json
+          section_groups: Json
+          seo: Json
+          updated_at: string
+        }
+        Insert: {
+          appearance?: Json
+          contact?: Json
+          content?: Json
+          custom_pages?: Json
+          home_membership?: Json
+          home_sections?: Json
+          id?: number
+          page_location?: Json
+          portfolio?: Json
+          section_groups?: Json
+          seo?: Json
+          updated_at?: string
+        }
+        Update: {
+          appearance?: Json
+          contact?: Json
+          content?: Json
+          custom_pages?: Json
+          home_membership?: Json
+          home_sections?: Json
+          id?: number
+          page_location?: Json
+          portfolio?: Json
+          section_groups?: Json
+          seo?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      purge_old_leads: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never
