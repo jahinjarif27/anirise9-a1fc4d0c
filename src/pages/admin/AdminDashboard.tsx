@@ -11,7 +11,7 @@ import {
   Save, X, Home, Search, Type, Copy, Phone, RefreshCw, Download, Image as ImageIcon, Bot,
   FolderOpen, FolderX, ArrowRight, Check, Code2, Link2, Monitor, Tablet, Smartphone, Layout,
   Sparkles, FileCog, ChevronRight, Layers, Globe, MapPin, FileEdit, Image as ImgIcon,
-  Inbox, PhoneCall, Mail, Clock,
+  Inbox, PhoneCall, Mail, Clock, Star, MessageSquare,
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -68,6 +68,7 @@ const AdminDashboard = () => {
     updatePageSeo,
     leads, deleteLead, clearLeads,
     visitSeries, pruneOldLeads,
+    reviews, approveReview, deleteReview,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
@@ -676,6 +677,12 @@ const AdminDashboard = () => {
               )}
             </TabsTrigger>
             <TabsTrigger value="blog"><FileText className="h-4 w-4 mr-1" /> Blog</TabsTrigger>
+            <TabsTrigger value="reviews">
+              <MessageSquare className="h-4 w-4 mr-1" /> Reviews
+              {reviews.filter((r) => !r.approved).length > 0 && (
+                <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-[10px]">{reviews.filter((r) => !r.approved).length}</Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="settings"><Settings className="h-4 w-4 mr-1" /> Settings</TabsTrigger>
           </TabsList>
 
@@ -1147,6 +1154,57 @@ const AdminDashboard = () => {
                   </li>
                 ))}
               </ul>
+            </Card>
+          </TabsContent>
+
+          {/* REVIEWS */}
+          <TabsContent value="reviews" className="space-y-4">
+            <Card className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-bold text-lg flex items-center gap-2"><MessageSquare className="h-5 w-5" /> Customer reviews</h3>
+                  <p className="text-sm text-muted-foreground">Approve reviews to make them visible on the Testimonials section.</p>
+                </div>
+                <Badge variant="outline">{reviews.length} total</Badge>
+              </div>
+              {reviews.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-8 text-center">No reviews yet. They will appear here once visitors submit them.</p>
+              ) : (
+                <ul className="divide-y divide-border">
+                  {reviews.map((r) => (
+                    <li key={r.id} className="py-4 flex flex-col sm:flex-row gap-4 sm:items-start">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-semibold">{r.name}</p>
+                          {r.role && <span className="text-xs text-muted-foreground">— {r.role}</span>}
+                          <Badge variant={r.approved ? "default" : "secondary"} className="text-[10px]">
+                            {r.approved ? "Approved" : "Pending"}
+                          </Badge>
+                          <div className="flex gap-0.5 ml-1">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star key={i} className={`h-3 w-3 ${i < r.rating ? "fill-accent text-accent" : "text-muted-foreground/30"}`} />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-sm text-foreground/80 mt-2 leading-relaxed">"{r.quote}"</p>
+                        <p className="text-xs text-muted-foreground mt-2">{new Date(r.createdAt).toLocaleString()}</p>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          variant={r.approved ? "outline" : "default"}
+                          onClick={() => approveReview(r.id, !r.approved)}
+                        >
+                          <Check className="h-4 w-4 mr-1" /> {r.approved ? "Unapprove" : "Approve"}
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => deleteReview(r.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </Card>
           </TabsContent>
 

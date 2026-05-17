@@ -127,6 +127,16 @@ export type Lead = {
   createdAt: number;
 };
 
+export type Review = {
+  id: string;
+  name: string;
+  role: string;
+  quote: string;
+  rating: number;
+  approved: boolean;
+  createdAt: number;
+};
+
 export type SectionKey = "hero" | "services" | "about" | "portfolio" | "blog" | "testimonials" | "contact";
 export const SECTION_KEYS: SectionKey[] = ["hero", "services", "about", "portfolio", "blog", "testimonials", "contact"];
 
@@ -319,6 +329,10 @@ type AdminCtx = {
   deleteLead: (id: string) => void;
   clearLeads: () => void;
   pruneOldLeads: () => Promise<number>;
+  reviews: Review[];
+  addReview: (r: Omit<Review, "id" | "createdAt" | "approved">) => Promise<void>;
+  approveReview: (id: string, approved: boolean) => Promise<void>;
+  deleteReview: (id: string) => Promise<void>;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
@@ -369,6 +383,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [pageLocation, setPageLocationState] = useState<Record<string, string>>(defaultPageLocation);
   const [appearance, setAppearance] = useState<Appearance>(defaultAppearance);
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [visits, setVisits] = useState(0);
   const [visitSeries, setVisitSeries] = useState<{ day: string; visits: number }[]>([]);
 
@@ -381,11 +396,12 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [settingsRes, postsRes, leadsRes, visitsRes] = await Promise.all([
+      const [settingsRes, postsRes, leadsRes, visitsRes, reviewsRes] = await Promise.all([
         supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
         supabase.from("blog_posts").select("*").order("date", { ascending: false }),
         supabase.from("leads").select("*").order("created_at", { ascending: false }),
         supabase.from("page_visits").select("created_at").gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString()),
+        supabase.from("reviews").select("*").order("created_at", { ascending: false }),
       ]);
       if (!alive) return;
 
@@ -409,6 +425,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
       if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
+      if (reviewsRes.data) setReviews(reviewsRes.data.map((r: any) => ({
+        id: r.id, name: r.name, role: r.role ?? "", quote: r.quote,
+        rating: r.rating ?? 5, approved: !!r.approved,
+        createdAt: new Date(r.created_at).getTime(),
+      })));
       if (visitsRes.data) {
         setVisits(visitsRes.data.length);
         // group by day for last 14 days
@@ -592,6 +613,29 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     return removed;
   };
 
+  // Reviews (DB-backed)
+  const addReview = async (r: Omit<Review, "id" | "createdAt" | "approved">) => {
+    const { data, error } = await supabase.from("reviews").insert({
+      name: r.name, role: r.role, quote: r.quote, rating: r.rating, approved: false,
+    }).select().single();
+    if (error || !data) { console.error(error); return; }
+    setReviews((prev) => [{
+      id: data.id, name: data.name, role: data.role ?? "", quote: data.quote,
+      rating: data.rating ?? 5, approved: !!data.approved,
+      createdAt: new Date(data.created_at).getTime(),
+    }, ...prev]);
+  };
+  const approveReview = async (id: string, approved: boolean) => {
+    const { error } = await supabase.from("reviews").update({ approved }).eq("id", id);
+    if (error) return console.error(error);
+    setReviews((prev) => prev.map((x) => (x.id === id ? { ...x, approved } : x)));
+  };
+  const deleteReview = async (id: string) => {
+    const { error } = await supabase.from("reviews").delete().eq("id", id);
+    if (error) return console.error(error);
+    setReviews((prev) => prev.filter((x) => x.id !== id));
+  };
+
   // ---------------------------------------------------------------
   // Local-state mutators (persisted via the site_settings effect)
   // ---------------------------------------------------------------
@@ -687,6 +731,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         fontChoices: FONT_CHOICES,
         visits, visitSeries,
         leads, addLead, deleteLead, clearLeads, pruneOldLeads,
+        reviews, addReview, approveReview, deleteReview,
       }}
     >
       {children}
