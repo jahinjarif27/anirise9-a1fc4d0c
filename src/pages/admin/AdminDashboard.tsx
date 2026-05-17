@@ -771,21 +771,48 @@ const AdminDashboard = () => {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <Badge variant="secondary" className="h-7 px-2.5">{leads.length} total</Badge>
                   {leads.length > 0 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        if (confirm("Clear all leads? This cannot be undone.")) {
-                          clearLeads();
-                          toast.success("All leads cleared");
-                        }
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" /> Clear all
-                    </Button>
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const esc = (v: string) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+                          const rows = [
+                            ["Date", "Name", "Email", "Phone", "Service", "Message"],
+                            ...leads.map((l) => [
+                              new Date(l.createdAt).toISOString(),
+                              l.name, l.email, l.phone, l.service, l.message,
+                            ]),
+                          ];
+                          const csv = rows.map((r) => r.map(esc).join(",")).join("\n");
+                          const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = `anirise-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                          toast.success("CSV exported");
+                        }}
+                      >
+                        <Download className="h-4 w-4" /> Export CSV
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (confirm("Clear all leads? This cannot be undone.")) {
+                            clearLeads();
+                            toast.success("All leads cleared");
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" /> Clear all
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
