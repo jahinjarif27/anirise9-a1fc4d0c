@@ -7,6 +7,7 @@ import { AdminProvider } from "@/context/AdminContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import { AppRoutes } from "./pages/AppRoutes";
 import { useTrackVisit } from "@/hooks/useTrackVisit";
+import { BottomNav } from "@/components/site/BottomNav";
 
 const RouteEffects = () => {
   useTrackVisit();
@@ -25,6 +26,7 @@ const App = () => (
           <ScrollToTop />
           <RouteEffects />
           <AppRoutes />
+          <BottomNav />
         </BrowserRouter>
       </AdminProvider>
     </TooltipProvider>
