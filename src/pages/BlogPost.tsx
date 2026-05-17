@@ -5,6 +5,7 @@ import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
+import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 const BlogPostPage = () => {
   const { slug } = useParams();
