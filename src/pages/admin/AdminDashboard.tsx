@@ -69,6 +69,13 @@ const AdminDashboard = () => {
     leads, deleteLead, clearLeads,
     visitSeries, pruneOldLeads,
     reviews, approveReview, deleteReview,
+    homeBlocks, setHomeBlock,
+    homeFaqs, addHomeFaq, updateHomeFaq, deleteHomeFaq,
+    serviceFaqs, addServiceFaq, updateServiceFaq, deleteServiceFaq,
+    stats, addStat, updateStat, deleteStat,
+    trustLogos, addTrustLogo, updateTrustLogo, deleteTrustLogo,
+    caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
+    finalCta, updateFinalCta,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
