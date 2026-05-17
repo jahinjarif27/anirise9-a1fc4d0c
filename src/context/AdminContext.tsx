@@ -613,6 +613,29 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     return removed;
   };
 
+  // Reviews (DB-backed)
+  const addReview = async (r: Omit<Review, "id" | "createdAt" | "approved">) => {
+    const { data, error } = await supabase.from("reviews").insert({
+      name: r.name, role: r.role, quote: r.quote, rating: r.rating, approved: false,
+    }).select().single();
+    if (error || !data) { console.error(error); return; }
+    setReviews((prev) => [{
+      id: data.id, name: data.name, role: data.role ?? "", quote: data.quote,
+      rating: data.rating ?? 5, approved: !!data.approved,
+      createdAt: new Date(data.created_at).getTime(),
+    }, ...prev]);
+  };
+  const approveReview = async (id: string, approved: boolean) => {
+    const { error } = await supabase.from("reviews").update({ approved }).eq("id", id);
+    if (error) return console.error(error);
+    setReviews((prev) => prev.map((x) => (x.id === id ? { ...x, approved } : x)));
+  };
+  const deleteReview = async (id: string) => {
+    const { error } = await supabase.from("reviews").delete().eq("id", id);
+    if (error) return console.error(error);
+    setReviews((prev) => prev.filter((x) => x.id !== id));
+  };
+
   // ---------------------------------------------------------------
   // Local-state mutators (persisted via the site_settings effect)
   // ---------------------------------------------------------------
@@ -708,6 +731,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         fontChoices: FONT_CHOICES,
         visits, visitSeries,
         leads, addLead, deleteLead, clearLeads, pruneOldLeads,
+        reviews, addReview, approveReview, deleteReview,
       }}
     >
       {children}
