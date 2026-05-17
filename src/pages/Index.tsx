@@ -33,10 +33,7 @@ const Index = () => {
       <Navbar />
       <main>
         {onHome("hero") && <Hero />}
-        {onHome("about") && <About />}
         {onHome("blog") && <Blog />}
-        {onHome("testimonials") && <Testimonials />}
-        {onHome("contact") && <Contact />}
         {homeSections.filter((s) => s.enabled && (s.groupKey ?? "home") === "home").map((s) => (
           <section key={s.id} className="py-16 md:py-24">
             <div className="container">
