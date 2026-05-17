@@ -345,6 +345,7 @@ const toDbPost = (p: Partial<BlogPost>) => {
   if (p.ctaEnabled !== undefined) out.cta_enabled = p.ctaEnabled;
   if (p.ctaLabel !== undefined) out.cta_label = p.ctaLabel;
   if (p.ctaUrl !== undefined) out.cta_url = p.ctaUrl;
+  if (p.body !== undefined) out.body = p.body;
   return out;
 };
 const fromDbLead = (r: any): Lead => ({
