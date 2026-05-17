@@ -22,6 +22,19 @@
   
   <link rel="icon" type="image/x-icon" href="/favicon.jpg">
   <link rel="apple-touch-icon" href="/favicon.jpg">
+  <link rel="preconnect" href="https://xlrmuspmekwbtnyeutxz.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="/favicon.jpg" fetchpriority="high">
+  <style>
+    #anirise-splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;z-index:9999;transition:opacity .35s ease;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    #anirise-splash img{width:72px;height:72px;border-radius:9999px;box-shadow:0 10px 30px -10px rgba(0,0,0,.25);animation:ar-pulse 1.6s ease-in-out infinite}
+    #anirise-splash .ar-name{font-size:22px;font-weight:800;letter-spacing:.3px;color:#0f172a}
+    #anirise-splash .ar-bar{width:120px;height:3px;border-radius:9999px;background:linear-gradient(90deg,transparent,#0f172a,transparent);background-size:200% 100%;animation:ar-slide 1.2s linear infinite}
+    @keyframes ar-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.85}}
+    @keyframes ar-slide{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .ar-splash-out{opacity:0;pointer-events:none}
+  </style>
   <meta property="og:title" content="AniRise — Visibility · Growth · Success | SEO &amp; Web Agency">
   <meta name="twitter:title" content="AniRise — Visibility · Growth · Success | SEO &amp; Web Agency">
   <meta property="og:description" content="AniRise helps brands rise online with SEO, ecommerce SEO, web development, and digital marketing. Visibility, growth, success.">
@@ -29,6 +42,11 @@
 </head>
 
   <body>
+    <div id="anirise-splash">
+      <img src="/favicon.jpg" alt="AniRise logo" />
+      <div class="ar-name">AniRise</div>
+      <div class="ar-bar"></div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
