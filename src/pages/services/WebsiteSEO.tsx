@@ -1,7 +1,8 @@
 import { ServiceLayout } from "./ServiceLayout";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, Search, TrendingUp, Target, BarChart3, Globe2, Sparkles, FileSearch, Link2, Gauge } from "lucide-react";
+import { ArrowRight, CheckCircle2, Search, TrendingUp, Target, BarChart3, Globe2, FileSearch, Link2, Gauge } from "lucide-react";
+import { ServiceFAQ } from "@/components/site/ServiceFAQ";
 
 const stats = [
   { value: "+187%", label: "Avg. organic traffic growth" },
