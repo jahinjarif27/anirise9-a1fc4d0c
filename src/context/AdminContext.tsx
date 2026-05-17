@@ -638,20 +638,21 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     }));
   const updateAppearance = (a: Partial<Appearance>) => setAppearance((prev) => ({ ...prev, ...a }));
 
-  const buildSitemap = (base: string, slugs: string[]) => {
+  const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
     const staticPaths = ["/", "/services", "/about", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
     const blogPaths = slugs.map((s) => `/blog/${s}`);
-    const all = [...staticPaths, ...blogPaths];
+    const customPaths = customSlugs.map((s) => `/${s}`);
+    const all = [...staticPaths, ...blogPaths, ...customPaths];
     const urls = all.map((p) => `  <url><loc>${base.replace(/\/$/, "")}${p}</loc><priority>${p === "/" ? "1.0" : "0.8"}</priority></url>`).join("\n");
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`;
   };
-  const regenerateSitemap = () => setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl, posts.map((p) => p.slug)) }));
+  const regenerateSitemap = () => setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl, posts.map((p) => p.slug), customPages.filter((p) => p.published).map((p) => p.slug)) }));
 
   useEffect(() => {
     if (!seo.autoSitemap) return;
-    setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl, posts.map((p) => p.slug)) }));
+    setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl, posts.map((p) => p.slug), customPages.filter((p) => p.published).map((p) => p.slug)) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [posts, seo.autoSitemap, seo.canonicalUrl]);
+  }, [posts, customPages, seo.autoSitemap, seo.canonicalUrl]);
 
   return (
     <Ctx.Provider
