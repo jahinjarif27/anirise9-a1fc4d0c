@@ -20,7 +20,11 @@ const deliverables = [
 ];
 
 const EcommerceSEOPage = () => (
-  <ServiceLayout title="Ecommerce SEO">
+  <ServiceLayout
+    title="Ecommerce SEO"
+    description="Ecommerce SEO that turns product searches into sales — product schema, category structure, and revenue keywords for Shopify, WooCommerce, and custom stores."
+    path="/services/ecommerce-seo"
+  >
     <section className="bg-gradient-hero py-20 lg:py-28 overflow-hidden">
       <div className="container grid lg:grid-cols-2 gap-12 items-center">
         <div>

@@ -1,0 +1,27 @@
+# AniRise
+
+> Digital agency helping brands rise online with SEO, ecommerce SEO, web development, and digital marketing.
+
+AniRise delivers visibility, growth, and success for clients through search engine optimization, ecommerce SEO, custom web development, graphics design, and performance digital marketing.
+
+## Pages
+
+- [Home](/): Agency overview, services, portfolio, and contact.
+- [Services](/services): Full list of services offered.
+- [About](/about): Who we are and how we work.
+- [Portfolio](/portfolio): Selected client work and results.
+- [Testimonials](/testimonials): What clients say about us.
+- [Contact](/contact): Get a quote or start a project.
+- [Blog](/blog): SEO, marketing, and growth tactics.
+
+## Services
+
+- [Website SEO](/services/website-seo): On-page, technical, and content SEO for websites.
+- [Ecommerce SEO](/services/ecommerce-seo): Product page, category, and conversion-focused SEO for stores.
+- [Graphics Design](/services/graphics-design): Brand, web, and marketing graphics.
+
+## Blog
+
+- [SEO Checklist 2026](/blog/seo-checklist-2026): The essentials to rank in 2026.
+- [Ecommerce Product Pages](/blog/ecommerce-product-pages): Convert more shoppers with better PDPs.
+- [Facebook Ads on a Small Budget](/blog/facebook-ads-small-budget): Practical Facebook Ads playbook.

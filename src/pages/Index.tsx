@@ -8,28 +8,25 @@ import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 import { Blog } from "@/components/site/Blog";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
-import { useEffect } from "react";
 import { useAdmin } from "@/context/AdminContext";
+import { useSEO } from "@/hooks/useSEO";
 
 const Index = () => {
   const { pageLocation, homeSections, customPages } = useAdmin();
   const onHome = (k: string) => (pageLocation[k] ?? "home") === "home";
-  useEffect(() => {
-    document.title = "AniRise — Visibility · Growth · Success | SEO & Web Agency";
-    const setMeta = (name: string, content: string) => {
-      let el = document.querySelector(`meta[name="${name}"]`);
-      if (!el) {
-        el = document.createElement("meta");
-        el.setAttribute("name", name);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", content);
-    };
-    setMeta(
-      "description",
+  useSEO({
+    title: "AniRise — Visibility · Growth · Success | SEO & Web Agency",
+    description:
       "AniRise is a digital agency helping brands rise online with SEO, ecommerce SEO, web development, and digital marketing. Visibility, growth, success.",
-    );
-  }, []);
+    path: "/",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "AniRise",
+      url: "https://anirise9.vercel.app/",
+      logo: "https://anirise9.vercel.app/favicon.jpg",
+    },
+  });
 
   return (
     <div className="min-h-screen bg-background">
