@@ -126,30 +126,34 @@ export const Navbar = () => {
                   <Menu className="h-6 w-6" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:max-w-sm p-0 flex flex-col">
-                <div className="flex items-center gap-3 px-6 py-5 border-b border-border bg-secondary/40">
-                  <img src={logo} alt="AniRise" className="h-10 w-10 rounded-full" />
-                  <span className="font-display text-xl font-bold">AniRise</span>
-                </div>
-                <ul className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-1">
-                  {allLinks.map((l) => (
-                    <li key={l.href}>
-                      <a
-                        href={l.href}
-                        onClick={() => setOpen(false)}
-                        className="block py-4 text-lg font-medium text-foreground/90 hover:text-accent border-b border-border/40"
-                      >
-                        {l.label}
-                      </a>
-                    </li>
-                  ))}
-                  <li className="mt-6">
-                    <Button asChild size="lg" className="w-full rounded-full bg-gradient-accent text-accent-foreground hover:opacity-90 h-14 text-base">
+              <SheetContent
+                side="top"
+                className="w-full max-h-[90vh] overflow-y-auto p-0 rounded-b-3xl border-b border-border shadow-elegant"
+              >
+                <div className="container py-6">
+                  <div className="flex items-center gap-3 pb-5 border-b border-border/60">
+                    <img src={logo} alt="AniRise" className="h-10 w-10 rounded-full ring-2 ring-primary/20" />
+                    <span className="font-display text-xl font-bold">AniRise</span>
+                  </div>
+                  <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-1 py-5">
+                    {allLinks.map((l) => (
+                      <li key={l.href}>
+                        <a
+                          href={l.href}
+                          onClick={() => setOpen(false)}
+                          className="flex items-center justify-between py-3 text-base font-medium text-foreground/90 hover:text-accent border-b border-border/40 group"
+                        >
+                          <span>{l.label}</span>
+                          <span className="opacity-0 group-hover:opacity-100 transition-smooth text-accent">→</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-3">
+                    <Button asChild size="lg" className="flex-1 rounded-full bg-gradient-accent text-accent-foreground hover:opacity-90 h-12">
                       <a href="#contact" onClick={() => setOpen(false)}>Hire Us</a>
                     </Button>
-                  </li>
-                  <li className="mt-6">
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2">
                       {contact.facebook && (
                         <a
                           href={contact.facebook}
@@ -172,16 +176,9 @@ export const Navbar = () => {
                           <Instagram className="h-5 w-5" />
                         </a>
                       )}
-                      <div className="flex gap-3 ml-auto">
-                        {["SEO", "Web", "Ads"].map((s) => (
-                          <span key={s} className="h-12 px-4 grid place-items-center rounded-xl bg-card shadow-card text-sm font-bold text-primary">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
                     </div>
-                  </li>
-                </ul>
+                  </div>
+                </div>
               </SheetContent>
             </Sheet>
           </div>
