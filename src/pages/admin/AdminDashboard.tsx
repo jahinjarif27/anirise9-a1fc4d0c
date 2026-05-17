@@ -282,13 +282,6 @@ const AdminDashboard = () => {
               Final URL: <span className="font-mono text-foreground">{seo.canonicalUrl}/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span>
             </div>
             <ImageUpload label="Page image" value={cp.image} onChange={(v) => updateCustomPage(cp.id, { image: v })} aspect="aspect-[16/9]" altValue={cp.imageAlt} onAltChange={(v) => updateCustomPage(cp.id, { imageAlt: v })} />
-            <RichTextEditor
-              label="Page body content"
-              value={cp.body}
-              onChange={(v) => updateCustomPage(cp.id, { body: v })}
-              templates={pageTemplates}
-              minHeight={420}
-            />
             <div className="flex justify-between pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteCustomPage(cp.id); setActivePage("hero"); toast.success("Page deleted"); }}>
                 <Trash2 className="h-4 w-4 text-destructive" /> Delete page
