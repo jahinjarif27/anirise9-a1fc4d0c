@@ -670,6 +670,7 @@ const AdminDashboard = () => {
           <TabsList className="h-auto flex-wrap justify-start">
             <TabsTrigger value="overview"><TrendingUp className="h-4 w-4 mr-1" /> Overview</TabsTrigger>
             <TabsTrigger value="pages"><Layout className="h-4 w-4 mr-1" /> Pages</TabsTrigger>
+            <TabsTrigger value="home"><Home className="h-4 w-4 mr-1" /> Home Builder</TabsTrigger>
             <TabsTrigger value="leads">
               <Inbox className="h-4 w-4 mr-1" /> Leads
               {leads.length > 0 && (
