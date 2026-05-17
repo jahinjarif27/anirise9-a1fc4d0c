@@ -581,7 +581,12 @@ const AdminDashboard = () => {
 
             <div className="grid gap-4">
               <Card className="p-5">
-                <h3 className="font-bold mb-4">Visitors — last 14 days</h3>
+                <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+                  <h3 className="font-bold">Visitors — last 14 days</h3>
+                  <Button variant="outline" size="sm" onClick={() => generateSeoReport()}>
+                    <Download className="h-4 w-4" /> Monthly SEO report (PDF)
+                  </Button>
+                </div>
                 <ResponsiveContainer width="100%" height={240}>
                   <LineChart data={visitSeries}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -593,6 +598,7 @@ const AdminDashboard = () => {
                 </ResponsiveContainer>
               </Card>
             </div>
+
 
             {/* Live device preview */}
             <Card className="p-5 sm:p-6 space-y-4">
