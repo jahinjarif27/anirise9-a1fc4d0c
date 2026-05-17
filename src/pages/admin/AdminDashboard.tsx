@@ -101,7 +101,7 @@ const AdminDashboard = () => {
     if (editingId) { updatePost(editingId, draft); toast.success("Post updated"); }
     else { addPost(draft); toast.success("Post created"); }
     setEditingId(null);
-    setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "" });
+    setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "", ctaEnabled: false, ctaLabel: "", ctaUrl: "" });
   };
 
   const downloadFile = (filename: string, content: string, type: string) => {
