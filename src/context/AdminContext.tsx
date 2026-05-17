@@ -396,11 +396,12 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [settingsRes, postsRes, leadsRes, visitsRes] = await Promise.all([
+      const [settingsRes, postsRes, leadsRes, visitsRes, reviewsRes] = await Promise.all([
         supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
         supabase.from("blog_posts").select("*").order("date", { ascending: false }),
         supabase.from("leads").select("*").order("created_at", { ascending: false }),
         supabase.from("page_visits").select("created_at").gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString()),
+        supabase.from("reviews").select("*").order("created_at", { ascending: false }),
       ]);
       if (!alive) return;
 
