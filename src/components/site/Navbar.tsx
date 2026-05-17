@@ -26,8 +26,8 @@ export const Navbar = () => {
     return { label, href: `/${k}` };
   });
   const customLinks = customPages
-    .filter((p) => p.published && p.navLocation !== "none" && (p.groupKey ?? "") === "")
-    .map((p) => ({ label: p.title || p.slug, href: `/p/${p.slug}` }));
+    .filter((p) => p.published && p.navLocation !== "none")
+    .map((p) => ({ label: p.title || p.slug, href: `/${p.slug}` }));
   const allLinks = [...links, ...customLinks];
   
   const [scrolled, setScrolled] = useState(false);
