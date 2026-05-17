@@ -346,6 +346,10 @@ type AdminCtx = {
   updateAppearance: (a: Partial<Appearance>) => void;
   fontChoices: readonly string[];
   visits: number;
+  leads: Lead[];
+  addLead: (l: Omit<Lead, "id" | "createdAt">) => void;
+  deleteLead: (id: string) => void;
+  clearLeads: () => void;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
