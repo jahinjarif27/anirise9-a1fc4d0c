@@ -96,14 +96,17 @@ const AdminDashboard = () => {
 
   const startEdit = (p: BlogPost) => {
     setEditingId(p.id);
+    setBlogMode(p.body && p.body.trim().length > 0 ? "editor" : "simple");
     setDraft({ slug: p.slug, title: p.title, excerpt: p.excerpt, category: p.category, author: p.author, date: p.date, readTime: p.readTime, cover: p.cover, coverAlt: p.coverAlt || "", ctaEnabled: !!p.ctaEnabled, ctaLabel: p.ctaLabel || "", ctaUrl: p.ctaUrl || "", body: p.body || "" });
   };
 
   const saveDraft = () => {
     if (!draft.title || !draft.slug) { toast.error("Title and slug are required"); return; }
-    if (editingId) { updatePost(editingId, draft); toast.success("Post updated"); }
-    else { addPost(draft); toast.success("Post created"); }
+    const payload = { ...draft, body: blogMode === "simple" ? "" : draft.body };
+    if (editingId) { updatePost(editingId, payload); toast.success("Post updated"); }
+    else { addPost(payload); toast.success("Post created"); }
     setEditingId(null);
+    setBlogMode("simple");
     setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "", ctaEnabled: false, ctaLabel: "", ctaUrl: "", body: "" });
   };
 
