@@ -90,7 +90,8 @@ export type CustomPage = {
   title: string;
   slug: string;
   parent: string;
-  navLocation: "navbar" | "menu" | "none";
+  /** Where the page link appears. Empty array = hidden (direct URL only). Multiple locations allowed. */
+  navLocation: ("navbar" | "menu")[];
   image: string;
   imageAlt: string;
   body: string;
