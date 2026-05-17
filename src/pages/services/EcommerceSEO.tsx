@@ -93,6 +93,8 @@ const EcommerceSEOPage = () => (
       </div>
     </section>
 
+    <ServiceFAQ slug="ecommerce-seo" />
+
     <section className="py-20">
       <div className="container text-center max-w-3xl">
         <Search className="h-10 w-10 text-accent mx-auto mb-4" />
