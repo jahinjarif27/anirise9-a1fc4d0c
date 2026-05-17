@@ -72,7 +72,7 @@ const AdminDashboard = () => {
     slug: "", title: "", excerpt: "", category: "SEO",
     author: "AniRise Team", date: new Date().toISOString().slice(0, 10),
     readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "",
-    ctaEnabled: false, ctaLabel: "", ctaUrl: "",
+    ctaEnabled: false, ctaLabel: "", ctaUrl: "", body: "",
   });
   const [device, setDevice] = useState<DeviceKey>("desktop");
   const [activePage, setActivePage] = useState<string>("hero");
