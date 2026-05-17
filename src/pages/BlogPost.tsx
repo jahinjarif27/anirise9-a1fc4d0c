@@ -65,10 +65,13 @@ const BlogPostPage = () => {
             <span className="inline-flex items-center gap-1"><Clock className="h-4 w-4" />{post.readTime}</span>
           </div>
           <img src={post.cover} alt={post.coverAlt || post.title} className="mt-8 w-full rounded-2xl shadow-elegant aspect-[16/9] object-cover" />
-          <div className="mt-8 prose prose-lg max-w-none text-foreground/90 leading-relaxed space-y-5">
-            <p className="text-xl text-muted-foreground">{post.excerpt}</p>
-            <p>This is a demo article preview. In a full setup, the rich body content for "{post.title}" would render here — managed from the AniRise admin dashboard.</p>
-            <p>You can publish, edit, or delete posts from the admin panel. Visit <code className="text-accent">/admin</code> or triple-click the AniRise logo and enter the password.</p>
+          <div className="mt-8 space-y-5">
+            <p className="text-xl text-muted-foreground leading-relaxed">{post.excerpt}</p>
+            {post.body && post.body.trim().length > 0 ? (
+              <MarkdownContent content={post.body} />
+            ) : (
+              <p className="text-foreground/80">Full article coming soon. Manage content from the admin dashboard.</p>
+            )}
           </div>
           {post.ctaEnabled && post.ctaLabel && post.ctaUrl && (
             <div className="mt-10 rounded-2xl border border-border bg-gradient-to-br from-accent/10 to-primary/5 p-6 sm:p-8 text-center">
