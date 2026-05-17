@@ -31,6 +31,7 @@ export const Navbar = () => {
   const allLinks = [...links, ...customLinks];
   
   const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const [clicks, setClicks] = useState<number[]>([]);
