@@ -425,6 +425,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
       if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
+      if (reviewsRes.data) setReviews(reviewsRes.data.map((r: any) => ({
+        id: r.id, name: r.name, role: r.role ?? "", quote: r.quote,
+        rating: r.rating ?? 5, approved: !!r.approved,
+        createdAt: new Date(r.created_at).getTime(),
+      })));
       if (visitsRes.data) {
         setVisits(visitsRes.data.length);
         // group by day for last 14 days
