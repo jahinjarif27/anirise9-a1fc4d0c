@@ -63,6 +63,7 @@ const AdminDashboard = () => {
     pageLocation, setPageLocation,
     sectionGroups, addSectionGroup, updateSectionGroup, deleteSectionGroup,
     updatePageSeo,
+    leads, deleteLead, clearLeads,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
