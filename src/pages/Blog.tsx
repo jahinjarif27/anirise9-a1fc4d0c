@@ -7,10 +7,12 @@ import { useSEO } from "@/hooks/useSEO";
 import { Calendar, Clock } from "lucide-react";
 
 const BlogPage = () => {
-  const { posts } = useAdmin();
+  const { posts, seo } = useAdmin();
+  const pageSeo = seo.pageSeo?.blog;
   useSEO({
-    title: "Blog — SEO, Marketing & Growth Insights | AniRise",
+    title: pageSeo?.metaTitle || "Blog — SEO, Marketing & Growth Insights | AniRise",
     description:
+      pageSeo?.metaDescription ||
       "Practical SEO, marketing, and growth tactics from the AniRise team. Read our latest articles to grow your traffic, leads, and revenue.",
     path: "/blog",
   });

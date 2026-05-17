@@ -3,12 +3,21 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
+import { useSEO } from "@/hooks/useSEO";
 import NotFound from "./NotFound";
 
 export const CustomPageView = () => {
   const { slug } = useParams();
   const { customPages } = useAdmin();
   const page = customPages.find((p) => p.slug === slug && p.published);
+
+  useSEO({
+    title: page?.seo?.metaTitle || (page ? `${page.title} — AniRise` : "AniRise"),
+    description: page?.seo?.metaDescription || (page?.body ? page.body.slice(0, 158) : undefined),
+    path: page ? `/${page.slug}` : undefined,
+    image: page?.image || undefined,
+  });
+
   if (!page) return <NotFound />;
   return (
     <div className="min-h-screen bg-background">

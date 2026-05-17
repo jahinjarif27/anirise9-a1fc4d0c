@@ -8,12 +8,13 @@ import { ArrowLeft, Calendar, Clock } from "lucide-react";
 
 const BlogPostPage = () => {
   const { slug } = useParams();
-  const { posts } = useAdmin();
+  const { posts, seo } = useAdmin();
   const post = posts.find((p) => p.slug === slug);
+  const override = seo.pageSeo?.[`blog/${slug ?? ""}`];
 
   useSEO({
-    title: post ? `${post.title} — AniRise` : "Article — AniRise",
-    description: post?.excerpt?.slice(0, 158) ?? "Article from the AniRise blog.",
+    title: override?.metaTitle || (post ? `${post.title} — AniRise` : "Article — AniRise"),
+    description: override?.metaDescription || post?.excerpt?.slice(0, 158) || "Article from the AniRise blog.",
     path: `/blog/${slug ?? ""}`,
     image: post?.cover,
     type: "article",

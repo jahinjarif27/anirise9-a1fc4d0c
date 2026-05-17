@@ -45,6 +45,7 @@ export const AppRoutes = () => {
       ))}
       <Route path="/p/:slug" element={<CustomPageView />} />
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/:slug" element={<CustomPageView />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
