@@ -936,9 +936,18 @@ const AdminDashboard = () => {
                 <Input placeholder="Read time" value={draft.readTime} onChange={(e) => setDraft({ ...draft, readTime: e.target.value })} />
                 <Input placeholder="Date" type="date" value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value })} />
               </div>
-              <Textarea className="mt-3" placeholder="Excerpt" rows={3} value={draft.excerpt} onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })} />
+              <Textarea className="mt-3" placeholder="Short excerpt — shown on blog cards and in search results (1-2 sentences)" rows={3} value={draft.excerpt} onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })} />
               <div className="mt-3">
                 <ImageUpload label="Cover image" value={draft.cover} onChange={(v) => setDraft({ ...draft, cover: v })} aspect="aspect-[16/9]" altValue={draft.coverAlt} onAltChange={(v) => setDraft({ ...draft, coverAlt: v })} />
+              </div>
+              <div className="mt-4">
+                <RichTextEditor
+                  label="Article body"
+                  value={draft.body || ""}
+                  onChange={(v) => setDraft({ ...draft, body: v })}
+                  templates={blogTemplates}
+                  minHeight={420}
+                />
               </div>
               <div className="mt-4 rounded-xl border border-border bg-secondary/30 p-4 space-y-3">
                 <div className="flex items-center justify-between gap-3">
