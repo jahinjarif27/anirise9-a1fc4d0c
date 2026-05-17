@@ -119,6 +119,36 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          approved: boolean
+          created_at: string
+          id: string
+          name: string
+          quote: string
+          rating: number
+          role: string
+        }
+        Insert: {
+          approved?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          quote: string
+          rating?: number
+          role?: string
+        }
+        Update: {
+          approved?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          quote?: string
+          rating?: number
+          role?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           appearance: Json
