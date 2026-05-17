@@ -73,7 +73,7 @@ export const Hero = () => {
             alt={content.heroImageAlt}
             width={1024}
             height={1024}
-            fetchPriority="high"
+            {...({ fetchpriority: "high" } as any)}
             decoding="async"
             className="relative rounded-[2rem] shadow-elegant w-full"
           />

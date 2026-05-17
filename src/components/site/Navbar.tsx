@@ -150,8 +150,8 @@ export const Navbar = () => {
                     ))}
                   </ul>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-3">
-                    <Button asChild size="lg" className="flex-1 rounded-full bg-gradient-accent text-accent-foreground hover:opacity-90 h-12">
-                      <a href="#contact" onClick={() => setOpen(false)}>Hire Us</a>
+                    <Button asChild size="lg" className="sm:flex-1 rounded-full bg-gradient-accent text-accent-foreground hover:opacity-90 min-h-14 h-14 text-base font-bold">
+                      <a href="#contact" onClick={() => setOpen(false)} className="flex items-center justify-center w-full h-full">Hire Us</a>
                     </Button>
                     <div className="flex items-center gap-2">
                       {contact.facebook && (

@@ -1,17 +1,17 @@
 import { Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Index from "./Index.tsx";
+import BlogPage from "./Blog.tsx";
+import BlogPostPage from "./BlogPost.tsx";
+import { CustomPageView } from "./CustomPageView";
+import { SectionPage } from "./SectionPage";
 
 const NotFound = lazy(() => import("./NotFound.tsx"));
-const BlogPage = lazy(() => import("./Blog.tsx"));
-const BlogPostPage = lazy(() => import("./BlogPost.tsx"));
 const AdminDashboard = lazy(() => import("./admin/AdminDashboard.tsx"));
 const WebsiteSEOPage = lazy(() => import("./services/WebsiteSEO.tsx"));
 const EcommerceSEOPage = lazy(() => import("./services/EcommerceSEO.tsx"));
 const GraphicsDesignPage = lazy(() => import("./services/GraphicsDesign.tsx"));
 const ComingSoonService = lazy(() => import("./services/ComingSoon.tsx"));
-const SectionPage = lazy(() => import("./SectionPage").then((m) => ({ default: m.SectionPage })));
-const CustomPageView = lazy(() => import("./CustomPageView").then((m) => ({ default: m.CustomPageView })));
 
 import { Hero } from "@/components/site/Hero";
 import { Services } from "@/components/site/Services";
