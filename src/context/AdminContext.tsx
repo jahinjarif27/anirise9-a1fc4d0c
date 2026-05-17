@@ -531,6 +531,14 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (Array.isArray(s.section_groups) && (s.section_groups as any[]).length) setSectionGroups(s.section_groups as any);
         if (s.page_location && Object.keys(s.page_location).length) setPageLocationState({ ...defaultPageLocation, ...(s.page_location as any) });
         if (s.home_membership && Object.keys(s.home_membership).length) setHomeMembershipState({ ...defaultHomeMembership, ...(s.home_membership as any) });
+        const sa = s as any;
+        if (sa.home_blocks && Object.keys(sa.home_blocks).length) setHomeBlocks({ ...defaultHomeBlocks, ...sa.home_blocks });
+        if (Array.isArray(sa.home_faqs) && sa.home_faqs.length) setHomeFaqs(sa.home_faqs);
+        if (sa.service_faqs && Object.keys(sa.service_faqs).length) setServiceFaqs({ ...defaultServiceFaqs, ...sa.service_faqs });
+        if (Array.isArray(sa.stats) && sa.stats.length) setStats(sa.stats);
+        if (Array.isArray(sa.trust_logos) && sa.trust_logos.length) setTrustLogos(sa.trust_logos);
+        if (Array.isArray(sa.case_studies) && sa.case_studies.length) setCaseStudies(sa.case_studies);
+        if (sa.final_cta && Object.keys(sa.final_cta).length) setFinalCta({ ...defaultFinalCta, ...sa.final_cta });
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
       if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
