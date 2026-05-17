@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, BarChart3, CheckCircle2, PackageSearch, Search, ShoppingCart, Star, Tags, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ServiceLayout } from "./ServiceLayout";
+import { ServiceFAQ } from "@/components/site/ServiceFAQ";
 
 const focusAreas = [
   { icon: PackageSearch, title: "Product discovery", desc: "Optimize product titles, filters, collections, and category intent so buyers find the right items faster." },
