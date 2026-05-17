@@ -126,7 +126,7 @@ export const Navbar = () => {
                   <Menu className="h-6 w-6" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="top" className="w-full sm:max-w-full max-h-screen h-screen p-0 flex flex-col">
+              <SheetContent side="right" className="w-full sm:max-w-sm p-0 flex flex-col">
                 <div className="flex items-center gap-3 px-6 py-5 border-b border-border bg-secondary/40">
                   <img src={logo} alt="AniRise" className="h-10 w-10 rounded-full" />
                   <span className="font-display text-xl font-bold">AniRise</span>
