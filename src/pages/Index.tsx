@@ -33,9 +33,7 @@ const Index = () => {
       <Navbar />
       <main>
         {onHome("hero") && <Hero />}
-        {onHome("services") && <Services />}
         {onHome("about") && <About />}
-        {onHome("portfolio") && <Portfolio />}
         {onHome("blog") && <Blog />}
         {onHome("testimonials") && <Testimonials />}
         {onHome("contact") && <Contact />}
