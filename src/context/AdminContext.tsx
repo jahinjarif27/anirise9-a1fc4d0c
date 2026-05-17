@@ -377,6 +377,34 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [appearance, setAppearance] = useState<Appearance>(defaultAppearance);
   const [visits, setVisits] = useState(0);
 
+  const LEADS_KEY = "anirise-leads";
+  const LEADS_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+  const [leads, setLeads] = useState<Lead[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem(LEADS_KEY);
+      if (!raw) return [];
+      const parsed: Lead[] = JSON.parse(raw);
+      const cutoff = Date.now() - LEADS_TTL_MS;
+      return parsed.filter((l) => l.createdAt >= cutoff);
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+    } catch {
+      // ignore
+    }
+  }, [leads]);
+
+  const addLead = (l: Omit<Lead, "id" | "createdAt">) =>
+    setLeads((prev) => [{ ...l, id: Date.now().toString(), createdAt: Date.now() }, ...prev]);
+  const deleteLead = (id: string) => setLeads((prev) => prev.filter((x) => x.id !== id));
+  const clearLeads = () => setLeads([]);
+
   useEffect(() => {
     // mock visit counter — increments on mount
     const base = 1240 + Math.floor(Math.random() * 60);
