@@ -26,6 +26,7 @@ const App = () => (
           <ScrollToTop />
           <RouteEffects />
           <AppRoutes />
+          <BottomNav />
         </BrowserRouter>
       </AdminProvider>
     </TooltipProvider>
