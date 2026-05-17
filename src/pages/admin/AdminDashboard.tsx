@@ -93,7 +93,7 @@ const AdminDashboard = () => {
 
   const startEdit = (p: BlogPost) => {
     setEditingId(p.id);
-    setDraft({ slug: p.slug, title: p.title, excerpt: p.excerpt, category: p.category, author: p.author, date: p.date, readTime: p.readTime, cover: p.cover, coverAlt: p.coverAlt || "", ctaEnabled: !!p.ctaEnabled, ctaLabel: p.ctaLabel || "", ctaUrl: p.ctaUrl || "" });
+    setDraft({ slug: p.slug, title: p.title, excerpt: p.excerpt, category: p.category, author: p.author, date: p.date, readTime: p.readTime, cover: p.cover, coverAlt: p.coverAlt || "", ctaEnabled: !!p.ctaEnabled, ctaLabel: p.ctaLabel || "", ctaUrl: p.ctaUrl || "", body: p.body || "" });
   };
 
   const saveDraft = () => {
@@ -101,7 +101,7 @@ const AdminDashboard = () => {
     if (editingId) { updatePost(editingId, draft); toast.success("Post updated"); }
     else { addPost(draft); toast.success("Post created"); }
     setEditingId(null);
-    setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "", ctaEnabled: false, ctaLabel: "", ctaUrl: "" });
+    setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "", ctaEnabled: false, ctaLabel: "", ctaUrl: "", body: "" });
   };
 
   const downloadFile = (filename: string, content: string, type: string) => {
