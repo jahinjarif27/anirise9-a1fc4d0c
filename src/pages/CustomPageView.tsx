@@ -5,6 +5,7 @@ import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 import NotFound from "./NotFound";
+import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 export const CustomPageView = () => {
   const { slug } = useParams();
