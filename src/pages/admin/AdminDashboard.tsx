@@ -160,19 +160,21 @@ const AdminDashboard = () => {
     );
   };
 
-  const SeoBlock = ({ pageKey }: { pageKey: string }) => {
+  const SeoBlock = ({ pageKey, hideAuto = false }: { pageKey: string; hideAuto?: boolean }) => {
     const s = seo.pageSeo[pageKey] || { metaTitle: "", metaDescription: "", metaKeywords: "" };
     return (
       <Card className="p-5 sm:p-6 space-y-3">
         <div className="flex items-center gap-2">
           <Search className="h-4 w-4" />
           <h4 className="font-bold">Page SEO</h4>
-          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => {
-            const title = (content as any)[`${pageKey}Headline`] || (content as any)[`${pageKey}Title`] || s.metaTitle;
-            const desc = (content as any)[`${pageKey}Blurb`] || (content as any)[`${pageKey}Tagline`] || s.metaDescription;
-            updatePageSeo(pageKey, { metaTitle: title, metaDescription: desc });
-            toast.success("Auto-filled from page content");
-          }}><Sparkles className="h-4 w-4" /> Auto-generate</Button>
+          {!hideAuto && (
+            <Button size="sm" variant="ghost" className="ml-auto" onClick={() => {
+              const title = (content as any)[`${pageKey}Headline`] || (content as any)[`${pageKey}Title`] || s.metaTitle;
+              const desc = (content as any)[`${pageKey}Blurb`] || (content as any)[`${pageKey}Tagline`] || s.metaDescription;
+              updatePageSeo(pageKey, { metaTitle: title, metaDescription: desc });
+              toast.success("Auto-filled from page content");
+            }}><Sparkles className="h-4 w-4" /> Auto-generate</Button>
+          )}
         </div>
         <div>
           <label className="text-xs font-medium mb-1 block">Meta title <span className="text-muted-foreground">({s.metaTitle.length}/60)</span></label>
