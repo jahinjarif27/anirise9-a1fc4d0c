@@ -119,6 +119,117 @@ const AdminDashboard = () => {
     toast.success(`${filename} downloaded`);
   };
 
+  const generateSeoReport = () => {
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const W = doc.internal.pageSize.getWidth();
+    const margin = 48;
+    let y = margin;
+    const now = new Date();
+    const monthLabel = now.toLocaleString("en-US", { month: "long", year: "numeric" });
+
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, W, 90, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("AniRise — Monthly SEO Report", margin, 50);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(`${monthLabel}  ·  ${seo.canonicalUrl}`, margin, 72);
+
+    y = 130;
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Key metrics (last 30 days)", margin, y);
+    y += 22;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    const metrics: [string, string][] = [
+      ["Total visitors", visits.toLocaleString()],
+      ["Estimated page views", Math.round(visits * 2.7).toLocaleString()],
+      ["New leads", leads.filter((l) => l.createdAt > Date.now() - 30 * 86400000).length.toString()],
+      ["Published posts", posts.length.toString()],
+      ["Custom pages", customPages.filter((p) => p.published).length.toString()],
+      ["Indexed sitemap URLs", (seo.sitemap.match(/<url>/g) || []).length.toString()],
+    ];
+    metrics.forEach(([k, v]) => {
+      doc.text(k, margin, y);
+      doc.setFont("helvetica", "bold");
+      doc.text(v, W - margin, y, { align: "right" });
+      doc.setFont("helvetica", "normal");
+      y += 18;
+    });
+
+    y += 16;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Daily visitors — last 14 days", margin, y);
+    y += 16;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const max = Math.max(1, ...visitSeries.map((d) => d.visits));
+    const barW = (W - margin * 2) / Math.max(1, visitSeries.length) - 4;
+    const baseY = y + 90;
+    visitSeries.forEach((d, i) => {
+      const h = (d.visits / max) * 80;
+      const x = margin + i * (barW + 4);
+      doc.setFillColor(59, 130, 246);
+      doc.rect(x, baseY - h, barW, h, "F");
+      doc.setTextColor(100, 116, 139);
+      doc.text(d.day, x + barW / 2, baseY + 12, { align: "center" });
+    });
+    y = baseY + 30;
+
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("SEO configuration", margin, y);
+    y += 20;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const wrap = (label: string, val: string) => {
+      doc.setFont("helvetica", "bold"); doc.text(`${label}:`, margin, y);
+      doc.setFont("helvetica", "normal");
+      const lines = doc.splitTextToSize(val || "—", W - margin * 2 - 90);
+      doc.text(lines, margin + 90, y);
+      y += lines.length * 13 + 4;
+    };
+    wrap("Meta title", seo.metaTitle);
+    wrap("Meta description", seo.metaDescription);
+    wrap("Keywords", seo.metaKeywords);
+    wrap("Canonical URL", seo.canonicalUrl);
+    wrap("Active schemas", seo.schemas.filter((s) => s.enabled).map((s) => s.type).join(", "));
+    wrap("Active redirects", seo.redirects.filter((r) => r.enabled).length.toString());
+
+    y += 10;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Recommendations", margin, y);
+    y += 18;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const recs = [
+      "Publish 2 new blog posts this month targeting long-tail SEO keywords.",
+      "Refresh the meta description on top 5 pages with action-oriented copy.",
+      "Add internal links from blog posts back to your top service pages.",
+      "Request indexing in Google Search Console for any new custom pages.",
+      "Review and optimise images > 200KB to improve Core Web Vitals.",
+    ];
+    recs.forEach((r) => {
+      const lines = doc.splitTextToSize(`• ${r}`, W - margin * 2);
+      doc.text(lines, margin, y);
+      y += lines.length * 13 + 2;
+    });
+
+    doc.setFontSize(9);
+    doc.setTextColor(148, 163, 184);
+    doc.text(`Generated ${now.toLocaleString()} · AniRise`, margin, doc.internal.pageSize.getHeight() - 24);
+
+    doc.save(`anirise-seo-report-${now.toISOString().slice(0, 7)}.pdf`);
+    toast.success("SEO report downloaded");
+  };
+
   const allPages = useMemo(
     () => [...SITE_PAGES.map((p) => ({ ...p, isCustom: false as const })),
            ...customPages.map((p) => ({ key: `custom:${p.id}`, label: p.title || p.slug || "Untitled page", isCustom: true as const, id: p.id }))],
