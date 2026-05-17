@@ -12,7 +12,11 @@ const services = [
 const packages = ["Logo and brand refresh concepts", "Social media post templates", "Ad creative variations", "Business card and print-ready files", "Campaign visual direction", "Editable source-file handoff"];
 
 const GraphicsDesignPage = () => (
-  <ServiceLayout title="Graphics Design">
+  <ServiceLayout
+    title="Graphics Design"
+    description="Strategic graphics design for brands — logo and identity, social creatives, ad banners, and marketing visuals that look premium and convert attention."
+    path="/services/graphics-design"
+  >
     <section className="bg-gradient-hero py-20 lg:py-28">
       <div className="container grid lg:grid-cols-2 gap-12 items-center">
         <div>
