@@ -23,6 +23,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <RouteEffects />
           <AppRoutes />
         </BrowserRouter>
       </AdminProvider>
