@@ -588,12 +588,19 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         section_groups: sectionGroups as any,
         page_location: pageLocation as any,
         home_membership: homeMembership as any,
+        home_blocks: homeBlocks as any,
+        home_faqs: homeFaqs as any,
+        service_faqs: serviceFaqs as any,
+        stats: stats as any,
+        trust_logos: trustLogos as any,
+        case_studies: caseStudies as any,
+        final_cta: finalCta as any,
         updated_at: new Date().toISOString(),
       }).eq("id", 1).then(({ error }) => {
         if (error) console.error("[site_settings] save failed", error);
       });
     }, 500);
-  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership]);
+  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta]);
 
   // ---------------------------------------------------------------
   // Live document.head effects (unchanged)
