@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, BadgeCheck, Brush, CheckCircle2, Image, LayoutGrid, Palette, PenTool, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ServiceLayout } from "./ServiceLayout";
+import { ServiceFAQ } from "@/components/site/ServiceFAQ";
 
 const services = [
   { icon: Palette, title: "Brand identity", desc: "Logo direction, color system, typography, and visual rules that make your brand memorable." },
