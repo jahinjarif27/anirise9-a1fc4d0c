@@ -80,6 +80,8 @@ const GraphicsDesignPage = () => (
         </ul>
       </div>
     </section>
+
+    <ServiceFAQ slug="graphics-design" />
   </ServiceLayout>
 );
 
