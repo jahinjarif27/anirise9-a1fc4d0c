@@ -818,6 +818,31 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     }));
   const updateAppearance = (a: Partial<Appearance>) => setAppearance((prev) => ({ ...prev, ...a }));
 
+  // ---------------------------------------------------------------
+  // Home builder mutators
+  // ---------------------------------------------------------------
+  const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const setHomeBlock = (k: HomeBlockKey, v: boolean) => setHomeBlocks((prev) => ({ ...prev, [k]: v }));
+  const addHomeFaq = (f: Omit<FaqItem, "id">) => setHomeFaqs((prev) => [...prev, { ...f, id: newId() }]);
+  const updateHomeFaq = (id: string, f: Partial<FaqItem>) => setHomeFaqs((prev) => prev.map((x) => x.id === id ? { ...x, ...f } : x));
+  const deleteHomeFaq = (id: string) => setHomeFaqs((prev) => prev.filter((x) => x.id !== id));
+  const addServiceFaq = (slug: string, f: Omit<FaqItem, "id">) =>
+    setServiceFaqs((prev) => ({ ...prev, [slug]: [...(prev[slug] || []), { ...f, id: newId() }] }));
+  const updateServiceFaq = (slug: string, id: string, f: Partial<FaqItem>) =>
+    setServiceFaqs((prev) => ({ ...prev, [slug]: (prev[slug] || []).map((x) => x.id === id ? { ...x, ...f } : x) }));
+  const deleteServiceFaq = (slug: string, id: string) =>
+    setServiceFaqs((prev) => ({ ...prev, [slug]: (prev[slug] || []).filter((x) => x.id !== id) }));
+  const addStat = (s: Omit<StatItem, "id">) => setStats((prev) => [...prev, { ...s, id: newId() }]);
+  const updateStat = (id: string, s: Partial<StatItem>) => setStats((prev) => prev.map((x) => x.id === id ? { ...x, ...s } : x));
+  const deleteStat = (id: string) => setStats((prev) => prev.filter((x) => x.id !== id));
+  const addTrustLogo = (t: Omit<TrustLogo, "id">) => setTrustLogos((prev) => [...prev, { ...t, id: newId() }]);
+  const updateTrustLogo = (id: string, t: Partial<TrustLogo>) => setTrustLogos((prev) => prev.map((x) => x.id === id ? { ...x, ...t } : x));
+  const deleteTrustLogo = (id: string) => setTrustLogos((prev) => prev.filter((x) => x.id !== id));
+  const addCaseStudy = (c: Omit<CaseStudy, "id">) => setCaseStudies((prev) => [...prev, { ...c, id: newId() }]);
+  const updateCaseStudy = (id: string, c: Partial<CaseStudy>) => setCaseStudies((prev) => prev.map((x) => x.id === id ? { ...x, ...c } : x));
+  const deleteCaseStudy = (id: string) => setCaseStudies((prev) => prev.filter((x) => x.id !== id));
+  const updateFinalCta = (c: Partial<FinalCta>) => setFinalCta((prev) => ({ ...prev, ...c }));
+
   const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
     const staticPaths = ["/", "/services", "/about", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
     const blogPaths = slugs.map((s) => `/blog/${s}`);
