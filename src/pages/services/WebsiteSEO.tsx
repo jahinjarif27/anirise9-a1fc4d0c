@@ -38,7 +38,11 @@ const faqs = [
 
 const WebsiteSEOPage = () => {
   return (
-    <ServiceLayout title="Website SEO">
+    <ServiceLayout
+      title="Website SEO"
+      description="Website SEO from AniRise — technical audits, keyword strategy, on-page optimization, and authority building that grow organic traffic and revenue."
+      path="/services/website-seo"
+    >
       {/* Hero */}
       <section className="bg-gradient-hero py-20 lg:py-28 relative overflow-hidden">
         <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-accent/10 blur-3xl" aria-hidden />

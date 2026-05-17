@@ -10,7 +10,11 @@ const ComingSoonService = () => {
   const Icon = service?.icon;
 
   return (
-    <ServiceLayout title={service?.title ?? "Service"}>
+    <ServiceLayout
+      title={service?.title ?? "Service"}
+      description={service?.desc ?? "Detailed page coming soon — get in touch and we'll walk you through it personally."}
+      path={`/services/${slug ?? ""}`}
+    >
       <section className="py-24">
         <div className="container max-w-2xl text-center">
           {Icon && (
