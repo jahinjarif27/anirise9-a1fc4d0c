@@ -127,6 +127,16 @@ export type Lead = {
   createdAt: number;
 };
 
+export type Review = {
+  id: string;
+  name: string;
+  role: string;
+  quote: string;
+  rating: number;
+  approved: boolean;
+  createdAt: number;
+};
+
 export type SectionKey = "hero" | "services" | "about" | "portfolio" | "blog" | "testimonials" | "contact";
 export const SECTION_KEYS: SectionKey[] = ["hero", "services", "about", "portfolio", "blog", "testimonials", "contact"];
 
@@ -319,6 +329,10 @@ type AdminCtx = {
   deleteLead: (id: string) => void;
   clearLeads: () => void;
   pruneOldLeads: () => Promise<number>;
+  reviews: Review[];
+  addReview: (r: Omit<Review, "id" | "createdAt" | "approved">) => Promise<void>;
+  approveReview: (id: string, approved: boolean) => Promise<void>;
+  deleteReview: (id: string) => Promise<void>;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
@@ -369,6 +383,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [pageLocation, setPageLocationState] = useState<Record<string, string>>(defaultPageLocation);
   const [appearance, setAppearance] = useState<Appearance>(defaultAppearance);
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [visits, setVisits] = useState(0);
   const [visitSeries, setVisitSeries] = useState<{ day: string; visits: number }[]>([]);
 
