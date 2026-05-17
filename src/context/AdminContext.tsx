@@ -410,6 +410,31 @@ type AdminCtx = {
   addReview: (r: Omit<Review, "id" | "createdAt" | "approved">) => Promise<void>;
   approveReview: (id: string, approved: boolean) => Promise<void>;
   deleteReview: (id: string) => Promise<void>;
+  // Home builder
+  homeBlocks: HomeBlocks;
+  setHomeBlock: (k: HomeBlockKey, v: boolean) => void;
+  homeFaqs: FaqItem[];
+  addHomeFaq: (f: Omit<FaqItem, "id">) => void;
+  updateHomeFaq: (id: string, f: Partial<FaqItem>) => void;
+  deleteHomeFaq: (id: string) => void;
+  serviceFaqs: Record<string, FaqItem[]>;
+  addServiceFaq: (slug: string, f: Omit<FaqItem, "id">) => void;
+  updateServiceFaq: (slug: string, id: string, f: Partial<FaqItem>) => void;
+  deleteServiceFaq: (slug: string, id: string) => void;
+  stats: StatItem[];
+  addStat: (s: Omit<StatItem, "id">) => void;
+  updateStat: (id: string, s: Partial<StatItem>) => void;
+  deleteStat: (id: string) => void;
+  trustLogos: TrustLogo[];
+  addTrustLogo: (t: Omit<TrustLogo, "id">) => void;
+  updateTrustLogo: (id: string, t: Partial<TrustLogo>) => void;
+  deleteTrustLogo: (id: string) => void;
+  caseStudies: CaseStudy[];
+  addCaseStudy: (c: Omit<CaseStudy, "id">) => void;
+  updateCaseStudy: (id: string, c: Partial<CaseStudy>) => void;
+  deleteCaseStudy: (id: string) => void;
+  finalCta: FinalCta;
+  updateFinalCta: (c: Partial<FinalCta>) => void;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
