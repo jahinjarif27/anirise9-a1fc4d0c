@@ -329,6 +329,7 @@ const fromDbPost = (r: any): BlogPost => ({
   category: r.category, author: r.author, date: r.date,
   readTime: r.read_time, cover: r.cover, coverAlt: r.cover_alt ?? "",
   ctaEnabled: !!r.cta_enabled, ctaLabel: r.cta_label ?? "", ctaUrl: r.cta_url ?? "",
+  body: r.body ?? "",
 });
 const toDbPost = (p: Partial<BlogPost>) => {
   const out: any = {};
