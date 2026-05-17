@@ -526,6 +526,12 @@ const AdminDashboard = () => {
           <TabsList className="h-auto flex-wrap justify-start">
             <TabsTrigger value="overview"><TrendingUp className="h-4 w-4 mr-1" /> Overview</TabsTrigger>
             <TabsTrigger value="pages"><Layout className="h-4 w-4 mr-1" /> Pages</TabsTrigger>
+            <TabsTrigger value="leads">
+              <Inbox className="h-4 w-4 mr-1" /> Leads
+              {leads.length > 0 && (
+                <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-[10px]">{leads.length}</Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="blog"><FileText className="h-4 w-4 mr-1" /> Blog</TabsTrigger>
             <TabsTrigger value="settings"><Settings className="h-4 w-4 mr-1" /> Settings</TabsTrigger>
           </TabsList>
