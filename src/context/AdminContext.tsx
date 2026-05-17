@@ -390,7 +390,12 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (Array.isArray(s.portfolio) && (s.portfolio as any[]).length) setPortfolio(s.portfolio as any);
         if (s.seo && Object.keys(s.seo).length) setSeo({ ...defaultSeo, ...(s.seo as any) });
         if (s.appearance && Object.keys(s.appearance).length) setAppearance({ ...defaultAppearance, ...(s.appearance as any) });
-        if (Array.isArray(s.custom_pages)) setCustomPages(s.custom_pages as any);
+        if (Array.isArray(s.custom_pages)) setCustomPages((s.custom_pages as any[]).map((p) => ({
+          ...p,
+          navLocation: Array.isArray(p.navLocation)
+            ? p.navLocation
+            : p.navLocation === "none" || !p.navLocation ? [] : [p.navLocation],
+        })) as any);
         if (Array.isArray(s.home_sections)) setHomeSections(s.home_sections as any);
         if (Array.isArray(s.section_groups) && (s.section_groups as any[]).length) setSectionGroups(s.section_groups as any);
         if (s.page_location && Object.keys(s.page_location).length) setPageLocationState({ ...defaultPageLocation, ...(s.page_location as any) });
