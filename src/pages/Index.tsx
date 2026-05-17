@@ -1,17 +1,19 @@
 import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
-import { Services } from "@/components/site/Services";
-import { About } from "@/components/site/About";
-import { Portfolio } from "@/components/site/Portfolio";
-import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 import { Blog } from "@/components/site/Blog";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
+import { TrustStrip } from "@/components/site/home/TrustStrip";
+import { StatsBand } from "@/components/site/home/StatsBand";
+import { ServicesPreview } from "@/components/site/home/ServicesPreview";
+import { CaseStudies } from "@/components/site/home/CaseStudies";
+import { HomeFAQ } from "@/components/site/home/HomeFAQ";
+import { FinalCTA } from "@/components/site/home/FinalCTA";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 
 const Index = () => {
-  const { pageLocation, homeSections, customPages } = useAdmin();
+  const { pageLocation, homeSections, customPages, homeBlocks } = useAdmin();
   const onHome = (k: string) => (pageLocation[k] ?? "home") === "home";
   useSEO({
     title: "AniRise — Visibility · Growth · Success | SEO & Web Agency",
@@ -32,7 +34,13 @@ const Index = () => {
       <Navbar />
       <main>
         {onHome("hero") && <Hero />}
+        {homeBlocks.trustStrip && <TrustStrip />}
+        {homeBlocks.stats && <StatsBand />}
+        {homeBlocks.servicesPreview && <ServicesPreview />}
+        {homeBlocks.caseStudies && <CaseStudies />}
         {onHome("blog") && <Blog />}
+        {homeBlocks.homeFaq && <HomeFAQ />}
+        {homeBlocks.finalCta && <FinalCTA />}
         {homeSections.filter((s) => s.enabled && (s.groupKey ?? "home") === "home").map((s) => (
           <section key={s.id} className="py-16 md:py-24">
             <div className="container">
