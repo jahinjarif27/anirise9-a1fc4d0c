@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,7 +7,30 @@ import { toast } from "sonner";
 import { useAdmin } from "@/context/AdminContext";
 
 export const Contact = () => {
-  const { content, contact } = useAdmin();
+  const { content, contact, addLead } = useAdmin();
+  const [form, setForm] = useState({ name: "", email: "", phone: "", service: "", message: "" });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.message.trim()) {
+      toast.error("Please fill in name, email, phone, and message.");
+      return;
+    }
+    const phoneDigits = form.phone.replace(/[^\d+]/g, "");
+    if (phoneDigits.replace(/\D/g, "").length < 7) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+    addLead({
+      name: form.name.trim().slice(0, 100),
+      email: form.email.trim().slice(0, 255),
+      phone: phoneDigits.slice(0, 20),
+      service: form.service.trim().slice(0, 100),
+      message: form.message.trim().slice(0, 1000),
+    });
+    toast.success("Message sent! We'll get back to you within 24 hours.");
+    setForm({ name: "", email: "", phone: "", service: "", message: "" });
+  };
 
   return (
     <section id="contact" className="py-24 bg-background">
@@ -71,30 +95,63 @@ export const Contact = () => {
         </div>
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            toast.success("Message sent! We'll get back to you within 24 hours.");
-            (e.target as HTMLFormElement).reset();
-          }}
+          onSubmit={handleSubmit}
           className="bg-card rounded-2xl p-8 shadow-elegant border border-border/40 space-y-5"
         >
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">Name</label>
-              <Input required placeholder="Your name" />
+              <Input
+                required
+                maxLength={100}
+                placeholder="Your name"
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              />
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">Email</label>
-              <Input required type="email" placeholder="you@brand.com" />
+              <Input
+                required
+                type="email"
+                maxLength={255}
+                placeholder="you@brand.com"
+                value={form.email}
+                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              />
             </div>
           </div>
           <div>
+            <label className="text-sm font-medium text-foreground mb-2 block">Mobile Number</label>
+            <Input
+              required
+              type="tel"
+              inputMode="tel"
+              maxLength={20}
+              placeholder="+8801XXXXXXXXX"
+              value={form.phone}
+              onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+            />
+          </div>
+          <div>
             <label className="text-sm font-medium text-foreground mb-2 block">Service</label>
-            <Input placeholder="e.g. Website SEO, Web Development" />
+            <Input
+              maxLength={100}
+              placeholder="e.g. Website SEO, Web Development"
+              value={form.service}
+              onChange={(e) => setForm((f) => ({ ...f, service: e.target.value }))}
+            />
           </div>
           <div>
             <label className="text-sm font-medium text-foreground mb-2 block">Message</label>
-            <Textarea required rows={5} placeholder="Tell us about your project..." />
+            <Textarea
+              required
+              rows={5}
+              maxLength={1000}
+              placeholder="Tell us about your project..."
+              value={form.message}
+              onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+            />
           </div>
           <Button type="submit" variant="hero" size="lg" className="w-full rounded-full">
             Send Message <Send className="h-4 w-4" />
