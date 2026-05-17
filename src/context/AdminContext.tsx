@@ -142,6 +142,16 @@ type Appearance = {
   baseFontSize: number; // px
 };
 
+export type Lead = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  service: string;
+  message: string;
+  createdAt: number; // ms epoch
+};
+
 export type SectionKey = "hero" | "services" | "about" | "portfolio" | "blog" | "testimonials" | "contact";
 export const SECTION_KEYS: SectionKey[] = ["hero", "services", "about", "portfolio", "blog", "testimonials", "contact"];
 
@@ -336,6 +346,10 @@ type AdminCtx = {
   updateAppearance: (a: Partial<Appearance>) => void;
   fontChoices: readonly string[];
   visits: number;
+  leads: Lead[];
+  addLead: (l: Omit<Lead, "id" | "createdAt">) => void;
+  deleteLead: (id: string) => void;
+  clearLeads: () => void;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
@@ -362,6 +376,34 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   });
   const [appearance, setAppearance] = useState<Appearance>(defaultAppearance);
   const [visits, setVisits] = useState(0);
+
+  const LEADS_KEY = "anirise-leads";
+  const LEADS_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+  const [leads, setLeads] = useState<Lead[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem(LEADS_KEY);
+      if (!raw) return [];
+      const parsed: Lead[] = JSON.parse(raw);
+      const cutoff = Date.now() - LEADS_TTL_MS;
+      return parsed.filter((l) => l.createdAt >= cutoff);
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+    } catch {
+      // ignore
+    }
+  }, [leads]);
+
+  const addLead = (l: Omit<Lead, "id" | "createdAt">) =>
+    setLeads((prev) => [{ ...l, id: Date.now().toString(), createdAt: Date.now() }, ...prev]);
+  const deleteLead = (id: string) => setLeads((prev) => prev.filter((x) => x.id !== id));
+  const clearLeads = () => setLeads([]);
 
   useEffect(() => {
     // mock visit counter — increments on mount
@@ -625,6 +667,10 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         updateAppearance,
         fontChoices: FONT_CHOICES,
         visits,
+        leads,
+        addLead,
+        deleteLead,
+        clearLeads,
       }}
     >
       {children}
