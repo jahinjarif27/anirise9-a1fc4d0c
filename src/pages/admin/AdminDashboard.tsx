@@ -753,6 +753,127 @@ const AdminDashboard = () => {
             </div>
           </TabsContent>
 
+          {/* LEADS */}
+          <TabsContent value="leads" className="space-y-4">
+            <Card className="p-5">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="flex items-start gap-3">
+                  <div className="h-11 w-11 rounded-xl bg-gradient-accent text-accent-foreground grid place-items-center shadow-accent">
+                    <Inbox className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">Contact form leads</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Every submission from the website Contact section. Tap a phone number to call instantly.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1.5">
+                      <Clock className="h-3 w-3" /> Auto-clears entries older than 90 days to save storage.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="h-7 px-2.5">{leads.length} total</Badge>
+                  {leads.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (confirm("Clear all leads? This cannot be undone.")) {
+                          clearLeads();
+                          toast.success("All leads cleared");
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" /> Clear all
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </Card>
+
+            {leads.length === 0 ? (
+              <Card className="p-10 text-center">
+                <div className="h-14 w-14 mx-auto rounded-2xl bg-secondary/60 grid place-items-center mb-4">
+                  <Inbox className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="font-semibold">No leads yet</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  New messages from the Contact section will appear here.
+                </p>
+              </Card>
+            ) : (
+              <div className="grid gap-3">
+                {leads.map((l) => {
+                  const date = new Date(l.createdAt);
+                  const expiresAt = new Date(l.createdAt + 90 * 24 * 60 * 60 * 1000);
+                  const daysLeft = Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000)));
+                  return (
+                    <Card key={l.id} className="p-5">
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-bold text-foreground">{l.name}</p>
+                            {l.service && (
+                              <Badge variant="secondary" className="text-[10px]">{l.service}</Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1.5">
+                            <Clock className="h-3 w-3" /> {date.toLocaleString()} · expires in {daysLeft}d
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => { deleteLead(l.id); toast.success("Lead deleted"); }}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-2 mt-4">
+                        <a
+                          href={`tel:${l.phone}`}
+                          className="flex items-center gap-3 rounded-xl border border-border bg-secondary/30 p-3 hover:bg-accent/10 hover:border-accent transition-smooth group"
+                        >
+                          <span className="h-9 w-9 rounded-lg bg-gradient-accent text-accent-foreground grid place-items-center shadow-accent">
+                            <PhoneCall className="h-4 w-4" />
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Tap to call</p>
+                            <p className="font-semibold text-foreground truncate group-hover:text-accent transition-smooth">
+                              {l.phone}
+                            </p>
+                          </div>
+                        </a>
+                        <a
+                          href={`mailto:${l.email}`}
+                          className="flex items-center gap-3 rounded-xl border border-border bg-secondary/30 p-3 hover:bg-accent/10 hover:border-accent transition-smooth group"
+                        >
+                          <span className="h-9 w-9 rounded-lg bg-accent/10 text-accent grid place-items-center">
+                            <Mail className="h-4 w-4" />
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Email</p>
+                            <p className="font-semibold text-foreground truncate group-hover:text-accent transition-smooth">
+                              {l.email}
+                            </p>
+                          </div>
+                        </a>
+                      </div>
+
+                      {l.message && (
+                        <div className="mt-3 rounded-xl bg-background border border-border/60 p-3">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Message</p>
+                          <p className="text-sm text-foreground whitespace-pre-wrap">{l.message}</p>
+                        </div>
+                      )}
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+
           {/* BLOG */}
           <TabsContent value="blog" className="space-y-6">
             <Card className="p-6">
