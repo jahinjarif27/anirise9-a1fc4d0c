@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const SITE_URL = "https://anirise9.vercel.app";
+const SITE_URL = "https://anirise.com.bd";
 
 type SEOOptions = {
   title: string;

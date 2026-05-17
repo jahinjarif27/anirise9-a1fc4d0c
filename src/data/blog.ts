@@ -9,6 +9,9 @@ export type BlogPost = {
   readTime: string;
   cover: string;
   coverAlt?: string;
+  ctaEnabled?: boolean;
+  ctaLabel?: string;
+  ctaUrl?: string;
 };
 
 export const initialPosts: BlogPost[] = [

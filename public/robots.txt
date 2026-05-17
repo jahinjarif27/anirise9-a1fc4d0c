@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-Sitemap: https://anirise9.vercel.app/sitemap.xml
+Sitemap: https://anirise.com.bd/sitemap.xml

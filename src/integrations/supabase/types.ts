@@ -21,6 +21,9 @@ export type Database = {
           cover: string
           cover_alt: string
           created_at: string
+          cta_enabled: boolean
+          cta_label: string
+          cta_url: string
           date: string
           excerpt: string
           id: string
@@ -34,6 +37,9 @@ export type Database = {
           cover?: string
           cover_alt?: string
           created_at?: string
+          cta_enabled?: boolean
+          cta_label?: string
+          cta_url?: string
           date?: string
           excerpt?: string
           id?: string
@@ -47,6 +53,9 @@ export type Database = {
           cover?: string
           cover_alt?: string
           created_at?: string
+          cta_enabled?: boolean
+          cta_label?: string
+          cta_url?: string
           date?: string
           excerpt?: string
           id?: string

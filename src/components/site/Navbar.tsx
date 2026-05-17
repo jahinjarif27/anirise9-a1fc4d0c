@@ -26,7 +26,7 @@ export const Navbar = () => {
     return { label, href: `/${k}` };
   });
   const customLinks = customPages
-    .filter((p) => p.published && p.navLocation !== "none")
+    .filter((p) => p.published && Array.isArray(p.navLocation) && p.navLocation.length > 0)
     .map((p) => ({ label: p.title || p.slug, href: `/${p.slug}` }));
   const allLinks = [...links, ...customLinks];
   

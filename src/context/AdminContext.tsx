@@ -90,7 +90,8 @@ export type CustomPage = {
   title: string;
   slug: string;
   parent: string;
-  navLocation: "navbar" | "menu" | "none";
+  /** Where the page link appears. Empty array = hidden (direct URL only). Multiple locations allowed. */
+  navLocation: ("navbar" | "menu")[];
   image: string;
   imageAlt: string;
   body: string;
@@ -208,11 +209,11 @@ const defaultSeo: SeoSettings = {
     "AniRise helps brands rise online with SEO, ecommerce SEO, web development, and digital marketing. Visibility, growth, success.",
   metaKeywords: "SEO, ecommerce SEO, web development, digital marketing, AniRise",
   ogImage: "/favicon.jpg",
-  canonicalUrl: "https://anirise9.vercel.app",
+  canonicalUrl: "https://anirise.com.bd",
   canonicalAuto: true,
   canonicalPerPage: {},
   sitemap: "",
-  robotsTxt: `User-agent: *\nAllow: /\nDisallow: /admin\n\nSitemap: https://anirise9.vercel.app/sitemap.xml`,
+  robotsTxt: `User-agent: *\nAllow: /\nDisallow: /admin\n\nSitemap: https://anirise.com.bd/sitemap.xml`,
   autoSitemap: true,
   redirects: [
     { id: "r1", from: "/old-blog", to: "/blog", code: 301, enabled: true },
@@ -225,8 +226,8 @@ const defaultSeo: SeoSettings = {
       name: "AniRise — Organization",
       json: JSON.stringify({
         name: "AniRise",
-        url: "https://anirise9.vercel.app",
-        logo: "https://anirise9.vercel.app/favicon.jpg",
+        url: "https://anirise.com.bd",
+        logo: "https://anirise.com.bd/favicon.jpg",
         sameAs: ["https://www.facebook.com/anirisebd"],
       }, null, 2),
     },
@@ -327,6 +328,7 @@ const fromDbPost = (r: any): BlogPost => ({
   id: r.id, slug: r.slug, title: r.title, excerpt: r.excerpt,
   category: r.category, author: r.author, date: r.date,
   readTime: r.read_time, cover: r.cover, coverAlt: r.cover_alt ?? "",
+  ctaEnabled: !!r.cta_enabled, ctaLabel: r.cta_label ?? "", ctaUrl: r.cta_url ?? "",
 });
 const toDbPost = (p: Partial<BlogPost>) => {
   const out: any = {};
@@ -339,6 +341,9 @@ const toDbPost = (p: Partial<BlogPost>) => {
   if (p.readTime !== undefined) out.read_time = p.readTime;
   if (p.cover !== undefined) out.cover = p.cover;
   if (p.coverAlt !== undefined) out.cover_alt = p.coverAlt;
+  if (p.ctaEnabled !== undefined) out.cta_enabled = p.ctaEnabled;
+  if (p.ctaLabel !== undefined) out.cta_label = p.ctaLabel;
+  if (p.ctaUrl !== undefined) out.cta_url = p.ctaUrl;
   return out;
 };
 const fromDbLead = (r: any): Lead => ({
@@ -389,7 +394,12 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (Array.isArray(s.portfolio) && (s.portfolio as any[]).length) setPortfolio(s.portfolio as any);
         if (s.seo && Object.keys(s.seo).length) setSeo({ ...defaultSeo, ...(s.seo as any) });
         if (s.appearance && Object.keys(s.appearance).length) setAppearance({ ...defaultAppearance, ...(s.appearance as any) });
-        if (Array.isArray(s.custom_pages)) setCustomPages(s.custom_pages as any);
+        if (Array.isArray(s.custom_pages)) setCustomPages((s.custom_pages as any[]).map((p) => ({
+          ...p,
+          navLocation: Array.isArray(p.navLocation)
+            ? p.navLocation
+            : p.navLocation === "none" || !p.navLocation ? [] : [p.navLocation],
+        })) as any);
         if (Array.isArray(s.home_sections)) setHomeSections(s.home_sections as any);
         if (Array.isArray(s.section_groups) && (s.section_groups as any[]).length) setSectionGroups(s.section_groups as any);
         if (s.page_location && Object.keys(s.page_location).length) setPageLocationState({ ...defaultPageLocation, ...(s.page_location as any) });

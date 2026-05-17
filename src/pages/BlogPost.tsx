@@ -30,9 +30,9 @@ const BlogPostPage = () => {
           publisher: {
             "@type": "Organization",
             name: "AniRise",
-            logo: { "@type": "ImageObject", url: "https://anirise9.vercel.app/favicon.jpg" },
+            logo: { "@type": "ImageObject", url: "https://anirise.com.bd/favicon.jpg" },
           },
-          mainEntityOfPage: `https://anirise9.vercel.app/blog/${slug ?? ""}`,
+          mainEntityOfPage: `https://anirise.com.bd/blog/${slug ?? ""}`,
         }
       : undefined,
   });
@@ -69,6 +69,18 @@ const BlogPostPage = () => {
             <p>This is a demo article preview. In a full setup, the rich body content for "{post.title}" would render here — managed from the AniRise admin dashboard.</p>
             <p>You can publish, edit, or delete posts from the admin panel. Visit <code className="text-accent">/admin</code> or triple-click the AniRise logo and enter the password.</p>
           </div>
+          {post.ctaEnabled && post.ctaLabel && post.ctaUrl && (
+            <div className="mt-10 rounded-2xl border border-border bg-gradient-to-br from-accent/10 to-primary/5 p-6 sm:p-8 text-center">
+              <a
+                href={post.ctaUrl}
+                target={post.ctaUrl.startsWith("http") ? "_blank" : undefined}
+                rel={post.ctaUrl.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="inline-flex items-center justify-center rounded-full bg-gradient-accent text-accent-foreground font-bold px-7 py-3.5 text-base shadow-elegant hover:opacity-90 transition-opacity"
+              >
+                {post.ctaLabel}
+              </a>
+            </div>
+          )}
         </article>
       </main>
       <Footer />

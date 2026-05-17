@@ -72,6 +72,7 @@ const AdminDashboard = () => {
     slug: "", title: "", excerpt: "", category: "SEO",
     author: "AniRise Team", date: new Date().toISOString().slice(0, 10),
     readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "",
+    ctaEnabled: false, ctaLabel: "", ctaUrl: "",
   });
   const [device, setDevice] = useState<DeviceKey>("desktop");
   const [activePage, setActivePage] = useState<string>("hero");
@@ -92,7 +93,7 @@ const AdminDashboard = () => {
 
   const startEdit = (p: BlogPost) => {
     setEditingId(p.id);
-    setDraft({ slug: p.slug, title: p.title, excerpt: p.excerpt, category: p.category, author: p.author, date: p.date, readTime: p.readTime, cover: p.cover, coverAlt: p.coverAlt || "" });
+    setDraft({ slug: p.slug, title: p.title, excerpt: p.excerpt, category: p.category, author: p.author, date: p.date, readTime: p.readTime, cover: p.cover, coverAlt: p.coverAlt || "", ctaEnabled: !!p.ctaEnabled, ctaLabel: p.ctaLabel || "", ctaUrl: p.ctaUrl || "" });
   };
 
   const saveDraft = () => {
@@ -100,7 +101,7 @@ const AdminDashboard = () => {
     if (editingId) { updatePost(editingId, draft); toast.success("Post updated"); }
     else { addPost(draft); toast.success("Post created"); }
     setEditingId(null);
-    setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "" });
+    setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "", ctaEnabled: false, ctaLabel: "", ctaUrl: "" });
   };
 
   const downloadFile = (filename: string, content: string, type: string) => {
@@ -160,19 +161,21 @@ const AdminDashboard = () => {
     );
   };
 
-  const SeoBlock = ({ pageKey }: { pageKey: string }) => {
+  const SeoBlock = ({ pageKey, hideAuto = false }: { pageKey: string; hideAuto?: boolean }) => {
     const s = seo.pageSeo[pageKey] || { metaTitle: "", metaDescription: "", metaKeywords: "" };
     return (
       <Card className="p-5 sm:p-6 space-y-3">
         <div className="flex items-center gap-2">
           <Search className="h-4 w-4" />
           <h4 className="font-bold">Page SEO</h4>
-          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => {
-            const title = (content as any)[`${pageKey}Headline`] || (content as any)[`${pageKey}Title`] || s.metaTitle;
-            const desc = (content as any)[`${pageKey}Blurb`] || (content as any)[`${pageKey}Tagline`] || s.metaDescription;
-            updatePageSeo(pageKey, { metaTitle: title, metaDescription: desc });
-            toast.success("Auto-filled from page content");
-          }}><Sparkles className="h-4 w-4" /> Auto-generate</Button>
+          {!hideAuto && (
+            <Button size="sm" variant="ghost" className="ml-auto" onClick={() => {
+              const title = (content as any)[`${pageKey}Headline`] || (content as any)[`${pageKey}Title`] || s.metaTitle;
+              const desc = (content as any)[`${pageKey}Blurb`] || (content as any)[`${pageKey}Tagline`] || s.metaDescription;
+              updatePageSeo(pageKey, { metaTitle: title, metaDescription: desc });
+              toast.success("Auto-filled from page content");
+            }}><Sparkles className="h-4 w-4" /> Auto-generate</Button>
+          )}
         </div>
         <div>
           <label className="text-xs font-medium mb-1 block">Meta title <span className="text-muted-foreground">({s.metaTitle.length}/60)</span></label>
@@ -236,14 +239,31 @@ const AdminDashboard = () => {
               </div>
               <div>
                 <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Show in</label>
-                <Select value={cp.navLocation} onValueChange={(v) => updateCustomPage(cp.id, { navLocation: v as any })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="navbar">Top navbar</SelectItem>
-                    <SelectItem value="menu">3-dot menu</SelectItem>
-                    <SelectItem value="none">Hidden (direct URL only)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-wrap gap-2">
+                  {([
+                    { v: "navbar", label: "Top navbar" },
+                    { v: "menu", label: "3-dot menu" },
+                  ] as const).map((opt) => {
+                    const checked = (cp.navLocation || []).includes(opt.v);
+                    return (
+                      <button
+                        type="button"
+                        key={opt.v}
+                        onClick={() => {
+                          const current = cp.navLocation || [];
+                          const next = checked ? current.filter((x) => x !== opt.v) : [...current, opt.v];
+                          updateCustomPage(cp.id, { navLocation: next });
+                        }}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                          checked ? "bg-accent text-accent-foreground border-accent" : "bg-background border-border text-foreground/70 hover:border-accent/40"
+                        }`}
+                      >
+                        {checked ? "✓ " : ""}{opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1.5">Select none = hidden (direct URL only). Select both to show everywhere.</p>
               </div>
               <div className="sm:col-span-2">
                 <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Section group</label>
@@ -271,7 +291,7 @@ const AdminDashboard = () => {
               <Button variant="hero" size="sm" onClick={() => toast.success("Saved")}><Save className="h-4 w-4" /> Save</Button>
             </div>
           </Card>
-          <SeoBlock pageKey={cpSeoKey} />
+          <SeoBlock pageKey={cpSeoKey} hideAuto />
         </div>
       );
     }
@@ -689,7 +709,7 @@ const AdminDashboard = () => {
                                 const id = Date.now().toString();
                                 addCustomPage({
                                   title: "New Page", slug: `new-page-${id.slice(-4)}`, parent: "",
-                                  navLocation: "menu", image: "", imageAlt: "", body: "",
+                                  navLocation: ["menu"], image: "", imageAlt: "", body: "",
                                   seo: { metaTitle: "New Page", metaDescription: "", metaKeywords: "" },
                                   published: false, groupKey: grp.key,
                                 });
@@ -738,7 +758,7 @@ const AdminDashboard = () => {
                     const id = Date.now().toString();
                     addCustomPage({
                       title: "New Page", slug: `new-page-${id.slice(-4)}`, parent: "",
-                      navLocation: "navbar", image: "", imageAlt: "", body: "",
+                      navLocation: ["navbar"], image: "", imageAlt: "", body: "",
                       seo: { metaTitle: "New Page", metaDescription: "", metaKeywords: "" },
                       published: false, groupKey: "",
                     });
@@ -917,6 +937,24 @@ const AdminDashboard = () => {
               <Textarea className="mt-3" placeholder="Excerpt" rows={3} value={draft.excerpt} onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })} />
               <div className="mt-3">
                 <ImageUpload label="Cover image" value={draft.cover} onChange={(v) => setDraft({ ...draft, cover: v })} aspect="aspect-[16/9]" altValue={draft.coverAlt} onAltChange={(v) => setDraft({ ...draft, coverAlt: v })} />
+              </div>
+              <div className="mt-4 rounded-xl border border-border bg-secondary/30 p-4 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-bold">Call-to-action button</p>
+                    <p className="text-xs text-muted-foreground">Optional. Shows below the article body when enabled.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Switch checked={!!draft.ctaEnabled} onCheckedChange={(v) => setDraft({ ...draft, ctaEnabled: v })} />
+                    <span className="text-xs font-medium">{draft.ctaEnabled ? "On" : "Off"}</span>
+                  </div>
+                </div>
+                {draft.ctaEnabled && (
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Input placeholder="Button label (e.g. Book a free SEO audit)" value={draft.ctaLabel || ""} onChange={(e) => setDraft({ ...draft, ctaLabel: e.target.value })} />
+                    <Input placeholder="Link URL (https://… or /contact)" value={draft.ctaUrl || ""} onChange={(e) => setDraft({ ...draft, ctaUrl: e.target.value })} />
+                  </div>
+                )}
               </div>
               <div className="mt-4 flex gap-2">
                 <Button onClick={saveDraft} variant="hero"><Save className="h-4 w-4" /> {editingId ? "Update" : "Publish"}</Button>
