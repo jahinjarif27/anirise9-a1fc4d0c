@@ -881,6 +881,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         visits, visitSeries,
         leads, addLead, deleteLead, clearLeads, pruneOldLeads,
         reviews, addReview, approveReview, deleteReview,
+        homeBlocks, setHomeBlock,
+        homeFaqs, addHomeFaq, updateHomeFaq, deleteHomeFaq,
+        serviceFaqs, addServiceFaq, updateServiceFaq, deleteServiceFaq,
+        stats, addStat, updateStat, deleteStat,
+        trustLogos, addTrustLogo, updateTrustLogo, deleteTrustLogo,
+        caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
+        finalCta, updateFinalCta,
       }}
     >
       {children}
