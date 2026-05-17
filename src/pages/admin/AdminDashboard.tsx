@@ -1080,12 +1080,22 @@ const AdminDashboard = () => {
                         onClick={() => setBlogMode(m)}
                         className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${blogMode === m ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground"}`}
                       >
-                        {m === "simple" ? "Simple (excerpt only)" : "Full editor"}
+                        {m === "simple" ? "Simple description" : "Full editor"}
                       </button>
                     ))}
                   </div>
                 </div>
-                {blogMode === "editor" && (
+                {blogMode === "simple" ? (
+                  <div className="mt-3">
+                    <Textarea
+                      rows={10}
+                      placeholder="Write the full article here. Plain text — paragraphs separated by blank lines. Basic Markdown (##, **bold**, lists, links) also works."
+                      value={draft.body || ""}
+                      onChange={(e) => setDraft({ ...draft, body: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">For a no-frills writing experience. Switch to Full editor for a richer toolbar and live preview.</p>
+                  </div>
+                ) : (
                   <div className="mt-3" data-color-mode="light">
                     <MDEditor
                       value={draft.body || ""}
@@ -1096,11 +1106,6 @@ const AdminDashboard = () => {
                     />
                     <p className="text-xs text-muted-foreground mt-2">Supports Markdown — headings, lists, links, images, tables, code blocks.</p>
                   </div>
-                )}
-                {blogMode === "simple" && (draft.body || "").trim().length > 0 && (
-                  <p className="text-xs text-muted-foreground mt-3">
-                    Note: this post has rich content saved. Switch to "Full editor" to keep it, or save to publish only the excerpt.
-                  </p>
                 )}
               </div>
               <div className="mt-4 rounded-xl border border-border bg-secondary/30 p-4 space-y-3">
