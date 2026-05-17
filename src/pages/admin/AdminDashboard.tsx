@@ -689,7 +689,7 @@ const AdminDashboard = () => {
                                 const id = Date.now().toString();
                                 addCustomPage({
                                   title: "New Page", slug: `new-page-${id.slice(-4)}`, parent: "",
-                                  navLocation: "menu", image: "", imageAlt: "", body: "",
+                                  navLocation: ["menu"], image: "", imageAlt: "", body: "",
                                   seo: { metaTitle: "New Page", metaDescription: "", metaKeywords: "" },
                                   published: false, groupKey: grp.key,
                                 });
