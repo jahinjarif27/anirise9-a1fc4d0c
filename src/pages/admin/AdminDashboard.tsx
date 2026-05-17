@@ -1327,6 +1327,19 @@ const AdminDashboard = () => {
                     <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
                     <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value })} />
                   </div>
+                  <div className="flex justify-end">
+                    <Button variant="hero" size="sm" onClick={() => { updateSeo({ sitemap: seo.sitemap }); toast.success("Sitemap saved"); }}>
+                      <Save className="h-4 w-4" /> Save sitemap
+                    </Button>
+                  </div>
+                  <div className="rounded-xl bg-secondary/40 border border-border/60 p-4 text-xs text-muted-foreground leading-relaxed">
+                    <p className="font-bold text-foreground mb-1.5 text-sm">How to use this sitemap</p>
+                    <p>
+                      Your sitemap auto-updates whenever you add or remove a page or blog post — no manual work needed.
+                      The <span className="font-semibold text-foreground">Priority</span> value (1.0 = highest, 0.1 = lowest) hints to Google which URLs matter most on your site; keep your homepage at 1.0 and core service pages above 0.8.
+                      Change priorities here and click <span className="font-semibold text-foreground">Save sitemap</span>. Submit the sitemap URL once in Google Search Console — Google then re-reads it automatically.
+                    </p>
+                  </div>
                 </Card>
               </TabsContent>
 
