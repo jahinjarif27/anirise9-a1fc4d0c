@@ -11,7 +11,7 @@ import {
   Save, X, Home, Search, Type, Copy, Phone, RefreshCw, Download, Image as ImageIcon, Bot,
   FolderOpen, FolderX, ArrowRight, Check, Code2, Link2, Monitor, Tablet, Smartphone, Layout,
   Sparkles, FileCog, ChevronRight, Layers, Globe, MapPin, FileEdit, Image as ImgIcon,
-  Inbox, PhoneCall, Mail, Clock,
+  Inbox, PhoneCall, Mail, Clock, Star, MessageSquare,
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -68,6 +68,7 @@ const AdminDashboard = () => {
     updatePageSeo,
     leads, deleteLead, clearLeads,
     visitSeries, pruneOldLeads,
+    reviews, approveReview, deleteReview,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
@@ -676,6 +677,12 @@ const AdminDashboard = () => {
               )}
             </TabsTrigger>
             <TabsTrigger value="blog"><FileText className="h-4 w-4 mr-1" /> Blog</TabsTrigger>
+            <TabsTrigger value="reviews">
+              <MessageSquare className="h-4 w-4 mr-1" /> Reviews
+              {reviews.filter((r) => !r.approved).length > 0 && (
+                <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-[10px]">{reviews.filter((r) => !r.approved).length}</Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="settings"><Settings className="h-4 w-4 mr-1" /> Settings</TabsTrigger>
           </TabsList>
 
