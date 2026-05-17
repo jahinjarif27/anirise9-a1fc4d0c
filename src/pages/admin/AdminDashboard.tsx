@@ -23,8 +23,8 @@ import logo from "@/assets/anirise-logo.jpg";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { Switch } from "@/components/ui/switch";
-import { RichTextEditor } from "@/components/admin/RichTextEditor";
-import { blogTemplates, pageTemplates } from "@/data/templates";
+import MDEditor from "@uiw/react-md-editor";
+import jsPDF from "jspdf";
 import { SECTION_KEYS, SectionKey } from "@/context/AdminContext";
 
 const visitData = Array.from({ length: 14 }, (_, i) => ({
