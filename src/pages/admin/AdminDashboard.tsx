@@ -937,14 +937,42 @@ const AdminDashboard = () => {
               <div className="mt-3">
                 <ImageUpload label="Cover image" value={draft.cover} onChange={(v) => setDraft({ ...draft, cover: v })} aspect="aspect-[16/9]" altValue={draft.coverAlt} onAltChange={(v) => setDraft({ ...draft, coverAlt: v })} />
               </div>
-              <div className="mt-4">
-                <RichTextEditor
-                  label="Article body"
-                  value={draft.body || ""}
-                  onChange={(v) => setDraft({ ...draft, body: v })}
-                  templates={blogTemplates}
-                  minHeight={420}
-                />
+              <div className="mt-4 rounded-xl border border-border bg-secondary/30 p-3">
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div>
+                    <p className="text-sm font-bold">Article body</p>
+                    <p className="text-xs text-muted-foreground">Choose how you want to write this post.</p>
+                  </div>
+                  <div className="inline-flex rounded-lg border border-border p-0.5 bg-background">
+                    {(["simple", "editor"] as const).map((m) => (
+                      <button
+                        type="button"
+                        key={m}
+                        onClick={() => setBlogMode(m)}
+                        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${blogMode === m ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                      >
+                        {m === "simple" ? "Simple (excerpt only)" : "Full editor"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {blogMode === "editor" && (
+                  <div className="mt-3" data-color-mode="light">
+                    <MDEditor
+                      value={draft.body || ""}
+                      onChange={(v) => setDraft({ ...draft, body: v ?? "" })}
+                      height={420}
+                      preview="edit"
+                      visibleDragbar={false}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">Supports Markdown — headings, lists, links, images, tables, code blocks.</p>
+                  </div>
+                )}
+                {blogMode === "simple" && (draft.body || "").trim().length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Note: this post has rich content saved. Switch to "Full editor" to keep it, or save to publish only the excerpt.
+                  </p>
+                )}
               </div>
               <div className="mt-4 rounded-xl border border-border bg-secondary/30 p-4 space-y-3">
                 <div className="flex items-center justify-between gap-3">
