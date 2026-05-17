@@ -6,6 +6,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AdminProvider } from "@/context/AdminContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import { AppRoutes } from "./pages/AppRoutes";
+import { useTrackVisit } from "@/hooks/useTrackVisit";
+
+const RouteEffects = () => {
+  useTrackVisit();
+  return null;
+};
 
 const queryClient = new QueryClient();
 
@@ -17,6 +23,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <RouteEffects />
           <AppRoutes />
         </BrowserRouter>
       </AdminProvider>

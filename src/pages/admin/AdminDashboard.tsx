@@ -65,6 +65,7 @@ const AdminDashboard = () => {
     sectionGroups, addSectionGroup, updateSectionGroup, deleteSectionGroup,
     updatePageSeo,
     leads, deleteLead, clearLeads,
+    visitSeries, pruneOldLeads,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
@@ -560,13 +561,12 @@ const AdminDashboard = () => {
               <Card className="p-5">
                 <h3 className="font-bold mb-4">Visitors — last 14 days</h3>
                 <ResponsiveContainer width="100%" height={240}>
-                  <LineChart data={visitData}>
+                  <LineChart data={visitSeries}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} allowDecimals={false} />
                     <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12 }} />
                     <Line type="monotone" dataKey="visits" stroke="hsl(var(--accent))" strokeWidth={2.5} dot={{ r: 3 }} />
-                    <Line type="monotone" dataKey="pageviews" stroke="hsl(var(--primary))" strokeWidth={2.5} dot={{ r: 3 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </Card>
