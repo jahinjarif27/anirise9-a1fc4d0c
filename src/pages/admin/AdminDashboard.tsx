@@ -23,6 +23,8 @@ import logo from "@/assets/anirise-logo.jpg";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { Switch } from "@/components/ui/switch";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { blogTemplates, pageTemplates } from "@/data/templates";
 import { SECTION_KEYS, SectionKey } from "@/context/AdminContext";
 
 const visitData = Array.from({ length: 14 }, (_, i) => ({
@@ -72,7 +74,7 @@ const AdminDashboard = () => {
     slug: "", title: "", excerpt: "", category: "SEO",
     author: "AniRise Team", date: new Date().toISOString().slice(0, 10),
     readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "",
-    ctaEnabled: false, ctaLabel: "", ctaUrl: "",
+    ctaEnabled: false, ctaLabel: "", ctaUrl: "", body: "",
   });
   const [device, setDevice] = useState<DeviceKey>("desktop");
   const [activePage, setActivePage] = useState<string>("hero");
@@ -93,7 +95,7 @@ const AdminDashboard = () => {
 
   const startEdit = (p: BlogPost) => {
     setEditingId(p.id);
-    setDraft({ slug: p.slug, title: p.title, excerpt: p.excerpt, category: p.category, author: p.author, date: p.date, readTime: p.readTime, cover: p.cover, coverAlt: p.coverAlt || "", ctaEnabled: !!p.ctaEnabled, ctaLabel: p.ctaLabel || "", ctaUrl: p.ctaUrl || "" });
+    setDraft({ slug: p.slug, title: p.title, excerpt: p.excerpt, category: p.category, author: p.author, date: p.date, readTime: p.readTime, cover: p.cover, coverAlt: p.coverAlt || "", ctaEnabled: !!p.ctaEnabled, ctaLabel: p.ctaLabel || "", ctaUrl: p.ctaUrl || "", body: p.body || "" });
   };
 
   const saveDraft = () => {
@@ -101,7 +103,7 @@ const AdminDashboard = () => {
     if (editingId) { updatePost(editingId, draft); toast.success("Post updated"); }
     else { addPost(draft); toast.success("Post created"); }
     setEditingId(null);
-    setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "", ctaEnabled: false, ctaLabel: "", ctaUrl: "" });
+    setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "", ctaEnabled: false, ctaLabel: "", ctaUrl: "", body: "" });
   };
 
   const downloadFile = (filename: string, content: string, type: string) => {
@@ -280,10 +282,13 @@ const AdminDashboard = () => {
               Final URL: <span className="font-mono text-foreground">{seo.canonicalUrl}/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span>
             </div>
             <ImageUpload label="Page image" value={cp.image} onChange={(v) => updateCustomPage(cp.id, { image: v })} aspect="aspect-[16/9]" altValue={cp.imageAlt} onAltChange={(v) => updateCustomPage(cp.id, { imageAlt: v })} />
-            <div>
-              <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Body content</label>
-              <Textarea rows={6} value={cp.body} onChange={(e) => updateCustomPage(cp.id, { body: e.target.value })} />
-            </div>
+            <RichTextEditor
+              label="Page body content"
+              value={cp.body}
+              onChange={(v) => updateCustomPage(cp.id, { body: v })}
+              templates={pageTemplates}
+              minHeight={420}
+            />
             <div className="flex justify-between pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteCustomPage(cp.id); setActivePage("hero"); toast.success("Page deleted"); }}>
                 <Trash2 className="h-4 w-4 text-destructive" /> Delete page
@@ -934,9 +939,18 @@ const AdminDashboard = () => {
                 <Input placeholder="Read time" value={draft.readTime} onChange={(e) => setDraft({ ...draft, readTime: e.target.value })} />
                 <Input placeholder="Date" type="date" value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value })} />
               </div>
-              <Textarea className="mt-3" placeholder="Excerpt" rows={3} value={draft.excerpt} onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })} />
+              <Textarea className="mt-3" placeholder="Short excerpt — shown on blog cards and in search results (1-2 sentences)" rows={3} value={draft.excerpt} onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })} />
               <div className="mt-3">
                 <ImageUpload label="Cover image" value={draft.cover} onChange={(v) => setDraft({ ...draft, cover: v })} aspect="aspect-[16/9]" altValue={draft.coverAlt} onAltChange={(v) => setDraft({ ...draft, coverAlt: v })} />
+              </div>
+              <div className="mt-4">
+                <RichTextEditor
+                  label="Article body"
+                  value={draft.body || ""}
+                  onChange={(v) => setDraft({ ...draft, body: v })}
+                  templates={blogTemplates}
+                  minHeight={420}
+                />
               </div>
               <div className="mt-4 rounded-xl border border-border bg-secondary/30 p-4 space-y-3">
                 <div className="flex items-center justify-between gap-3">

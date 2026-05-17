@@ -5,6 +5,7 @@ import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 import NotFound from "./NotFound";
+import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 export const CustomPageView = () => {
   const { slug } = useParams();
@@ -24,9 +25,9 @@ export const CustomPageView = () => {
       <Navbar />
       <main className="pt-32 pb-16">
         <article className="container max-w-4xl">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-6">{page.title}</h1>
-          {page.image && <img src={page.image} alt={page.imageAlt} className="rounded-2xl w-full mb-8" />}
-          {page.body && <p className="text-foreground/80 whitespace-pre-line leading-relaxed">{page.body}</p>}
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-foreground">{page.title}</h1>
+          {page.image && <img src={page.image} alt={page.imageAlt} className="rounded-2xl w-full mb-8 shadow-elegant" />}
+          {page.body && <MarkdownContent content={page.body} />}
         </article>
       </main>
       <Footer />

@@ -12,6 +12,7 @@ export type BlogPost = {
   ctaEnabled?: boolean;
   ctaLabel?: string;
   ctaUrl?: string;
+  body?: string;
 };
 
 export const initialPosts: BlogPost[] = [

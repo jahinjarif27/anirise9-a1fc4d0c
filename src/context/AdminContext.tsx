@@ -329,6 +329,7 @@ const fromDbPost = (r: any): BlogPost => ({
   category: r.category, author: r.author, date: r.date,
   readTime: r.read_time, cover: r.cover, coverAlt: r.cover_alt ?? "",
   ctaEnabled: !!r.cta_enabled, ctaLabel: r.cta_label ?? "", ctaUrl: r.cta_url ?? "",
+  body: r.body ?? "",
 });
 const toDbPost = (p: Partial<BlogPost>) => {
   const out: any = {};
@@ -344,6 +345,7 @@ const toDbPost = (p: Partial<BlogPost>) => {
   if (p.ctaEnabled !== undefined) out.cta_enabled = p.ctaEnabled;
   if (p.ctaLabel !== undefined) out.cta_label = p.ctaLabel;
   if (p.ctaUrl !== undefined) out.cta_url = p.ctaUrl;
+  if (p.body !== undefined) out.body = p.body;
   return out;
 };
 const fromDbLead = (r: any): Lead => ({
