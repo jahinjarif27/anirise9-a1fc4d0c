@@ -397,6 +397,16 @@ const AdminDashboard = () => {
               Final URL: <span className="font-mono text-foreground">{seo.canonicalUrl}/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span>
             </div>
             <ImageUpload label="Page image" value={cp.image} onChange={(v) => updateCustomPage(cp.id, { image: v })} aspect="aspect-[16/9]" altValue={cp.imageAlt} onAltChange={(v) => updateCustomPage(cp.id, { imageAlt: v })} />
+            <div>
+              <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Page description / body</label>
+              <Textarea
+                rows={8}
+                placeholder="Write the page content here. Plain text or Markdown — headings (##), lists, links etc. are supported."
+                value={cp.body}
+                onChange={(e) => updateCustomPage(cp.id, { body: e.target.value })}
+              />
+              <p className="text-[11px] text-muted-foreground mt-1.5">This shows as the main content on the page. Leave empty to show only the title and image.</p>
+            </div>
             <div className="flex justify-between pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteCustomPage(cp.id); setActivePage("hero"); toast.success("Page deleted"); }}>
                 <Trash2 className="h-4 w-4 text-destructive" /> Delete page
