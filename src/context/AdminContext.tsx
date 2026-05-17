@@ -277,16 +277,76 @@ const FONT_CHOICES = [
 
 const defaultAppearance: Appearance = { headingFont: "Poppins", bodyFont: "Inter", baseFontSize: 16 };
 
+const defaultHomeBlocks: HomeBlocks = {
+  trustStrip: true, stats: true, servicesPreview: true,
+  caseStudies: true, homeFaq: true, finalCta: true,
+};
+
+const defaultHomeFaqs: FaqItem[] = [
+  { id: "hf1", question: "Apnara kothai based?", answer: "AniRise globally kaj kore. Bangladesh and bairer client der jonno fully remote ebong on-call support pawa jay." },
+  { id: "hf2", question: "Project shuru korte koto somoy lage?", answer: "Initial call er por 3–5 din er moddhe proposal, ar approval er 7 din er moddhe kickoff hoy." },
+  { id: "hf3", question: "Apnader pricing model kemon?", answer: "Project-based and monthly retainer — duitai available. Free consultation er por scope onujayi quote dei." },
+  { id: "hf4", question: "Result kobe theke dekhte parbo?", answer: "SEO 60–90 din, web/graphics deliverables 2–4 soptaher moddhe, marketing campaigns 2–3 soptah er moddhe early signals." },
+  { id: "hf5", question: "Contract sign korte hobe?", answer: "Onek shomoy simple SOW e kaj suru hoy. Long-term retainer er jonno standard service agreement thake." },
+];
+
+const defaultServiceFaqs: Record<string, FaqItem[]> = {
+  "website-seo": [
+    { id: "wseo1", question: "How long until I see results?", answer: "Most clients see ranking improvements in 60–90 days, with significant traffic growth by month 4–6." },
+    { id: "wseo2", question: "Do you guarantee #1 rankings?", answer: "No reputable agency does. We guarantee a documented, ethical process and measurable progress." },
+    { id: "wseo3", question: "What makes AniRise different?", answer: "We combine technical depth with conversion-focused content — rankings without revenue is vanity." },
+    { id: "wseo4", question: "Do you work with small businesses?", answer: "Absolutely. We tailor scope to your stage and budget, from local SEO to enterprise campaigns." },
+  ],
+  "ecommerce-seo": [
+    { id: "eseo1", question: "Do you optimize product pages?", answer: "Yes — titles, descriptions, schema, internal linking, and category architecture." },
+    { id: "eseo2", question: "Which platforms do you support?", answer: "Shopify, WooCommerce, Magento, and custom builds." },
+  ],
+  "graphics-design": [
+    { id: "gd1", question: "Koto rounds revision pabo?", answer: "Standard package e 3 round revision included. Extra round chaile small fee." },
+    { id: "gd2", question: "File format ki ki pabo?", answer: "Source file (AI/PSD/Figma) + print-ready PDF + web-ready PNG/JPG." },
+  ],
+};
+
+const defaultStats: StatItem[] = [
+  { id: "st1", value: "15+", label: "Projects Delivered" },
+  { id: "st2", value: "10+", label: "Happy Clients" },
+  { id: "st3", value: "2+", label: "Years Experience" },
+  { id: "st4", value: "95%", label: "Client Retention" },
+];
+
+const defaultTrustLogos: TrustLogo[] = [
+  { id: "tl1", name: "Brand One", image: "" },
+  { id: "tl2", name: "Brand Two", image: "" },
+  { id: "tl3", name: "Brand Three", image: "" },
+  { id: "tl4", name: "Brand Four", image: "" },
+  { id: "tl5", name: "Brand Five", image: "" },
+  { id: "tl6", name: "Brand Six", image: "" },
+];
+
+const defaultCaseStudies: CaseStudy[] = [
+  { id: "cs1", title: "Local Brand SEO Sprint", metric: "+180% organic traffic", description: "3 maser moddhe organic traffic prai 3x — high-intent keyword targeting and on-page optimization e.", image: portfolio1, link: "/portfolio" },
+  { id: "cs2", title: "Ecommerce Revenue Lift", metric: "3x leads", description: "Product schema + category restructure er moddhe lead 3 gun briddhi.", image: portfolio2, link: "/portfolio" },
+];
+
+const defaultFinalCta: FinalCta = {
+  headline: "Ready to make your brand rise?",
+  subline: "Free 30-min strategy call. Clear next steps, honest scope, no jargon.",
+  primaryLabel: "Get Free Proposal",
+  primaryUrl: "/contact",
+  secondaryLabel: "WhatsApp Us",
+  secondaryUrl: "https://wa.me/8801337744727",
+};
+
 const defaultSectionGroups: SectionGroup[] = [
   { id: "g-home", key: "home", label: "Home", isHome: true },
   { id: "g-services", key: "services-group", label: "Services", isHome: false },
 ];
 const defaultPageLocation: Record<string, string> = {
-  hero: "home", services: "home", about: "home", portfolio: "home",
-  blog: "home", testimonials: "home", contact: "home",
+  hero: "home", services: "", about: "", portfolio: "",
+  blog: "home", testimonials: "", contact: "",
 };
 const defaultHomeMembership: Record<SectionKey, boolean> = {
-  hero: true, services: true, about: true, portfolio: true, blog: true, testimonials: true, contact: true,
+  hero: true, services: false, about: false, portfolio: false, blog: true, testimonials: false, contact: false,
 };
 
 // ============================================================
