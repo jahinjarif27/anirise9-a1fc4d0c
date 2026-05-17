@@ -133,25 +133,7 @@ const WebsiteSEOPage = () => {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-secondary/40">
-        <div className="container max-w-3xl">
-          <div className="mb-10 text-center">
-            <Sparkles className="h-8 w-8 text-accent mx-auto mb-3" />
-            <h2 className="text-4xl font-extrabold text-foreground">Frequently Asked Questions</h2>
-          </div>
-          <div className="space-y-4">
-            {faqs.map((f) => (
-              <details key={f.q} className="group bg-card rounded-xl p-5 shadow-card border border-border/40">
-                <summary className="cursor-pointer font-semibold text-foreground flex items-center justify-between">
-                  {f.q}
-                  <span className="text-accent group-open:rotate-45 transition-transform text-2xl leading-none">+</span>
-                </summary>
-                <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ServiceFAQ slug="website-seo" />
 
       {/* CTA */}
       <section className="py-20">
