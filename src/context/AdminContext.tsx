@@ -140,6 +140,23 @@ export type Review = {
 export type SectionKey = "hero" | "services" | "about" | "portfolio" | "blog" | "testimonials" | "contact";
 export const SECTION_KEYS: SectionKey[] = ["hero", "services", "about", "portfolio", "blog", "testimonials", "contact"];
 
+// ============= Home builder structured data =============
+export type FaqItem = { id: string; question: string; answer: string };
+export type StatItem = { id: string; value: string; label: string };
+export type TrustLogo = { id: string; name: string; image: string };
+export type CaseStudy = { id: string; title: string; metric: string; description: string; image: string; link: string };
+export type FinalCta = {
+  headline: string;
+  subline: string;
+  primaryLabel: string;
+  primaryUrl: string;
+  secondaryLabel: string;
+  secondaryUrl: string;
+};
+export type HomeBlockKey = "trustStrip" | "stats" | "servicesPreview" | "caseStudies" | "homeFaq" | "finalCta";
+export type HomeBlocks = Record<HomeBlockKey, boolean>;
+export const HOME_BLOCK_KEYS: HomeBlockKey[] = ["trustStrip", "stats", "servicesPreview", "caseStudies", "homeFaq", "finalCta"];
+
 type SeoSettings = {
   metaTitle: string;
   metaDescription: string;
