@@ -8,10 +8,17 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { AppRoutes } from "./pages/AppRoutes";
 import { useTrackVisit } from "@/hooks/useTrackVisit";
 import { BottomNav } from "@/components/site/BottomNav";
+import { useLocation } from "react-router-dom";
 
 const RouteEffects = () => {
   useTrackVisit();
   return null;
+};
+
+const ConditionalBottomNav = () => {
+  const { pathname } = useLocation();
+  if (pathname.startsWith("/admin")) return null;
+  return <BottomNav />;
 };
 
 const queryClient = new QueryClient();
@@ -26,7 +33,7 @@ const App = () => (
           <ScrollToTop />
           <RouteEffects />
           <AppRoutes />
-          <BottomNav />
+          <ConditionalBottomNav />
         </BrowserRouter>
       </AdminProvider>
     </TooltipProvider>
