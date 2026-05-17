@@ -140,6 +140,23 @@ export type Review = {
 export type SectionKey = "hero" | "services" | "about" | "portfolio" | "blog" | "testimonials" | "contact";
 export const SECTION_KEYS: SectionKey[] = ["hero", "services", "about", "portfolio", "blog", "testimonials", "contact"];
 
+// ============= Home builder structured data =============
+export type FaqItem = { id: string; question: string; answer: string };
+export type StatItem = { id: string; value: string; label: string };
+export type TrustLogo = { id: string; name: string; image: string };
+export type CaseStudy = { id: string; title: string; metric: string; description: string; image: string; link: string };
+export type FinalCta = {
+  headline: string;
+  subline: string;
+  primaryLabel: string;
+  primaryUrl: string;
+  secondaryLabel: string;
+  secondaryUrl: string;
+};
+export type HomeBlockKey = "trustStrip" | "stats" | "servicesPreview" | "caseStudies" | "homeFaq" | "finalCta";
+export type HomeBlocks = Record<HomeBlockKey, boolean>;
+export const HOME_BLOCK_KEYS: HomeBlockKey[] = ["trustStrip", "stats", "servicesPreview", "caseStudies", "homeFaq", "finalCta"];
+
 type SeoSettings = {
   metaTitle: string;
   metaDescription: string;
@@ -260,16 +277,76 @@ const FONT_CHOICES = [
 
 const defaultAppearance: Appearance = { headingFont: "Poppins", bodyFont: "Inter", baseFontSize: 16 };
 
+const defaultHomeBlocks: HomeBlocks = {
+  trustStrip: true, stats: true, servicesPreview: true,
+  caseStudies: true, homeFaq: true, finalCta: true,
+};
+
+const defaultHomeFaqs: FaqItem[] = [
+  { id: "hf1", question: "Apnara kothai based?", answer: "AniRise globally kaj kore. Bangladesh and bairer client der jonno fully remote ebong on-call support pawa jay." },
+  { id: "hf2", question: "Project shuru korte koto somoy lage?", answer: "Initial call er por 3–5 din er moddhe proposal, ar approval er 7 din er moddhe kickoff hoy." },
+  { id: "hf3", question: "Apnader pricing model kemon?", answer: "Project-based and monthly retainer — duitai available. Free consultation er por scope onujayi quote dei." },
+  { id: "hf4", question: "Result kobe theke dekhte parbo?", answer: "SEO 60–90 din, web/graphics deliverables 2–4 soptaher moddhe, marketing campaigns 2–3 soptah er moddhe early signals." },
+  { id: "hf5", question: "Contract sign korte hobe?", answer: "Onek shomoy simple SOW e kaj suru hoy. Long-term retainer er jonno standard service agreement thake." },
+];
+
+const defaultServiceFaqs: Record<string, FaqItem[]> = {
+  "website-seo": [
+    { id: "wseo1", question: "How long until I see results?", answer: "Most clients see ranking improvements in 60–90 days, with significant traffic growth by month 4–6." },
+    { id: "wseo2", question: "Do you guarantee #1 rankings?", answer: "No reputable agency does. We guarantee a documented, ethical process and measurable progress." },
+    { id: "wseo3", question: "What makes AniRise different?", answer: "We combine technical depth with conversion-focused content — rankings without revenue is vanity." },
+    { id: "wseo4", question: "Do you work with small businesses?", answer: "Absolutely. We tailor scope to your stage and budget, from local SEO to enterprise campaigns." },
+  ],
+  "ecommerce-seo": [
+    { id: "eseo1", question: "Do you optimize product pages?", answer: "Yes — titles, descriptions, schema, internal linking, and category architecture." },
+    { id: "eseo2", question: "Which platforms do you support?", answer: "Shopify, WooCommerce, Magento, and custom builds." },
+  ],
+  "graphics-design": [
+    { id: "gd1", question: "Koto rounds revision pabo?", answer: "Standard package e 3 round revision included. Extra round chaile small fee." },
+    { id: "gd2", question: "File format ki ki pabo?", answer: "Source file (AI/PSD/Figma) + print-ready PDF + web-ready PNG/JPG." },
+  ],
+};
+
+const defaultStats: StatItem[] = [
+  { id: "st1", value: "15+", label: "Projects Delivered" },
+  { id: "st2", value: "10+", label: "Happy Clients" },
+  { id: "st3", value: "2+", label: "Years Experience" },
+  { id: "st4", value: "95%", label: "Client Retention" },
+];
+
+const defaultTrustLogos: TrustLogo[] = [
+  { id: "tl1", name: "Brand One", image: "" },
+  { id: "tl2", name: "Brand Two", image: "" },
+  { id: "tl3", name: "Brand Three", image: "" },
+  { id: "tl4", name: "Brand Four", image: "" },
+  { id: "tl5", name: "Brand Five", image: "" },
+  { id: "tl6", name: "Brand Six", image: "" },
+];
+
+const defaultCaseStudies: CaseStudy[] = [
+  { id: "cs1", title: "Local Brand SEO Sprint", metric: "+180% organic traffic", description: "3 maser moddhe organic traffic prai 3x — high-intent keyword targeting and on-page optimization e.", image: portfolio1, link: "/portfolio" },
+  { id: "cs2", title: "Ecommerce Revenue Lift", metric: "3x leads", description: "Product schema + category restructure er moddhe lead 3 gun briddhi.", image: portfolio2, link: "/portfolio" },
+];
+
+const defaultFinalCta: FinalCta = {
+  headline: "Ready to make your brand rise?",
+  subline: "Free 30-min strategy call. Clear next steps, honest scope, no jargon.",
+  primaryLabel: "Get Free Proposal",
+  primaryUrl: "/contact",
+  secondaryLabel: "WhatsApp Us",
+  secondaryUrl: "https://wa.me/8801337744727",
+};
+
 const defaultSectionGroups: SectionGroup[] = [
   { id: "g-home", key: "home", label: "Home", isHome: true },
   { id: "g-services", key: "services-group", label: "Services", isHome: false },
 ];
 const defaultPageLocation: Record<string, string> = {
-  hero: "home", services: "home", about: "home", portfolio: "home",
-  blog: "home", testimonials: "home", contact: "home",
+  hero: "home", services: "", about: "", portfolio: "",
+  blog: "home", testimonials: "", contact: "",
 };
 const defaultHomeMembership: Record<SectionKey, boolean> = {
-  hero: true, services: true, about: true, portfolio: true, blog: true, testimonials: true, contact: true,
+  hero: true, services: false, about: false, portfolio: false, blog: true, testimonials: false, contact: false,
 };
 
 // ============================================================
@@ -333,6 +410,31 @@ type AdminCtx = {
   addReview: (r: Omit<Review, "id" | "createdAt" | "approved">) => Promise<void>;
   approveReview: (id: string, approved: boolean) => Promise<void>;
   deleteReview: (id: string) => Promise<void>;
+  // Home builder
+  homeBlocks: HomeBlocks;
+  setHomeBlock: (k: HomeBlockKey, v: boolean) => void;
+  homeFaqs: FaqItem[];
+  addHomeFaq: (f: Omit<FaqItem, "id">) => void;
+  updateHomeFaq: (id: string, f: Partial<FaqItem>) => void;
+  deleteHomeFaq: (id: string) => void;
+  serviceFaqs: Record<string, FaqItem[]>;
+  addServiceFaq: (slug: string, f: Omit<FaqItem, "id">) => void;
+  updateServiceFaq: (slug: string, id: string, f: Partial<FaqItem>) => void;
+  deleteServiceFaq: (slug: string, id: string) => void;
+  stats: StatItem[];
+  addStat: (s: Omit<StatItem, "id">) => void;
+  updateStat: (id: string, s: Partial<StatItem>) => void;
+  deleteStat: (id: string) => void;
+  trustLogos: TrustLogo[];
+  addTrustLogo: (t: Omit<TrustLogo, "id">) => void;
+  updateTrustLogo: (id: string, t: Partial<TrustLogo>) => void;
+  deleteTrustLogo: (id: string) => void;
+  caseStudies: CaseStudy[];
+  addCaseStudy: (c: Omit<CaseStudy, "id">) => void;
+  updateCaseStudy: (id: string, c: Partial<CaseStudy>) => void;
+  deleteCaseStudy: (id: string) => void;
+  finalCta: FinalCta;
+  updateFinalCta: (c: Partial<FinalCta>) => void;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
@@ -386,6 +488,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [visits, setVisits] = useState(0);
   const [visitSeries, setVisitSeries] = useState<{ day: string; visits: number }[]>([]);
+  const [homeBlocks, setHomeBlocks] = useState<HomeBlocks>(defaultHomeBlocks);
+  const [homeFaqs, setHomeFaqs] = useState<FaqItem[]>(defaultHomeFaqs);
+  const [serviceFaqs, setServiceFaqs] = useState<Record<string, FaqItem[]>>(defaultServiceFaqs);
+  const [stats, setStats] = useState<StatItem[]>(defaultStats);
+  const [trustLogos, setTrustLogos] = useState<TrustLogo[]>(defaultTrustLogos);
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(defaultCaseStudies);
+  const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
 
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
@@ -422,6 +531,14 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (Array.isArray(s.section_groups) && (s.section_groups as any[]).length) setSectionGroups(s.section_groups as any);
         if (s.page_location && Object.keys(s.page_location).length) setPageLocationState({ ...defaultPageLocation, ...(s.page_location as any) });
         if (s.home_membership && Object.keys(s.home_membership).length) setHomeMembershipState({ ...defaultHomeMembership, ...(s.home_membership as any) });
+        const sa = s as any;
+        if (sa.home_blocks && Object.keys(sa.home_blocks).length) setHomeBlocks({ ...defaultHomeBlocks, ...sa.home_blocks });
+        if (Array.isArray(sa.home_faqs) && sa.home_faqs.length) setHomeFaqs(sa.home_faqs);
+        if (sa.service_faqs && Object.keys(sa.service_faqs).length) setServiceFaqs({ ...defaultServiceFaqs, ...sa.service_faqs });
+        if (Array.isArray(sa.stats) && sa.stats.length) setStats(sa.stats);
+        if (Array.isArray(sa.trust_logos) && sa.trust_logos.length) setTrustLogos(sa.trust_logos);
+        if (Array.isArray(sa.case_studies) && sa.case_studies.length) setCaseStudies(sa.case_studies);
+        if (sa.final_cta && Object.keys(sa.final_cta).length) setFinalCta({ ...defaultFinalCta, ...sa.final_cta });
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
       if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
@@ -471,12 +588,19 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         section_groups: sectionGroups as any,
         page_location: pageLocation as any,
         home_membership: homeMembership as any,
+        home_blocks: homeBlocks as any,
+        home_faqs: homeFaqs as any,
+        service_faqs: serviceFaqs as any,
+        stats: stats as any,
+        trust_logos: trustLogos as any,
+        case_studies: caseStudies as any,
+        final_cta: finalCta as any,
         updated_at: new Date().toISOString(),
       }).eq("id", 1).then(({ error }) => {
         if (error) console.error("[site_settings] save failed", error);
       });
     }, 500);
-  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership]);
+  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta]);
 
   // ---------------------------------------------------------------
   // Live document.head effects (unchanged)
@@ -694,6 +818,31 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     }));
   const updateAppearance = (a: Partial<Appearance>) => setAppearance((prev) => ({ ...prev, ...a }));
 
+  // ---------------------------------------------------------------
+  // Home builder mutators
+  // ---------------------------------------------------------------
+  const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const setHomeBlock = (k: HomeBlockKey, v: boolean) => setHomeBlocks((prev) => ({ ...prev, [k]: v }));
+  const addHomeFaq = (f: Omit<FaqItem, "id">) => setHomeFaqs((prev) => [...prev, { ...f, id: newId() }]);
+  const updateHomeFaq = (id: string, f: Partial<FaqItem>) => setHomeFaqs((prev) => prev.map((x) => x.id === id ? { ...x, ...f } : x));
+  const deleteHomeFaq = (id: string) => setHomeFaqs((prev) => prev.filter((x) => x.id !== id));
+  const addServiceFaq = (slug: string, f: Omit<FaqItem, "id">) =>
+    setServiceFaqs((prev) => ({ ...prev, [slug]: [...(prev[slug] || []), { ...f, id: newId() }] }));
+  const updateServiceFaq = (slug: string, id: string, f: Partial<FaqItem>) =>
+    setServiceFaqs((prev) => ({ ...prev, [slug]: (prev[slug] || []).map((x) => x.id === id ? { ...x, ...f } : x) }));
+  const deleteServiceFaq = (slug: string, id: string) =>
+    setServiceFaqs((prev) => ({ ...prev, [slug]: (prev[slug] || []).filter((x) => x.id !== id) }));
+  const addStat = (s: Omit<StatItem, "id">) => setStats((prev) => [...prev, { ...s, id: newId() }]);
+  const updateStat = (id: string, s: Partial<StatItem>) => setStats((prev) => prev.map((x) => x.id === id ? { ...x, ...s } : x));
+  const deleteStat = (id: string) => setStats((prev) => prev.filter((x) => x.id !== id));
+  const addTrustLogo = (t: Omit<TrustLogo, "id">) => setTrustLogos((prev) => [...prev, { ...t, id: newId() }]);
+  const updateTrustLogo = (id: string, t: Partial<TrustLogo>) => setTrustLogos((prev) => prev.map((x) => x.id === id ? { ...x, ...t } : x));
+  const deleteTrustLogo = (id: string) => setTrustLogos((prev) => prev.filter((x) => x.id !== id));
+  const addCaseStudy = (c: Omit<CaseStudy, "id">) => setCaseStudies((prev) => [...prev, { ...c, id: newId() }]);
+  const updateCaseStudy = (id: string, c: Partial<CaseStudy>) => setCaseStudies((prev) => prev.map((x) => x.id === id ? { ...x, ...c } : x));
+  const deleteCaseStudy = (id: string) => setCaseStudies((prev) => prev.filter((x) => x.id !== id));
+  const updateFinalCta = (c: Partial<FinalCta>) => setFinalCta((prev) => ({ ...prev, ...c }));
+
   const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
     const staticPaths = ["/", "/services", "/about", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
     const blogPaths = slugs.map((s) => `/blog/${s}`);
@@ -732,6 +881,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         visits, visitSeries,
         leads, addLead, deleteLead, clearLeads, pruneOldLeads,
         reviews, addReview, approveReview, deleteReview,
+        homeBlocks, setHomeBlock,
+        homeFaqs, addHomeFaq, updateHomeFaq, deleteHomeFaq,
+        serviceFaqs, addServiceFaq, updateServiceFaq, deleteServiceFaq,
+        stats, addStat, updateStat, deleteStat,
+        trustLogos, addTrustLogo, updateTrustLogo, deleteTrustLogo,
+        caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
+        finalCta, updateFinalCta,
       }}
     >
       {children}

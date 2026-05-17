@@ -69,6 +69,13 @@ const AdminDashboard = () => {
     leads, deleteLead, clearLeads,
     visitSeries, pruneOldLeads,
     reviews, approveReview, deleteReview,
+    homeBlocks, setHomeBlock,
+    homeFaqs, addHomeFaq, updateHomeFaq, deleteHomeFaq,
+    serviceFaqs, addServiceFaq, updateServiceFaq, deleteServiceFaq,
+    stats, addStat, updateStat, deleteStat,
+    trustLogos, addTrustLogo, updateTrustLogo, deleteTrustLogo,
+    caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
+    finalCta, updateFinalCta,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
@@ -670,6 +677,7 @@ const AdminDashboard = () => {
           <TabsList className="h-auto flex-wrap justify-start">
             <TabsTrigger value="overview"><TrendingUp className="h-4 w-4 mr-1" /> Overview</TabsTrigger>
             <TabsTrigger value="pages"><Layout className="h-4 w-4 mr-1" /> Pages</TabsTrigger>
+            <TabsTrigger value="home"><Home className="h-4 w-4 mr-1" /> Home Builder</TabsTrigger>
             <TabsTrigger value="leads">
               <Inbox className="h-4 w-4 mr-1" /> Leads
               {leads.length > 0 && (
@@ -906,6 +914,176 @@ const AdminDashboard = () => {
               </Card>
               <div>{renderPageEditor()}</div>
             </div>
+          </TabsContent>
+
+          {/* HOME BUILDER */}
+          <TabsContent value="home" className="space-y-6">
+            <Card className="p-5">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="h-11 w-11 rounded-xl bg-gradient-accent text-accent-foreground grid place-items-center">
+                  <Home className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg">Home page builder</h2>
+                  <p className="text-sm text-muted-foreground">Toggle, edit, and order shob home page section ek jaygai.</p>
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {([
+                  { k: "trustStrip", label: "Trust strip" },
+                  { k: "stats", label: "Stats band" },
+                  { k: "servicesPreview", label: "Services preview" },
+                  { k: "caseStudies", label: "Case studies" },
+                  { k: "homeFaq", label: "Home FAQ" },
+                  { k: "finalCta", label: "Final CTA" },
+                ] as const).map((b) => (
+                  <div key={b.k} className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-border/60 bg-secondary/40">
+                    <span className="text-sm font-semibold">{b.label}</span>
+                    <Switch checked={homeBlocks[b.k]} onCheckedChange={(v) => { setHomeBlock(b.k, v); toast.success("Updated"); }} />
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Trust logos */}
+            <Card className="p-5 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <h3 className="font-bold">Trust strip — client logos</h3>
+                  <p className="text-xs text-muted-foreground">Image upload korle logo, na korle name text dekhabe.</p>
+                </div>
+                <Button size="sm" onClick={() => { addTrustLogo({ name: "New Brand", image: "" }); toast.success("Logo added"); }}><Plus className="h-4 w-4" /> Add logo</Button>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {trustLogos.map((t) => (
+                  <div key={t.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                    <Input placeholder="Brand name" value={t.name} onChange={(e) => updateTrustLogo(t.id, { name: e.target.value })} />
+                    <ImageUpload value={t.image} onChange={(url) => updateTrustLogo(t.id, { image: url })} />
+                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteTrustLogo(t.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Stats */}
+            <Card className="p-5 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <h3 className="font-bold">Stats band</h3>
+                  <p className="text-xs text-muted-foreground">Boro number gula (e.g. "15+" / "Projects Delivered").</p>
+                </div>
+                <Button size="sm" onClick={() => { addStat({ value: "0+", label: "New metric" }); toast.success("Stat added"); }}><Plus className="h-4 w-4" /> Add stat</Button>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {stats.map((s) => (
+                  <div key={s.id} className="p-3 rounded-xl border border-border/60 bg-card grid grid-cols-[100px_1fr_auto] gap-2 items-center">
+                    <Input value={s.value} onChange={(e) => updateStat(s.id, { value: e.target.value })} placeholder="Value" />
+                    <Input value={s.label} onChange={(e) => updateStat(s.id, { label: e.target.value })} placeholder="Label" />
+                    <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteStat(s.id)}><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Case studies */}
+            <Card className="p-5 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <h3 className="font-bold">Featured case studies</h3>
+                  <p className="text-xs text-muted-foreground">2–3 ta best work with metric.</p>
+                </div>
+                <Button size="sm" onClick={() => { addCaseStudy({ title: "New case study", metric: "+100%", description: "", image: "", link: "/portfolio" }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add case study</Button>
+              </div>
+              <div className="space-y-3">
+                {caseStudies.map((c) => (
+                  <div key={c.id} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      <Input value={c.title} onChange={(e) => updateCaseStudy(c.id, { title: e.target.value })} placeholder="Title" />
+                      <Input value={c.metric} onChange={(e) => updateCaseStudy(c.id, { metric: e.target.value })} placeholder="Metric (e.g. +180% traffic)" />
+                    </div>
+                    <Textarea value={c.description} onChange={(e) => updateCaseStudy(c.id, { description: e.target.value })} placeholder="Short description" rows={2} />
+                    <Input value={c.link} onChange={(e) => updateCaseStudy(c.id, { link: e.target.value })} placeholder="Link URL (e.g. /portfolio)" />
+                    <ImageUpload value={c.image} onChange={(url) => updateCaseStudy(c.id, { image: url })} />
+                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Home FAQ */}
+            <Card className="p-5 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <h3 className="font-bold">Home FAQ</h3>
+                  <p className="text-xs text-muted-foreground">Brand/general questions. Service-specific FAQ niche.</p>
+                </div>
+                <Button size="sm" onClick={() => { addHomeFaq({ question: "New question?", answer: "Answer..." }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add FAQ</Button>
+              </div>
+              <div className="space-y-3">
+                {homeFaqs.map((f) => (
+                  <div key={f.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                    <Input value={f.question} onChange={(e) => updateHomeFaq(f.id, { question: e.target.value })} placeholder="Question" />
+                    <Textarea value={f.answer} onChange={(e) => updateHomeFaq(f.id, { answer: e.target.value })} placeholder="Answer" rows={2} />
+                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteHomeFaq(f.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Service FAQs */}
+            <Card className="p-5 space-y-4">
+              <h3 className="font-bold">Service page FAQs</h3>
+              <p className="text-xs text-muted-foreground">Each service page-er jonno alada question/answer.</p>
+              {["website-seo", "ecommerce-seo", "graphics-design", "website-development", "social-media-marketing", "digital-marketing"].map((slug) => (
+                <Collapsible key={slug}>
+                  <CollapsibleTrigger className="w-full flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary text-left">
+                    <span className="font-semibold text-sm">{slug} <span className="text-muted-foreground">({(serviceFaqs[slug] || []).length})</span></span>
+                    <ChevronRight className="h-4 w-4 transition-transform data-[state=open]:rotate-90" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-3 space-y-3">
+                    {(serviceFaqs[slug] || []).map((f) => (
+                      <div key={f.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                        <Input value={f.question} onChange={(e) => updateServiceFaq(slug, f.id, { question: e.target.value })} placeholder="Question" />
+                        <Textarea value={f.answer} onChange={(e) => updateServiceFaq(slug, f.id, { answer: e.target.value })} placeholder="Answer" rows={2} />
+                        <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteServiceFaq(slug, f.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+                      </div>
+                    ))}
+                    <Button size="sm" variant="outline" onClick={() => { addServiceFaq(slug, { question: "New question?", answer: "Answer..." }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add to {slug}</Button>
+                  </CollapsibleContent>
+                </Collapsible>
+              ))}
+            </Card>
+
+            {/* Final CTA */}
+            <Card className="p-5 space-y-3">
+              <h3 className="font-bold">Final CTA banner</h3>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-semibold mb-1 block">Headline</label>
+                  <Input value={finalCta.headline} onChange={(e) => updateFinalCta({ headline: e.target.value })} />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-semibold mb-1 block">Subline</label>
+                  <Textarea rows={2} value={finalCta.subline} onChange={(e) => updateFinalCta({ subline: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold mb-1 block">Primary button label</label>
+                  <Input value={finalCta.primaryLabel} onChange={(e) => updateFinalCta({ primaryLabel: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold mb-1 block">Primary button URL</label>
+                  <Input value={finalCta.primaryUrl} onChange={(e) => updateFinalCta({ primaryUrl: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold mb-1 block">Secondary button label</label>
+                  <Input value={finalCta.secondaryLabel} onChange={(e) => updateFinalCta({ secondaryLabel: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold mb-1 block">Secondary button URL</label>
+                  <Input value={finalCta.secondaryUrl} onChange={(e) => updateFinalCta({ secondaryUrl: e.target.value })} />
+                </div>
+              </div>
+            </Card>
           </TabsContent>
 
           {/* LEADS */}
