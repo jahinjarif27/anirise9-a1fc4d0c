@@ -667,6 +667,10 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         updateAppearance,
         fontChoices: FONT_CHOICES,
         visits,
+        leads,
+        addLead,
+        deleteLead,
+        clearLeads,
       }}
     >
       {children}
