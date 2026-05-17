@@ -63,9 +63,9 @@ export const BottomNav = () => {
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               aria-label="Top"
-              className="-mt-7 h-14 w-14 rounded-full bg-gradient-accent text-accent-foreground grid place-items-center shadow-elegant ring-4 ring-background"
+              className="-mt-7 h-14 w-14 rounded-full overflow-hidden grid place-items-center shadow-elegant ring-4 ring-background bg-background"
             >
-              <Sparkles className="h-6 w-6" />
+              <img src={logo} alt="AniRise" className="h-full w-full object-cover" />
             </button>
           </div>
           <button onClick={() => go("/portfolio")} className="flex flex-col items-center gap-0.5 py-1 text-foreground/80 hover:text-accent">
