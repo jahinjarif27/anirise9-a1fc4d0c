@@ -5,7 +5,7 @@ import { writeFileSync } from "fs";
 import { resolve } from "path";
 import { initialPosts } from "../src/data/blog";
 
-const BASE_URL = "https://anirise9.vercel.app";
+const BASE_URL = "https://anirise.com.bd";
 
 interface SitemapEntry {
   path: string;

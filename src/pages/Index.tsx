@@ -23,8 +23,8 @@ const Index = () => {
       "@context": "https://schema.org",
       "@type": "Organization",
       name: "AniRise",
-      url: "https://anirise9.vercel.app/",
-      logo: "https://anirise9.vercel.app/favicon.jpg",
+      url: "https://anirise.com.bd/",
+      logo: "https://anirise.com.bd/favicon.jpg",
     },
   });
 

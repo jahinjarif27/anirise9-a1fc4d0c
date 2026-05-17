@@ -30,9 +30,9 @@ const BlogPostPage = () => {
           publisher: {
             "@type": "Organization",
             name: "AniRise",
-            logo: { "@type": "ImageObject", url: "https://anirise9.vercel.app/favicon.jpg" },
+            logo: { "@type": "ImageObject", url: "https://anirise.com.bd/favicon.jpg" },
           },
-          mainEntityOfPage: `https://anirise9.vercel.app/blog/${slug ?? ""}`,
+          mainEntityOfPage: `https://anirise.com.bd/blog/${slug ?? ""}`,
         }
       : undefined,
   });
