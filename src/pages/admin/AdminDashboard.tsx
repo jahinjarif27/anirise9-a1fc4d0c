@@ -65,6 +65,7 @@ const AdminDashboard = () => {
     sectionGroups, addSectionGroup, updateSectionGroup, deleteSectionGroup,
     updatePageSeo,
     leads, deleteLead, clearLeads,
+    visitSeries, pruneOldLeads,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
