@@ -488,6 +488,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [visits, setVisits] = useState(0);
   const [visitSeries, setVisitSeries] = useState<{ day: string; visits: number }[]>([]);
+  const [homeBlocks, setHomeBlocks] = useState<HomeBlocks>(defaultHomeBlocks);
+  const [homeFaqs, setHomeFaqs] = useState<FaqItem[]>(defaultHomeFaqs);
+  const [serviceFaqs, setServiceFaqs] = useState<Record<string, FaqItem[]>>(defaultServiceFaqs);
+  const [stats, setStats] = useState<StatItem[]>(defaultStats);
+  const [trustLogos, setTrustLogos] = useState<TrustLogo[]>(defaultTrustLogos);
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(defaultCaseStudies);
+  const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
 
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
