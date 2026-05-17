@@ -102,9 +102,8 @@ const AdminDashboard = () => {
 
   const saveDraft = () => {
     if (!draft.title || !draft.slug) { toast.error("Title and slug are required"); return; }
-    const payload = { ...draft, body: blogMode === "simple" ? "" : draft.body };
-    if (editingId) { updatePost(editingId, payload); toast.success("Post updated"); }
-    else { addPost(payload); toast.success("Post created"); }
+    if (editingId) { updatePost(editingId, draft); toast.success("Post updated"); }
+    else { addPost(draft); toast.success("Post created"); }
     setEditingId(null);
     setBlogMode("simple");
     setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "", ctaEnabled: false, ctaLabel: "", ctaUrl: "", body: "" });
@@ -397,6 +396,16 @@ const AdminDashboard = () => {
               Final URL: <span className="font-mono text-foreground">{seo.canonicalUrl}/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span>
             </div>
             <ImageUpload label="Page image" value={cp.image} onChange={(v) => updateCustomPage(cp.id, { image: v })} aspect="aspect-[16/9]" altValue={cp.imageAlt} onAltChange={(v) => updateCustomPage(cp.id, { imageAlt: v })} />
+            <div>
+              <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Page description / body</label>
+              <Textarea
+                rows={8}
+                placeholder="Write the page content here. Plain text or Markdown — headings (##), lists, links etc. are supported."
+                value={cp.body}
+                onChange={(e) => updateCustomPage(cp.id, { body: e.target.value })}
+              />
+              <p className="text-[11px] text-muted-foreground mt-1.5">This shows as the main content on the page. Leave empty to show only the title and image.</p>
+            </div>
             <div className="flex justify-between pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteCustomPage(cp.id); setActivePage("hero"); toast.success("Page deleted"); }}>
                 <Trash2 className="h-4 w-4 text-destructive" /> Delete page
@@ -1071,12 +1080,22 @@ const AdminDashboard = () => {
                         onClick={() => setBlogMode(m)}
                         className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${blogMode === m ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground"}`}
                       >
-                        {m === "simple" ? "Simple (excerpt only)" : "Full editor"}
+                        {m === "simple" ? "Simple description" : "Full editor"}
                       </button>
                     ))}
                   </div>
                 </div>
-                {blogMode === "editor" && (
+                {blogMode === "simple" ? (
+                  <div className="mt-3">
+                    <Textarea
+                      rows={10}
+                      placeholder="Write the full article here. Plain text — paragraphs separated by blank lines. Basic Markdown (##, **bold**, lists, links) also works."
+                      value={draft.body || ""}
+                      onChange={(e) => setDraft({ ...draft, body: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">For a no-frills writing experience. Switch to Full editor for a richer toolbar and live preview.</p>
+                  </div>
+                ) : (
                   <div className="mt-3" data-color-mode="light">
                     <MDEditor
                       value={draft.body || ""}
@@ -1087,11 +1106,6 @@ const AdminDashboard = () => {
                     />
                     <p className="text-xs text-muted-foreground mt-2">Supports Markdown — headings, lists, links, images, tables, code blocks.</p>
                   </div>
-                )}
-                {blogMode === "simple" && (draft.body || "").trim().length > 0 && (
-                  <p className="text-xs text-muted-foreground mt-3">
-                    Note: this post has rich content saved. Switch to "Full editor" to keep it, or save to publish only the excerpt.
-                  </p>
                 )}
               </div>
               <div className="mt-4 rounded-xl border border-border bg-secondary/30 p-4 space-y-3">
@@ -1265,7 +1279,6 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" onClick={regenerateSitemap}><RefreshCw className="h-4 w-4" /> Regenerate</Button>
                       <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(seo.sitemap); toast.success("Copied"); }}><Copy className="h-4 w-4" /> Copy</Button>
                       <Button variant="outline" size="sm" onClick={() => downloadFile("sitemap.xml", seo.sitemap, "application/xml")}><Download className="h-4 w-4" /> Download</Button>
                     </div>
@@ -1313,6 +1326,19 @@ const AdminDashboard = () => {
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
                     <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value })} />
+                  </div>
+                  <div className="flex justify-end">
+                    <Button variant="hero" size="sm" onClick={() => { updateSeo({ sitemap: seo.sitemap }); toast.success("Sitemap saved"); }}>
+                      <Save className="h-4 w-4" /> Save sitemap
+                    </Button>
+                  </div>
+                  <div className="rounded-xl bg-secondary/40 border border-border/60 p-4 text-xs text-muted-foreground leading-relaxed">
+                    <p className="font-bold text-foreground mb-1.5 text-sm">How to use this sitemap</p>
+                    <p>
+                      Your sitemap auto-updates whenever you add or remove a page or blog post — no manual work needed.
+                      The <span className="font-semibold text-foreground">Priority</span> value (1.0 = highest, 0.1 = lowest) hints to Google which URLs matter most on your site; keep your homepage at 1.0 and core service pages above 0.8.
+                      Change priorities here and click <span className="font-semibold text-foreground">Save sitemap</span>. Submit the sitemap URL once in Google Search Console — Google then re-reads it automatically.
+                    </p>
                   </div>
                 </Card>
               </TabsContent>
