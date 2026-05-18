@@ -22,6 +22,7 @@ import { BlogPost } from "@/data/blog";
 import logo from "@/assets/anirise-logo.jpg";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { ServiceContentEditor } from "@/components/admin/ServiceContentEditor";
 import { Switch } from "@/components/ui/switch";
 import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
@@ -155,6 +156,7 @@ const AdminDashboard = () => {
     caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
     finalCta, updateFinalCta,
     servicePreviews, updateServicePreview,
+    serviceContent, updateServiceContent,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
@@ -166,7 +168,7 @@ const AdminDashboard = () => {
   const [device, setDevice] = useState<DeviceKey>("desktop");
   const [blogMode, setBlogMode] = useState<"simple" | "editor">("simple");
   const [activePage, setActivePage] = useState<string>("hero");
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ home: true });
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const previewWrapRef = useRef<HTMLDivElement>(null);
   const [wrapWidth, setWrapWidth] = useState(1000);
 
@@ -569,8 +571,14 @@ const AdminDashboard = () => {
                 <Button asChild variant="outline" size="sm"><Link to={`/services/${slug}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
               }
             />
-            <p className="text-sm text-muted-foreground">Page layout & copy are managed in code. Use the FAQ editor below to add/edit questions shown on this service page.</p>
+            <p className="text-sm text-muted-foreground">Edit every text, stat, process step, deliverable, chart bar and CTA shown on this service page. FAQ is at the bottom.</p>
           </Card>
+
+          <ServiceContentEditor
+            slug={slug}
+            content={serviceContent[slug] ?? { enabled: true, heroEyebrow: svc.label, heroHeadlineBefore: svc.label, heroHeadlineAccent: "", heroBlurb: "", heroPrimaryLabel: "", heroPrimaryUrl: "/#contact", heroSecondaryLabel: "", heroSecondaryUrl: "#process", stats: [], whyEyebrow: "", whyTitle: "", whyCards: [], processEyebrow: "", processTitle: "", processSteps: [], deliverablesEyebrow: "", deliverablesTitle: "", deliverablesBlurb: "", deliverables: [], chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] }, ctaHeadline: "", ctaBlurb: "", ctaLabel: "", ctaUrl: "/#contact" }}
+            onChange={(patch) => updateServiceContent(slug, patch)}
+          />
 
           <Card className="p-5 sm:p-6 space-y-4">
             <SectionHeader
@@ -963,7 +971,7 @@ const AdminDashboard = () => {
                 <div className="p-2 space-y-1">
                   {/* HOME page group */}
                   {(() => {
-                    const isOpen = openGroups["home"] ?? true;
+                    const isOpen = openGroups["home"] ?? false;
                     const customHomeSections = homeSections.filter((s) => (s.groupKey ?? "home") === "home" || !s.groupKey);
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, home: v }))}>
@@ -1039,7 +1047,7 @@ const AdminDashboard = () => {
 
                   {/* SERVICES group */}
                   {(() => {
-                    const isOpen = openGroups["services"] ?? true;
+                    const isOpen = openGroups["services"] ?? false;
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, services: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
@@ -1079,7 +1087,7 @@ const AdminDashboard = () => {
 
                   {/* PROJECTS group */}
                   {(() => {
-                    const isOpen = openGroups["projects"] ?? true;
+                    const isOpen = openGroups["projects"] ?? false;
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, projects: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
@@ -1125,7 +1133,7 @@ const AdminDashboard = () => {
 
                   {/* Other built-in pages */}
                   {(() => {
-                    const isOpen = openGroups["other"] ?? true;
+                    const isOpen = openGroups["other"] ?? false;
                     const others = ["testimonials", "contact"];
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, other: v }))}>
@@ -1157,7 +1165,7 @@ const AdminDashboard = () => {
 
                   {/* Custom pages */}
                   {(() => {
-                    const isOpen = openGroups["custom"] ?? true;
+                    const isOpen = openGroups["custom"] ?? false;
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, custom: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">

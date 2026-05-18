@@ -6,6 +6,8 @@ import logoImg from "@/assets/anirise-logo.jpg";
 import portfolio1 from "@/assets/portfolio-1.jpg";
 import portfolio2 from "@/assets/portfolio-2.jpg";
 import portfolio3 from "@/assets/portfolio-3.jpg";
+import { defaultServiceContent, ServiceContent } from "@/data/serviceContentDefaults";
+export type { ServiceContent } from "@/data/serviceContentDefaults";
 
 // ============================================================
 // Types (exported API unchanged so existing UI keeps working)
@@ -446,6 +448,8 @@ type AdminCtx = {
   updateFinalCta: (c: Partial<FinalCta>) => void;
   servicePreviews: Record<string, ServicePreview>;
   updateServicePreview: (slug: string, sp: Partial<ServicePreview>) => void;
+  serviceContent: Record<string, ServiceContent>;
+  updateServiceContent: (slug: string, patch: Partial<ServiceContent>) => void;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
@@ -507,6 +511,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(defaultCaseStudies);
   const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
   const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({});
+  const [serviceContent, setServiceContent] = useState<Record<string, ServiceContent>>(defaultServiceContent);
 
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
@@ -552,6 +557,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (Array.isArray(sa.case_studies) && sa.case_studies.length) setCaseStudies(sa.case_studies);
         if (sa.final_cta && Object.keys(sa.final_cta).length) setFinalCta({ ...defaultFinalCta, ...sa.final_cta });
         if (sa.service_previews && Object.keys(sa.service_previews).length) setServicePreviews(sa.service_previews);
+        if (sa.service_content && Object.keys(sa.service_content).length) {
+          const merged: Record<string, ServiceContent> = { ...defaultServiceContent };
+          Object.keys(sa.service_content).forEach((k) => {
+            merged[k] = { ...(defaultServiceContent[k] ?? defaultServiceContent["website-seo"]), ...sa.service_content[k] };
+          });
+          setServiceContent(merged);
+        }
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
       if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
@@ -613,12 +625,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         case_studies: caseStudies as any,
         final_cta: finalCta as any,
         service_previews: servicePreviews as any,
+        service_content: serviceContent as any,
         updated_at: new Date().toISOString(),
       }).eq("id", 1).then(({ error }) => {
         if (error) console.error("[site_settings] save failed", error);
       });
     }, 500);
-  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews]);
+  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews, serviceContent]);
 
   // ---------------------------------------------------------------
   // Live document.head effects (unchanged)
@@ -862,6 +875,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const updateFinalCta = (c: Partial<FinalCta>) => setFinalCta((prev) => ({ ...prev, ...c }));
   const updateServicePreview = (slug: string, sp: Partial<ServicePreview>) =>
     setServicePreviews((prev) => ({ ...prev, [slug]: { image: "", imageAlt: "", ...(prev[slug] || {}), ...sp } }));
+  const updateServiceContent = (slug: string, patch: Partial<ServiceContent>) =>
+    setServiceContent((prev) => {
+      const base = prev[slug] ?? defaultServiceContent[slug] ?? defaultServiceContent["website-seo"];
+      return { ...prev, [slug]: { ...base, ...patch } };
+    });
 
   const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
     const staticPaths = ["/", "/services", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
@@ -909,6 +927,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
         finalCta, updateFinalCta,
         servicePreviews, updateServicePreview,
+        serviceContent, updateServiceContent,
       }}
     >
       {children}

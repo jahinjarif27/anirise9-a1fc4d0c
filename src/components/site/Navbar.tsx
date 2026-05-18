@@ -73,7 +73,7 @@ export const Navbar = () => {
 
   return (
     <>
-    <header className={cn("fixed top-0 left-0 right-0 z-50 transition-all duration-300", pastHero ? "lg:translate-y-0 -translate-y-full opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto" : "translate-y-0 opacity-100")}>
+    <header className={cn("fixed top-0 left-0 right-0 z-50 transition-all duration-300", pastHero ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100")}>
       {/* Top contact bar */}
       <div className="bg-primary text-primary-foreground text-xs sm:text-sm">
         <div className="container flex items-center justify-between gap-3 py-2.5">
