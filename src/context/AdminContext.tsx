@@ -122,6 +122,8 @@ export type PageSeo = {
   metaKeywords: string;
 };
 
+export type CustomPageSection = { id: string; title: string; body: string };
+
 export type CustomPage = {
   id: string;
   title: string;
@@ -135,6 +137,17 @@ export type CustomPage = {
   seo: PageSeo;
   published: boolean;
   groupKey?: string;
+  // rich page-builder fields (all optional)
+  eyebrow?: string;
+  intro?: string;
+  sections?: CustomPageSection[];
+  metrics?: ProjectStat[];
+  deliverables?: string[];
+  table?: ProjectTable;
+  chart?: ProjectChart;
+  gallery?: GalleryImage[];
+  ctaLabel?: string;
+  ctaUrl?: string;
 };
 
 export type HomeSection = {
