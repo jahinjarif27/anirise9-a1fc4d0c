@@ -455,6 +455,153 @@ const AdminDashboard = () => {
               <Button variant="hero" size="sm" onClick={() => toast.success("Saved")}><Save className="h-4 w-4" /> Save</Button>
             </div>
           </Card>
+
+          {(() => {
+            const sections = cp.sections || [];
+            const metrics = cp.metrics || [];
+            const deliverables = cp.deliverables || [];
+            const gallery = cp.gallery || [];
+            const table = cp.table || { title: "", headers: ["Column 1", "Column 2"], rows: [["", ""]] };
+            const chart = cp.chart || { title: "", type: "area" as const, data: [] };
+            const updateTable = (patch: Partial<typeof table>) => updateCustomPage(cp.id, { table: { ...table, ...patch } });
+            const updateChart = (patch: Partial<typeof chart>) => updateCustomPage(cp.id, { chart: { ...chart, ...patch } });
+            return (
+              <Card className="p-5 sm:p-6 space-y-5">
+                <div>
+                  <h4 className="font-bold">Page builder — rich content</h4>
+                  <p className="text-xs text-muted-foreground">Add an intro, narrative sections, stat cards, a chart, a table, deliverables, gallery and a CTA. All optional.</p>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <Field label="Eyebrow (small label above title)">
+                    <Input value={cp.eyebrow || ""} onChange={(e) => updateCustomPage(cp.id, { eyebrow: e.target.value })} placeholder="e.g. Service · 2025" />
+                  </Field>
+                  <Field label="CTA label">
+                    <Input value={cp.ctaLabel || ""} onChange={(e) => updateCustomPage(cp.id, { ctaLabel: e.target.value })} placeholder="e.g. Book a free call" />
+                  </Field>
+                  <Field label="CTA link">
+                    <Input value={cp.ctaUrl || ""} onChange={(e) => updateCustomPage(cp.id, { ctaUrl: e.target.value })} placeholder="https://... or /contact" />
+                  </Field>
+                </div>
+
+                <Field label="Intro paragraph (shows under the title)">
+                  <Textarea rows={3} value={cp.intro || ""} onChange={(e) => updateCustomPage(cp.id, { intro: e.target.value })} placeholder="One short paragraph summarising the page." />
+                </Field>
+
+                {/* Sections */}
+                <div className="space-y-2 border-t border-border/60 pt-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Narrative sections</p>
+                    <Button size="sm" variant="outline" onClick={() => updateCustomPage(cp.id, { sections: [...sections, { id: `s${Date.now()}`, title: "New section", body: "" }] })}><Plus className="h-3 w-3" /> Add section</Button>
+                  </div>
+                  {sections.map((s, idx) => (
+                    <div key={s.id} className="space-y-2 p-3 rounded-lg border border-border/50">
+                      <div className="flex gap-2">
+                        <Input value={s.title} onChange={(e) => { const next = [...sections]; next[idx] = { ...s, title: e.target.value }; updateCustomPage(cp.id, { sections: next }); }} placeholder="Section title" className="font-semibold" />
+                        <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updateCustomPage(cp.id, { sections: sections.filter((x) => x.id !== s.id) })}><Trash2 className="h-4 w-4" /></Button>
+                      </div>
+                      <Textarea rows={4} value={s.body} onChange={(e) => { const next = [...sections]; next[idx] = { ...s, body: e.target.value }; updateCustomPage(cp.id, { sections: next }); }} placeholder="Section body. Plain text or Markdown." />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Metrics */}
+                <div className="space-y-2 border-t border-border/60 pt-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Stat cards</p>
+                    <Button size="sm" variant="outline" onClick={() => updateCustomPage(cp.id, { metrics: [...metrics, { id: `m${Date.now()}`, label: "New metric", value: "+0%" }] })}><Plus className="h-3 w-3" /> Add stat</Button>
+                  </div>
+                  {metrics.map((m, idx) => (
+                    <div key={m.id} className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                      <Input value={m.value} onChange={(e) => { const next = [...metrics]; next[idx] = { ...m, value: e.target.value }; updateCustomPage(cp.id, { metrics: next }); }} placeholder="Value (+180%)" />
+                      <Input value={m.label} onChange={(e) => { const next = [...metrics]; next[idx] = { ...m, label: e.target.value }; updateCustomPage(cp.id, { metrics: next }); }} placeholder="Label" />
+                      <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updateCustomPage(cp.id, { metrics: metrics.filter((x) => x.id !== m.id) })}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Chart */}
+                <div className="space-y-2 border-t border-border/60 pt-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Chart</p>
+                    <div className="flex items-center gap-2">
+                      <select className="text-xs rounded-md border border-input bg-background px-2 py-1" value={chart.type} onChange={(e) => updateChart({ type: e.target.value as "area" | "bar" })}>
+                        <option value="area">Area</option>
+                        <option value="bar">Bar</option>
+                      </select>
+                      <Button size="sm" variant="outline" onClick={() => updateChart({ data: [...chart.data, { id: `p${Date.now()}`, label: "New", value: 0 }] })}><Plus className="h-3 w-3" /> Add point</Button>
+                    </div>
+                  </div>
+                  <Input value={chart.title || ""} onChange={(e) => updateChart({ title: e.target.value })} placeholder="Chart title" />
+                  {chart.data.map((pt, idx) => (
+                    <div key={pt.id} className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                      <Input value={pt.label} onChange={(e) => { const next = [...chart.data]; next[idx] = { ...pt, label: e.target.value }; updateChart({ data: next }); }} placeholder="Label" />
+                      <Input type="number" value={pt.value} onChange={(e) => { const next = [...chart.data]; next[idx] = { ...pt, value: Number(e.target.value) }; updateChart({ data: next }); }} placeholder="Value" />
+                      <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updateChart({ data: chart.data.filter((x) => x.id !== pt.id) })}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Table */}
+                <div className="space-y-2 border-t border-border/60 pt-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Data table</p>
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" variant="outline" onClick={() => updateTable({ headers: [...table.headers, "Col"], rows: table.rows.map((r) => [...r, ""]) })}><Plus className="h-3 w-3" /> Column</Button>
+                      <Button size="sm" variant="outline" onClick={() => updateTable({ rows: [...table.rows, table.headers.map(() => "")] })}><Plus className="h-3 w-3" /> Row</Button>
+                    </div>
+                  </div>
+                  <Input value={table.title || ""} onChange={(e) => updateTable({ title: e.target.value })} placeholder="Table title" />
+                  <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${table.headers.length}, minmax(0,1fr)) auto` }}>
+                    {table.headers.map((h, i) => (
+                      <Input key={`h${i}`} value={h} onChange={(e) => { const next = [...table.headers]; next[i] = e.target.value; updateTable({ headers: next }); }} placeholder={`Header ${i + 1}`} className="font-semibold" />
+                    ))}
+                    <div />
+                    {table.rows.map((row, ri) => (
+                      <Fragment key={`r${ri}`}>
+                        {table.headers.map((_, ci) => (
+                          <Input key={`r${ri}c${ci}`} value={row[ci] || ""} onChange={(e) => { const next = table.rows.map((r) => [...r]); next[ri][ci] = e.target.value; updateTable({ rows: next }); }} placeholder="..." />
+                        ))}
+                        <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updateTable({ rows: table.rows.filter((_, i) => i !== ri) })}><Trash2 className="h-4 w-4" /></Button>
+                      </Fragment>
+                    ))}
+                  </div>
+                  {table.headers.length > 1 && (
+                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => updateTable({ headers: table.headers.slice(0, -1), rows: table.rows.map((r) => r.slice(0, -1)) })}><Trash2 className="h-3 w-3" /> Remove last column</Button>
+                  )}
+                </div>
+
+                {/* Deliverables / checklist */}
+                <div className="space-y-2 border-t border-border/60 pt-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Checklist / "What's included"</p>
+                    <Button size="sm" variant="outline" onClick={() => updateCustomPage(cp.id, { deliverables: [...deliverables, ""] })}><Plus className="h-3 w-3" /> Add item</Button>
+                  </div>
+                  {deliverables.map((d, idx) => (
+                    <div key={idx} className="flex gap-2">
+                      <Input value={d} onChange={(e) => { const next = [...deliverables]; next[idx] = e.target.value; updateCustomPage(cp.id, { deliverables: next }); }} placeholder="e.g. Monthly performance report" />
+                      <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updateCustomPage(cp.id, { deliverables: deliverables.filter((_, i) => i !== idx) })}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Gallery */}
+                <div className="space-y-2 border-t border-border/60 pt-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Gallery images</p>
+                    <Button size="sm" variant="outline" onClick={() => updateCustomPage(cp.id, { gallery: [...gallery, { id: `g${Date.now()}`, image: "", alt: "" }] })}><Plus className="h-3 w-3" /> Add image</Button>
+                  </div>
+                  {gallery.map((g, idx) => (
+                    <div key={g.id} className="space-y-2 p-3 rounded-lg border border-border/50">
+                      <ImageUpload value={g.image} onChange={(v) => { const next = [...gallery]; next[idx] = { ...g, image: v }; updateCustomPage(cp.id, { gallery: next }); }} aspect="aspect-[4/3]" altValue={g.alt} onAltChange={(v) => { const next = [...gallery]; next[idx] = { ...g, alt: v }; updateCustomPage(cp.id, { gallery: next }); }} />
+                      <Button size="sm" variant="ghost" className="text-destructive" onClick={() => updateCustomPage(cp.id, { gallery: gallery.filter((x) => x.id !== g.id) })}><Trash2 className="h-3 w-3" /> Remove image</Button>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            );
+          })()}
+
           <Card className="p-5 sm:p-6 space-y-3">
             <div className="flex items-center gap-2 flex-wrap">
               <Search className="h-4 w-4" />
