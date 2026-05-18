@@ -40,6 +40,7 @@ const Index = () => {
         {homeBlocks.trustStrip && <TrustStrip />}
         {homeBlocks.stats && <StatsBand />}
         {homeBlocks.servicesPreview && <ServicesPreview />}
+        <About />
         {homeBlocks.caseStudies && <CaseStudies />}
         <WhyChooseAniRise />
         <StrategyCall />
