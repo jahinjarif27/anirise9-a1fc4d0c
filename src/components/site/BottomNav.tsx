@@ -16,6 +16,10 @@ export const BottomNav = () => {
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isActive = (href: string) => href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+  const itemCls = (href: string) =>
+    `flex flex-col items-center gap-0.5 py-1 transition-colors ${isActive(href) ? "text-accent" : "text-foreground/80 hover:text-accent"}`;
 
   useEffect(() => {
     const onScroll = () => {
