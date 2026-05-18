@@ -60,11 +60,22 @@ export type ProjectChartPoint = { id: string; label: string; value: number };
 export type ProjectChart = { title?: string; type: "area" | "bar"; data: ProjectChartPoint[] };
 export type GalleryImage = { id: string; image: string; alt: string };
 
+export const PROJECT_CATEGORIES = [
+  "Website SEO",
+  "Ecommerce SEO",
+  "Website Development",
+  "Social Media Marketing",
+  "Graphics Design",
+  "Digital Marketing",
+] as const;
+export type ProjectCategory = typeof PROJECT_CATEGORIES[number];
+
 export type PortfolioItem = {
   id: string;
   image: string;
   imageAlt: string;
   tag: string;
+  category?: string;
   title: string;
   description?: string;
   body?: string;
