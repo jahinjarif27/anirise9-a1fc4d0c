@@ -825,7 +825,7 @@ const AdminDashboard = () => {
             })}
           </div>
         </Card>
-        <SeoBlock pageKey="home" />
+        <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} content={content} />
       </div>
     );
   };
