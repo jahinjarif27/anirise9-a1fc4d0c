@@ -442,6 +442,8 @@ type AdminCtx = {
   deleteCaseStudy: (id: string) => void;
   finalCta: FinalCta;
   updateFinalCta: (c: Partial<FinalCta>) => void;
+  servicePreviews: Record<string, ServicePreview>;
+  updateServicePreview: (slug: string, sp: Partial<ServicePreview>) => void;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
