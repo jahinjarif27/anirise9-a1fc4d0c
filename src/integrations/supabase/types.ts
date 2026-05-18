@@ -169,6 +169,7 @@ export type Database = {
           portfolio: Json
           section_groups: Json
           seo: Json
+          service_content: Json
           service_faqs: Json
           service_previews: Json
           stats: Json
@@ -191,6 +192,7 @@ export type Database = {
           portfolio?: Json
           section_groups?: Json
           seo?: Json
+          service_content?: Json
           service_faqs?: Json
           service_previews?: Json
           stats?: Json
@@ -213,6 +215,7 @@ export type Database = {
           portfolio?: Json
           section_groups?: Json
           seo?: Json
+          service_content?: Json
           service_faqs?: Json
           service_previews?: Json
           stats?: Json
