@@ -302,6 +302,7 @@ const defaultPortfolio: PortfolioItem[] = [
     image: portfolio1,
     imageAlt: "Ecommerce SEO case study cover",
     tag: "Ecommerce SEO",
+    category: "Ecommerce SEO",
     title: "Online Store Growth",
     description: "Shopify store er full SEO overhaul — product schema, faceted nav fix, ar conversion-focused copy diye revenue dramatic boost.",
     eyebrow: "Shopify · Fashion retail",
