@@ -288,7 +288,13 @@ const defaultHomeFaqs: FaqItem[] = [
   { id: "hf3", question: "Apnader pricing model kemon?", answer: "Project-based and monthly retainer — duitai available. Free consultation er por scope onujayi quote dei." },
   { id: "hf4", question: "Result kobe theke dekhte parbo?", answer: "SEO 60–90 din, web/graphics deliverables 2–4 soptaher moddhe, marketing campaigns 2–3 soptah er moddhe early signals." },
   { id: "hf5", question: "Contract sign korte hobe?", answer: "Onek shomoy simple SOW e kaj suru hoy. Long-term retainer er jonno standard service agreement thake." },
+  { id: "hf6", question: "Payment terms ki?", answer: "Project shurute 50% advance, delivery er por 50%. Retainer hole monthly upfront billing." },
+  { id: "hf7", question: "Communication kivabe hoy?", answer: "WhatsApp, email, ar weekly Zoom/Meet call e regular update. Dedicated project manager assign kora hoy." },
+  { id: "hf8", question: "Project er ownership kar?", answer: "Final payment er por shob deliverable (code, design source, content) apnar — full ownership transfer hoy." },
+  { id: "hf9", question: "Revisions koto bar pabo?", answer: "Most package e 2–3 round revision included. Scope onujayi extra revisions discuss kora jay." },
+  { id: "hf10", question: "NDA sign korte parben?", answer: "Obossoi. Sensitive project er jonno NDA sign kore tarpor kaj suru kori." },
 ];
+
 
 const defaultServiceFaqs: Record<string, FaqItem[]> = {
   "website-seo": [

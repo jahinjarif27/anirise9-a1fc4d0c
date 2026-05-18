@@ -1,27 +1,12 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
 import { services } from "@/data/services";
 import { useAdmin } from "@/context/AdminContext";
-import { cn } from "@/lib/utils";
 
 export const ServicesPreview = () => {
   const { content } = useAdmin();
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, align: "center" },
-    [Autoplay({ delay: 3500, stopOnInteraction: false, stopOnMouseEnter: true })]
-  );
-  const [selected, setSelected] = useState(0);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    const onSelect = () => setSelected(emblaApi.selectedScrollSnap());
-    onSelect();
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
-  }, [emblaApi]);
+  // Duplicate list so marquee loops seamlessly
+  const loop = [...services, ...services];
 
   return (
     <section className="py-20 lg:py-24 bg-gradient-primary text-primary-foreground relative overflow-hidden">
@@ -44,45 +29,38 @@ export const ServicesPreview = () => {
             View all <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
+      </div>
 
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex">
-            {services.map((s) => (
-              <div
-                key={s.slug}
-                className="min-w-0 shrink-0 grow-0 basis-full sm:basis-1/2 lg:basis-1/3 px-3"
-              >
-                <Link
-                  to={`/services/${s.slug}`}
-                  className="group block bg-gradient-to-br from-accent/20 via-card to-accent/10 rounded-3xl p-8 shadow-elegant border border-primary-foreground/10 hover:scale-[1.02] transition-smooth h-full"
-                >
-                  <div className="aspect-square rounded-2xl bg-accent/20 grid place-items-center mb-6 group-hover:bg-gradient-accent transition-smooth">
-                    <s.icon className="h-24 w-24 text-accent group-hover:text-accent-foreground transition-smooth" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="text-2xl font-extrabold text-foreground mb-2 text-center">
-                    {s.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed text-center italic">
-                    {s.desc}
-                  </p>
-                </Link>
+      {/* Continuous auto-scroll marquee */}
+      <div
+        className="relative w-full overflow-hidden group"
+        style={{
+          maskImage:
+            "linear-gradient(to right, transparent, black 6%, black 94%, transparent)",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent, black 6%, black 94%, transparent)",
+        }}
+      >
+        <div className="flex gap-6 w-max animate-services-marquee group-hover:[animation-play-state:paused]">
+          {loop.map((s, idx) => (
+            <Link
+              key={`${s.slug}-${idx}`}
+              to="/portfolio"
+              className="group/card block w-[280px] sm:w-[320px] shrink-0 bg-gradient-to-br from-accent/20 via-card to-accent/10 rounded-3xl p-6 shadow-elegant border border-primary-foreground/10 hover:scale-[1.02] transition-smooth"
+            >
+              <div className="aspect-square rounded-2xl bg-accent/20 grid place-items-center mb-5 group-hover/card:bg-gradient-accent transition-smooth">
+                <s.icon
+                  className="h-20 w-20 text-accent group-hover/card:text-accent-foreground transition-smooth"
+                  strokeWidth={1.5}
+                />
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex justify-center gap-2 mt-8">
-          {services.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Go to slide ${i + 1}`}
-              onClick={() => emblaApi?.scrollTo(i)}
-              className={cn(
-                "h-2.5 rounded-full transition-all",
-                selected === i ? "w-8 bg-accent" : "w-2.5 bg-primary-foreground/30"
-              )}
-            />
+              <h3 className="text-xl font-extrabold text-foreground mb-2 text-center">
+                {s.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed text-center italic line-clamp-3">
+                {s.desc}
+              </p>
+            </Link>
           ))}
         </div>
       </div>
