@@ -30,20 +30,6 @@ const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title
   contact: { Component: Contact, title: "Contact" },
 };
 
-import { Hero } from "@/components/site/Hero";
-import { Services } from "@/components/site/Services";
-import { Portfolio } from "@/components/site/Portfolio";
-import { Testimonials } from "@/components/site/Testimonials";
-import { Contact } from "@/components/site/Contact";
-import { Blog as BlogSection } from "@/components/site/Blog";
-
-const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title: string }> = {
-  services: { Component: Services, title: "Services" },
-  about: { Component: About, title: "About" },
-  portfolio: { Component: Portfolio, title: "Portfolio" },
-  testimonials: { Component: Testimonials, title: "Testimonials" },
-  contact: { Component: Contact, title: "Contact" },
-};
 
 export const AppRoutes = () => {
   return (
@@ -53,6 +39,7 @@ export const AppRoutes = () => {
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/strategy-call" element={<StrategyCallPage />} />
         <Route path="/case-studies/:id" element={<CaseStudyDetail />} />
+        <Route path="/portfolio/:id" element={<ProjectDetail />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/services/website-seo" element={<WebsiteSEOPage />} />
         <Route path="/services/ecommerce-seo" element={<EcommerceSEOPage />} />
