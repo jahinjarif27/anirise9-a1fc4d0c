@@ -40,9 +40,10 @@ const Index = () => {
         {homeBlocks.stats && <StatsBand />}
         {homeBlocks.servicesPreview && <ServicesPreview />}
         {homeBlocks.caseStudies && <CaseStudies />}
-        {onHome("blog") && <Blog />}
+        <WhyChooseAniRise />
         <StrategyCall />
         {homeBlocks.homeFaq && <HomeFAQ />}
+        {onHome("blog") && <Blog />}
         {homeBlocks.finalCta && <FinalCTA />}
         {homeSections.filter((s) => s.enabled && (s.groupKey ?? "home") === "home").map((s) => (
           <section key={s.id} className="py-16 md:py-24">
