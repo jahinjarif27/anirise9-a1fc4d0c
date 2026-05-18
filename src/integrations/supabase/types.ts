@@ -167,6 +167,7 @@ export type Database = {
           section_groups: Json
           seo: Json
           service_faqs: Json
+          service_previews: Json
           stats: Json
           trust_logos: Json
           updated_at: string
@@ -188,6 +189,7 @@ export type Database = {
           section_groups?: Json
           seo?: Json
           service_faqs?: Json
+          service_previews?: Json
           stats?: Json
           trust_logos?: Json
           updated_at?: string
@@ -209,6 +211,7 @@ export type Database = {
           section_groups?: Json
           seo?: Json
           service_faqs?: Json
+          service_previews?: Json
           stats?: Json
           trust_logos?: Json
           updated_at?: string
