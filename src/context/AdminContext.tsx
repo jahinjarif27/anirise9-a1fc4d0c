@@ -504,6 +504,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [trustLogos, setTrustLogos] = useState<TrustLogo[]>(defaultTrustLogos);
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(defaultCaseStudies);
   const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
+  const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({});
 
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
