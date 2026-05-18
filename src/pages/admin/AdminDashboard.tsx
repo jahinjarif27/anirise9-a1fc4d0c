@@ -26,7 +26,7 @@ import { ServiceContentEditor } from "@/components/admin/ServiceContentEditor";
 import { Switch } from "@/components/ui/switch";
 import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
-import { SECTION_KEYS, SectionKey } from "@/context/AdminContext";
+import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES } from "@/context/AdminContext";
 
 const visitData = Array.from({ length: 14 }, (_, i) => ({
   day: `D${i + 1}`,
