@@ -94,38 +94,61 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
   </div>
 );
 
+// Only these admin pageKeys map to a real public URL where meta tags actually ship.
+// Listed once here so we never render SEO controls for pages clients can't index.
+const INDEXABLE_PAGE_KEYS = new Set([
+  "home", "services", "portfolio", "blog", "testimonials", "contact", "strategy-call",
+]);
+
+const PAGE_URL_PREVIEW: Record<string, string> = {
+  home: "/", services: "/services", portfolio: "/portfolio", blog: "/blog",
+  testimonials: "/testimonials", contact: "/contact", "strategy-call": "/strategy-call",
+};
+
 const SeoBlock = ({
-  pageKey, hideAuto = false, seo, updatePageSeo, content,
+  pageKey, seo, updatePageSeo,
 }: {
-  pageKey: string; hideAuto?: boolean;
-  seo: any; updatePageSeo: (key: string, patch: any) => void; content: any;
+  pageKey: string;
+  seo: any; updatePageSeo: (key: string, patch: any) => void;
 }) => {
+  if (!INDEXABLE_PAGE_KEYS.has(pageKey)) return null;
   const s = seo.pageSeo[pageKey] || { metaTitle: "", metaDescription: "", metaKeywords: "" };
+  const titleLen = s.metaTitle?.length || 0;
+  const descLen = s.metaDescription?.length || 0;
+  const onSave = () => {
+    // SEO is persisted reactively via the AdminContext debounce; this triggers
+    // a no-op write that flushes any pending edits and confirms to the user.
+    updatePageSeo(pageKey, {});
+    toast.success(`SEO saved for ${PAGE_URL_PREVIEW[pageKey] || pageKey} — live on next page load`);
+  };
   return (
     <Card className="p-5 sm:p-6 space-y-3">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <Search className="h-4 w-4" />
         <h4 className="font-bold">Page SEO</h4>
-        {!hideAuto && (
-          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => {
-            const title = content[`${pageKey}Headline`] || content[`${pageKey}Title`] || s.metaTitle;
-            const desc = content[`${pageKey}Blurb`] || content[`${pageKey}Tagline`] || s.metaDescription;
-            updatePageSeo(pageKey, { metaTitle: title, metaDescription: desc });
-            toast.success("Auto-filled from page content");
-          }}><Sparkles className="h-4 w-4" /> Auto-generate</Button>
-        )}
+        <span className="text-[11px] text-muted-foreground">{PAGE_URL_PREVIEW[pageKey]}</span>
+        <Button size="sm" variant="hero" className="ml-auto" onClick={onSave}>
+          <Save className="h-4 w-4" /> Save SEO
+        </Button>
+      </div>
+      <p className="text-[11px] text-muted-foreground -mt-1">
+        These tags ship in the <code>&lt;head&gt;</code> of <code>{PAGE_URL_PREVIEW[pageKey]}</code> so Google can rank this page correctly.
+      </p>
+      <div>
+        <label className="text-xs font-medium mb-1 block">
+          Meta title <span className={titleLen > 60 ? "text-destructive" : "text-muted-foreground"}>({titleLen}/60)</span>
+        </label>
+        <Input value={s.metaTitle} onChange={(e) => updatePageSeo(pageKey, { metaTitle: e.target.value })} placeholder="e.g. Portfolio — AniRise Client Work & Results" />
       </div>
       <div>
-        <label className="text-xs font-medium mb-1 block">Meta title <span className="text-muted-foreground">({s.metaTitle.length}/60)</span></label>
-        <Input value={s.metaTitle} onChange={(e) => updatePageSeo(pageKey, { metaTitle: e.target.value })} />
+        <label className="text-xs font-medium mb-1 block">
+          Meta description <span className={descLen > 160 ? "text-destructive" : "text-muted-foreground"}>({descLen}/160)</span>
+        </label>
+        <Textarea rows={3} value={s.metaDescription} onChange={(e) => updatePageSeo(pageKey, { metaDescription: e.target.value })} placeholder="Short summary shown by Google under the title." />
       </div>
       <div>
-        <label className="text-xs font-medium mb-1 block">Meta description <span className="text-muted-foreground">({s.metaDescription.length}/160)</span></label>
-        <Textarea rows={3} value={s.metaDescription} onChange={(e) => updatePageSeo(pageKey, { metaDescription: e.target.value })} />
-      </div>
-      <div>
-        <label className="text-xs font-medium mb-1 block">Meta keywords</label>
-        <Input value={s.metaKeywords} onChange={(e) => updatePageSeo(pageKey, { metaKeywords: e.target.value })} />
+        <label className="text-xs font-medium mb-1 block">Meta keywords <span className="text-muted-foreground">(optional)</span></label>
+        <Input value={s.metaKeywords} onChange={(e) => updatePageSeo(pageKey, { metaKeywords: e.target.value })} placeholder="comma, separated, keywords" />
       </div>
     </Card>
   );
@@ -432,7 +455,29 @@ const AdminDashboard = () => {
               <Button variant="hero" size="sm" onClick={() => toast.success("Saved")}><Save className="h-4 w-4" /> Save</Button>
             </div>
           </Card>
-          <SeoBlock pageKey={cpSeoKey} hideAuto seo={seo} updatePageSeo={updatePageSeo} content={content} />
+          <Card className="p-5 sm:p-6 space-y-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Search className="h-4 w-4" />
+              <h4 className="font-bold">Page SEO</h4>
+              <span className="text-[11px] text-muted-foreground">/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span>
+              <Button size="sm" variant="hero" className="ml-auto" onClick={() => toast.success(`SEO saved for /${cp.slug} — live on next page load`)}>
+                <Save className="h-4 w-4" /> Save SEO
+              </Button>
+            </div>
+            <p className="text-[11px] text-muted-foreground -mt-1">These tags ship in the <code>&lt;head&gt;</code> of this page so Google can rank it correctly.</p>
+            <div>
+              <label className="text-xs font-medium mb-1 block">Meta title <span className={(cp.seo?.metaTitle?.length || 0) > 60 ? "text-destructive" : "text-muted-foreground"}>({cp.seo?.metaTitle?.length || 0}/60)</span></label>
+              <Input value={cp.seo?.metaTitle || ""} onChange={(e) => updateCustomPage(cp.id, { seo: { ...(cp.seo || { metaTitle: "", metaDescription: "", metaKeywords: "" }), metaTitle: e.target.value } })} />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block">Meta description <span className={(cp.seo?.metaDescription?.length || 0) > 160 ? "text-destructive" : "text-muted-foreground"}>({cp.seo?.metaDescription?.length || 0}/160)</span></label>
+              <Textarea rows={3} value={cp.seo?.metaDescription || ""} onChange={(e) => updateCustomPage(cp.id, { seo: { ...(cp.seo || { metaTitle: "", metaDescription: "", metaKeywords: "" }), metaDescription: e.target.value } })} />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block">Meta keywords <span className="text-muted-foreground">(optional)</span></label>
+              <Input value={cp.seo?.metaKeywords || ""} onChange={(e) => updateCustomPage(cp.id, { seo: { ...(cp.seo || { metaTitle: "", metaDescription: "", metaKeywords: "" }), metaKeywords: e.target.value } })} />
+            </div>
+          </Card>
         </div>
       );
     }
@@ -788,7 +833,7 @@ const AdminDashboard = () => {
               </div>
             </Card>
           )}
-          <SeoBlock pageKey={activePage} seo={seo} updatePageSeo={updatePageSeo} content={content} />
+          <SeoBlock pageKey={activePage} seo={seo} updatePageSeo={updatePageSeo} />
         </div>
       );
     }
@@ -862,7 +907,8 @@ const AdminDashboard = () => {
             })}
           </div>
         </Card>
-        <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} content={content} />
+        <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} />
+        <SeoBlock pageKey="strategy-call" seo={seo} updatePageSeo={updatePageSeo} />
       </div>
     );
   };

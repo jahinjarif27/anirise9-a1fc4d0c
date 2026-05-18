@@ -281,6 +281,7 @@ const defaultSeo: SeoSettings = {
     blog: { metaTitle: "Blog — AniRise", metaDescription: "Insights from the AniRise team.", metaKeywords: "blog" },
     testimonials: { metaTitle: "Testimonials — AniRise", metaDescription: "What clients say.", metaKeywords: "testimonials" },
     contact: { metaTitle: "Contact AniRise", metaDescription: "Let's make your brand rise.", metaKeywords: "contact" },
+    "strategy-call": { metaTitle: "Book A Strategy Call — AniRise", metaDescription: "Book a free strategy call with AniRise. Share your business challenges and get a tailored growth plan within 24 hours.", metaKeywords: "strategy call, free consultation, AniRise" },
   },
 };
 

@@ -17,11 +17,13 @@ import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 
 const Index = () => {
-  const { pageLocation, homeSections, customPages, homeBlocks } = useAdmin();
+  const { pageLocation, homeSections, customPages, homeBlocks, seo } = useAdmin();
   const onHome = (k: string) => (pageLocation[k] ?? "home") === "home";
+  const pageSeo = seo.pageSeo?.home;
   useSEO({
-    title: "AniRise — Visibility · Growth · Success | SEO & Web Agency",
+    title: pageSeo?.metaTitle || "AniRise — Visibility · Growth · Success | SEO & Web Agency",
     description:
+      pageSeo?.metaDescription ||
       "AniRise is a digital agency helping brands rise online with SEO, ecommerce SEO, web development, and digital marketing. Visibility, growth, success.",
     path: "/",
     jsonLd: {

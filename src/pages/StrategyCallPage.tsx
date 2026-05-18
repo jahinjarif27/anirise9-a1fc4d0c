@@ -3,11 +3,15 @@ import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { StrategyCall } from "@/components/site/home/StrategyCall";
 import { useSEO } from "@/hooks/useSEO";
+import { useAdmin } from "@/context/AdminContext";
 
 const StrategyCallPage = () => {
+  const { seo } = useAdmin();
+  const override = seo.pageSeo?.["strategy-call"];
   useSEO({
-    title: "Book A Strategy Call — AniRise",
+    title: override?.metaTitle || "Book A Strategy Call — AniRise",
     description:
+      override?.metaDescription ||
       "Book a free strategy call with AniRise. Share your business challenges and get a tailored growth plan within 24 hours.",
     path: "/strategy-call",
   });
