@@ -38,7 +38,7 @@ const BlogPostPage = () => {
       : undefined,
   });
 
-  if (loading) return null;
+  
 
   if (!post) {
     return (
