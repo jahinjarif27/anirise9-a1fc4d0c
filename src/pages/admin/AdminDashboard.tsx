@@ -155,6 +155,7 @@ const AdminDashboard = () => {
     caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
     finalCta, updateFinalCta,
     servicePreviews, updateServicePreview,
+    serviceContent, updateServiceContent,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
@@ -569,8 +570,14 @@ const AdminDashboard = () => {
                 <Button asChild variant="outline" size="sm"><Link to={`/services/${slug}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
               }
             />
-            <p className="text-sm text-muted-foreground">Page layout & copy are managed in code. Use the FAQ editor below to add/edit questions shown on this service page.</p>
+            <p className="text-sm text-muted-foreground">Edit every text, stat, process step, deliverable, chart bar and CTA shown on this service page. FAQ is at the bottom.</p>
           </Card>
+
+          <ServiceContentEditor
+            slug={slug}
+            content={serviceContent[slug] ?? { enabled: true, heroEyebrow: svc.label, heroHeadlineBefore: svc.label, heroHeadlineAccent: "", heroBlurb: "", heroPrimaryLabel: "", heroPrimaryUrl: "/#contact", heroSecondaryLabel: "", heroSecondaryUrl: "#process", stats: [], whyEyebrow: "", whyTitle: "", whyCards: [], processEyebrow: "", processTitle: "", processSteps: [], deliverablesEyebrow: "", deliverablesTitle: "", deliverablesBlurb: "", deliverables: [], chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] }, ctaHeadline: "", ctaBlurb: "", ctaLabel: "", ctaUrl: "/#contact" }}
+            onChange={(patch) => updateServiceContent(slug, patch)}
+          />
 
           <Card className="p-5 sm:p-6 space-y-4">
             <SectionHeader
