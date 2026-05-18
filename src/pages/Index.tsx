@@ -9,6 +9,7 @@ import { ServicesPreview } from "@/components/site/home/ServicesPreview";
 import { CaseStudies } from "@/components/site/home/CaseStudies";
 import { HomeFAQ } from "@/components/site/home/HomeFAQ";
 import { FinalCTA } from "@/components/site/home/FinalCTA";
+import { StrategyCall } from "@/components/site/home/StrategyCall";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 
@@ -39,6 +40,7 @@ const Index = () => {
         {homeBlocks.servicesPreview && <ServicesPreview />}
         {homeBlocks.caseStudies && <CaseStudies />}
         {onHome("blog") && <Blog />}
+        <StrategyCall />
         {homeBlocks.homeFaq && <HomeFAQ />}
         {homeBlocks.finalCta && <FinalCTA />}
         {homeSections.filter((s) => s.enabled && (s.groupKey ?? "home") === "home").map((s) => (
