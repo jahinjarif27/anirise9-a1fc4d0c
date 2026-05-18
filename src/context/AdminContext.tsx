@@ -144,7 +144,8 @@ export const SECTION_KEYS: SectionKey[] = ["hero", "services", "about", "portfol
 export type FaqItem = { id: string; question: string; answer: string };
 export type StatItem = { id: string; value: string; label: string };
 export type TrustLogo = { id: string; name: string; image: string };
-export type CaseStudy = { id: string; title: string; metric: string; description: string; image: string; link: string };
+export type CaseStudy = { id: string; title: string; metric: string; description: string; image: string; link: string; imageAlt?: string; body?: string };
+export type ServicePreview = { image: string; imageAlt: string };
 export type FinalCta = {
   headline: string;
   subline: string;
