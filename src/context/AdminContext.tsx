@@ -293,7 +293,22 @@ const defaultAppearance: Appearance = { headingFont: "Poppins", bodyFont: "Inter
 
 const defaultHomeBlocks: HomeBlocks = {
   trustStrip: true, stats: true, servicesPreview: true,
-  caseStudies: true, homeFaq: true, finalCta: true,
+  caseStudies: true, processFlow: true, homeFaq: true, finalCta: true,
+};
+
+const defaultProcessFlow: ProcessFlow = {
+  eyebrow: "How We Work",
+  titleBefore: "Our 6-Step",
+  titleAccent: "Growth Process",
+  blurb: "A clear, proven path — from understanding your brand to delivering unstoppable growth.",
+  steps: [
+    { id: "pf1", icon: "Users", title: "Understanding Client Requirements & Goals", chip: "Identifying Brand" },
+    { id: "pf2", icon: "Search", title: "Conducting Market Research & Planning Strategy", chip: "Strategy Mapping" },
+    { id: "pf3", icon: "PenTool", title: "Campaign Setup & Content Creation", chip: "Compelling Copywriting" },
+    { id: "pf4", icon: "Rocket", title: "Executing Campaigns, AI Integration & Promotion", chip: "Performance Driven SEO" },
+    { id: "pf5", icon: "Gauge", title: "Monitoring, Optimization & Improvement", chip: "Live Tracking" },
+    { id: "pf6", icon: "TrendingUp", title: "Reporting Results & Client Support", chip: "Unstoppable Growth" },
+  ],
 };
 
 const defaultHomeFaqs: FaqItem[] = [
