@@ -1337,12 +1337,16 @@ const AdminDashboard = () => {
           {/* OVERVIEW */}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { icon: Users, label: "Visitors (30d)", value: visits.toLocaleString(), trend: "+12.4%" },
-                { icon: Eye, label: "Page views", value: (visits * 2.7).toFixed(0), trend: "+8.1%" },
-                { icon: MousePointerClick, label: "Conversions", value: "47", trend: "+22%" },
-                { icon: FileText, label: "Posts", value: posts.length.toString(), trend: "" },
-              ].map((s) => (
+              {(() => {
+                const todayVisits = visitSeries.length ? visitSeries[visitSeries.length - 1].visits : 0;
+                const todayLeads = leads.filter((l) => l.createdAt > Date.now() - 86400000).length;
+                return [
+                  { icon: Users, label: "Visitors (30d)", value: visits.toLocaleString(), trend: "+12.4%" },
+                  { icon: Eye, label: "Page views (today)", value: Math.round(todayVisits * 2.7).toLocaleString(), trend: "+8.1%" },
+                  { icon: MousePointerClick, label: "Conversions (30d)", value: leads.filter((l) => l.createdAt > Date.now() - 30 * 86400000).length.toString(), trend: "+22%" },
+                  { icon: FileText, label: "New leads (today)", value: todayLeads.toString(), trend: "" },
+                ];
+              })().map((s) => (
                 <Card key={s.label} className="p-5">
                   <div className="flex items-center justify-between">
                     <div className="h-10 w-10 rounded-xl bg-accent/10 text-accent grid place-items-center"><s.icon className="h-5 w-5" /></div>

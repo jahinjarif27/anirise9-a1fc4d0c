@@ -13,11 +13,19 @@ import { FinalCTA } from "@/components/site/home/FinalCTA";
 import { StrategyCall } from "@/components/site/home/StrategyCall";
 import { WhyChooseAniRise } from "@/components/site/home/WhyChooseAniRise";
 import { ProcessSteps } from "@/components/site/home/ProcessSteps";
+import { HomeLoader } from "@/components/site/HomeLoader";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
+import { useEffect, useState } from "react";
 
 const Index = () => {
-  const { pageLocation, homeSections, customPages, homeBlocks, seo } = useAdmin();
+  const { pageLocation, homeSections, customPages, homeBlocks, seo, loading } = useAdmin();
+  const [minDelay, setMinDelay] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setMinDelay(false), 600);
+    return () => clearTimeout(t);
+  }, []);
+  const showLoader = loading || minDelay;
   const onHome = (k: string) => (pageLocation[k] ?? "home") === "home";
   const pageSeo = seo.pageSeo?.home;
   useSEO({
@@ -37,6 +45,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {showLoader && <HomeLoader />}
       <Navbar />
       <main>
         {onHome("hero") && <Hero />}
