@@ -96,18 +96,21 @@ export const WhyChooseAniRise = () => {
               A snapshot of what working with AniRise has looked like across recent client engagements.
             </p>
           </div>
-          <div className="w-full h-[320px]">
+          <div className="w-full h-[360px] sm:h-[380px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis
                   dataKey="name"
                   stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
+                  fontSize={11}
                   interval={0}
+                  angle={-30}
+                  textAnchor="end"
+                  height={70}
                   tick={{ fill: "hsl(var(--muted-foreground))" }}
                 />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} width={36} />
                 <Tooltip
                   contentStyle={{
                     background: "hsl(var(--card))",
@@ -117,7 +120,7 @@ export const WhyChooseAniRise = () => {
                   }}
                   cursor={{ fill: "hsl(var(--accent) / 0.1)" }}
                 />
-                <Legend wrapperStyle={{ color: "hsl(var(--muted-foreground))" }} />
+                <Legend wrapperStyle={{ color: "hsl(var(--muted-foreground))", paddingTop: 8 }} />
                 <Bar
                   dataKey="value"
                   name="AniRise"
