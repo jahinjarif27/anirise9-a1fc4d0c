@@ -144,7 +144,8 @@ export const SECTION_KEYS: SectionKey[] = ["hero", "services", "about", "portfol
 export type FaqItem = { id: string; question: string; answer: string };
 export type StatItem = { id: string; value: string; label: string };
 export type TrustLogo = { id: string; name: string; image: string };
-export type CaseStudy = { id: string; title: string; metric: string; description: string; image: string; link: string };
+export type CaseStudy = { id: string; title: string; metric: string; description: string; image: string; link: string; imageAlt?: string; body?: string };
+export type ServicePreview = { image: string; imageAlt: string };
 export type FinalCta = {
   headline: string;
   subline: string;
@@ -441,6 +442,8 @@ type AdminCtx = {
   deleteCaseStudy: (id: string) => void;
   finalCta: FinalCta;
   updateFinalCta: (c: Partial<FinalCta>) => void;
+  servicePreviews: Record<string, ServicePreview>;
+  updateServicePreview: (slug: string, sp: Partial<ServicePreview>) => void;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
@@ -501,6 +504,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [trustLogos, setTrustLogos] = useState<TrustLogo[]>(defaultTrustLogos);
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(defaultCaseStudies);
   const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
+  const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({});
 
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
@@ -545,6 +549,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (Array.isArray(sa.trust_logos) && sa.trust_logos.length) setTrustLogos(sa.trust_logos);
         if (Array.isArray(sa.case_studies) && sa.case_studies.length) setCaseStudies(sa.case_studies);
         if (sa.final_cta && Object.keys(sa.final_cta).length) setFinalCta({ ...defaultFinalCta, ...sa.final_cta });
+        if (sa.service_previews && Object.keys(sa.service_previews).length) setServicePreviews(sa.service_previews);
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
       if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
@@ -601,12 +606,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         trust_logos: trustLogos as any,
         case_studies: caseStudies as any,
         final_cta: finalCta as any,
+        service_previews: servicePreviews as any,
         updated_at: new Date().toISOString(),
       }).eq("id", 1).then(({ error }) => {
         if (error) console.error("[site_settings] save failed", error);
       });
     }, 500);
-  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta]);
+  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews]);
 
   // ---------------------------------------------------------------
   // Live document.head effects (unchanged)
@@ -848,6 +854,8 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const updateCaseStudy = (id: string, c: Partial<CaseStudy>) => setCaseStudies((prev) => prev.map((x) => x.id === id ? { ...x, ...c } : x));
   const deleteCaseStudy = (id: string) => setCaseStudies((prev) => prev.filter((x) => x.id !== id));
   const updateFinalCta = (c: Partial<FinalCta>) => setFinalCta((prev) => ({ ...prev, ...c }));
+  const updateServicePreview = (slug: string, sp: Partial<ServicePreview>) =>
+    setServicePreviews((prev) => ({ ...prev, [slug]: { image: "", imageAlt: "", ...(prev[slug] || {}), ...sp } }));
 
   const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
     const staticPaths = ["/", "/services", "/about", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
@@ -894,6 +902,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         trustLogos, addTrustLogo, updateTrustLogo, deleteTrustLogo,
         caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
         finalCta, updateFinalCta,
+        servicePreviews, updateServicePreview,
       }}
     >
       {children}

@@ -13,6 +13,7 @@ const EcommerceSEOPage = lazy(() => import("./services/EcommerceSEO.tsx"));
 const GraphicsDesignPage = lazy(() => import("./services/GraphicsDesign.tsx"));
 const ComingSoonService = lazy(() => import("./services/ComingSoon.tsx"));
 const StrategyCallPage = lazy(() => import("./StrategyCallPage.tsx"));
+const CaseStudyDetail = lazy(() => import("./CaseStudyDetail.tsx"));
 
 import { Hero } from "@/components/site/Hero";
 import { Services } from "@/components/site/Services";
@@ -46,6 +47,7 @@ export const AppRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/strategy-call" element={<StrategyCallPage />} />
+        <Route path="/case-studies/:id" element={<CaseStudyDetail />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/services/website-seo" element={<WebsiteSEOPage />} />
         <Route path="/services/ecommerce-seo" element={<EcommerceSEOPage />} />

@@ -4,7 +4,7 @@ import { services } from "@/data/services";
 import { useAdmin } from "@/context/AdminContext";
 
 export const ServicesPreview = () => {
-  const { content } = useAdmin();
+  const { content, servicePreviews } = useAdmin();
   // Duplicate list so marquee loops seamlessly
   const loop = [...services, ...services];
 
@@ -42,17 +42,23 @@ export const ServicesPreview = () => {
         }}
       >
         <div className="flex gap-6 w-max animate-services-marquee group-hover:[animation-play-state:paused]">
-          {loop.map((s, idx) => (
+          {loop.map((s, idx) => {
+            const sp = servicePreviews?.[s.slug];
+            return (
             <Link
               key={`${s.slug}-${idx}`}
               to={`/services/${s.slug}`}
               className="group/card block w-[280px] sm:w-[320px] shrink-0 bg-gradient-to-br from-accent/20 via-card to-accent/10 rounded-3xl p-6 shadow-elegant border border-primary-foreground/10 hover:scale-[1.02] transition-smooth"
             >
-              <div className="aspect-square rounded-2xl bg-accent/20 grid place-items-center mb-5 group-hover/card:bg-gradient-accent transition-smooth">
-                <s.icon
-                  className="h-20 w-20 text-accent group-hover/card:text-accent-foreground transition-smooth"
-                  strokeWidth={1.5}
-                />
+              <div className="aspect-square rounded-2xl bg-accent/20 grid place-items-center mb-5 overflow-hidden group-hover/card:bg-gradient-accent transition-smooth">
+                {sp?.image ? (
+                  <img src={sp.image} alt={sp.imageAlt || s.title} loading="lazy" className="w-full h-full object-cover" />
+                ) : (
+                  <s.icon
+                    className="h-20 w-20 text-accent group-hover/card:text-accent-foreground transition-smooth"
+                    strokeWidth={1.5}
+                  />
+                )}
               </div>
               <h3 className="text-xl font-extrabold text-foreground mb-2 text-center">
                 {s.title}
@@ -61,7 +67,8 @@ export const ServicesPreview = () => {
                 {s.desc}
               </p>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

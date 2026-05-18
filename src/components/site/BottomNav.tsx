@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Home, LayoutGrid, Briefcase, Menu as MenuIcon, Phone, Facebook, Instagram } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/anirise-logo.jpg";
 import { useAdmin } from "@/context/AdminContext";
 
@@ -16,6 +16,10 @@ export const BottomNav = () => {
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isActive = (href: string) => href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+  const itemCls = (href: string) =>
+    `flex flex-col items-center gap-0.5 py-1 transition-colors ${isActive(href) ? "text-accent" : "text-foreground/80 hover:text-accent"}`;
 
   useEffect(() => {
     const onScroll = () => {
@@ -51,11 +55,11 @@ export const BottomNav = () => {
         style={{ width: "min(94vw, 440px)" }}
       >
         <nav className="relative bg-background/95 backdrop-blur-md shadow-elegant rounded-full border border-border/60 px-2 py-2 grid grid-cols-5 items-center">
-          <button onClick={() => go("/")} className="flex flex-col items-center gap-0.5 py-1 text-foreground/80 hover:text-accent">
+          <button onClick={() => go("/")} className={itemCls("/")}>
             <Home className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">HOME</span>
           </button>
-          <button onClick={() => go("/services")} className="flex flex-col items-center gap-0.5 py-1 text-foreground/80 hover:text-accent">
+          <button onClick={() => go("/services")} className={itemCls("/services")}>
             <LayoutGrid className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">SERVICES</span>
           </button>
@@ -68,7 +72,7 @@ export const BottomNav = () => {
               <img src={logo} alt="AniRise" className="h-full w-full object-cover" />
             </button>
           </div>
-          <button onClick={() => go("/portfolio")} className="flex flex-col items-center gap-0.5 py-1 text-foreground/80 hover:text-accent">
+          <button onClick={() => go("/portfolio")} className={itemCls("/portfolio")}>
             <Briefcase className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">PROJECTS</span>
           </button>

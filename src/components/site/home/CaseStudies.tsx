@@ -16,10 +16,10 @@ export const CaseStudies = () => {
         </div>
         <div className="grid md:grid-cols-2 gap-6">
           {caseStudies.map((c) => (
-            <Link to={c.link || "/portfolio"} key={c.id} className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-smooth border border-border/40 flex flex-col">
+            <Link to={`/case-studies/${c.id}`} key={c.id} className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-smooth border border-border/40 flex flex-col">
               {c.image && (
                 <div className="aspect-video overflow-hidden bg-secondary">
-                  <img src={c.image} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" />
+                  <img src={c.image} alt={c.imageAlt || c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" />
                 </div>
               )}
               <div className="p-6 flex-1 flex flex-col">

@@ -94,6 +94,7 @@ const AdminDashboard = () => {
     trustLogos, addTrustLogo, updateTrustLogo, deleteTrustLogo,
     caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
     finalCta, updateFinalCta,
+    servicePreviews, updateServicePreview,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
@@ -520,15 +521,30 @@ const AdminDashboard = () => {
       );
 
       if (blockKey === "servicesPreview") return (
-        <Wrap subtitle="Auto-scrolling services cards section. Card content comes from the Services list.">
-          <p className="text-sm text-muted-foreground">Edit the section title/intro from the <button className="text-accent underline" onClick={() => setActivePage("services")}>Services page</button>. Individual cards come from code.</p>
+        <Wrap subtitle="Auto-scrolling services cards on home. Add an image + alt text for each service card.">
+          <p className="text-sm text-muted-foreground">Section title/intro is edited on the <button className="text-accent underline" onClick={() => setActivePage("services")}>Services page</button>.</p>
+          <div className="space-y-3">
+            {SITE_SERVICES.map((s) => {
+              const sp = servicePreviews[s.slug] || { image: "", imageAlt: "" };
+              return (
+                <div key={s.slug} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold text-foreground">{s.label}</p>
+                    <span className="text-xs text-muted-foreground">/{s.slug}</span>
+                  </div>
+                  <ImageUpload value={sp.image} onChange={(url) => updateServicePreview(s.slug, { image: url })} />
+                  <Input value={sp.imageAlt} onChange={(e) => updateServicePreview(s.slug, { imageAlt: e.target.value })} placeholder="Image alt text (for SEO)" />
+                </div>
+              );
+            })}
+          </div>
         </Wrap>
       );
 
       if (blockKey === "caseStudies") return (
-        <Wrap subtitle="2–3 ta best work with metric.">
+        <Wrap subtitle="Each card opens its own case study page (/case-studies/:id).">
           <div className="flex justify-end">
-            <Button size="sm" onClick={() => { addCaseStudy({ title: "New case study", metric: "+100%", description: "", image: "", link: "/portfolio" }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add case study</Button>
+            <Button size="sm" onClick={() => { addCaseStudy({ title: "New case study", metric: "+100%", description: "", image: "", link: "", imageAlt: "", body: "" }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add case study</Button>
           </div>
           <div className="space-y-3">
             {caseStudies.map((c) => (
@@ -537,9 +553,10 @@ const AdminDashboard = () => {
                   <Input value={c.title} onChange={(e) => updateCaseStudy(c.id, { title: e.target.value })} placeholder="Title" />
                   <Input value={c.metric} onChange={(e) => updateCaseStudy(c.id, { metric: e.target.value })} placeholder="Metric (e.g. +180% traffic)" />
                 </div>
-                <Textarea value={c.description} onChange={(e) => updateCaseStudy(c.id, { description: e.target.value })} placeholder="Short description" rows={2} />
-                <Input value={c.link} onChange={(e) => updateCaseStudy(c.id, { link: e.target.value })} placeholder="Link URL (e.g. /portfolio)" />
+                <Textarea value={c.description} onChange={(e) => updateCaseStudy(c.id, { description: e.target.value })} placeholder="Short description (card)" rows={2} />
                 <ImageUpload value={c.image} onChange={(url) => updateCaseStudy(c.id, { image: url })} />
+                <Input value={c.imageAlt || ""} onChange={(e) => updateCaseStudy(c.id, { imageAlt: e.target.value })} placeholder="Image alt text" />
+                <Textarea value={c.body || ""} onChange={(e) => updateCaseStudy(c.id, { body: e.target.value })} placeholder="Full case study content (shown on detail page)" rows={6} />
                 <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
               </div>
             ))}
