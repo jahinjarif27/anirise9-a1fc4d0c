@@ -9,7 +9,7 @@ import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 const BlogPostPage = () => {
   const { slug } = useParams();
-  const { posts, seo } = useAdmin();
+  const { posts, seo, loading } = useAdmin();
   const post = posts.find((p) => p.slug === slug);
   const override = seo.pageSeo?.[`blog/${slug ?? ""}`];
 
@@ -38,8 +38,7 @@ const BlogPostPage = () => {
       : undefined,
   });
 
-  
-
+  if (loading) return null;
   if (!post) {
     return (
       <div className="min-h-screen bg-background">

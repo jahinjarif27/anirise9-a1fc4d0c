@@ -8,8 +8,9 @@ import { useSEO } from "@/hooks/useSEO";
 
 const CaseStudyDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { caseStudies } = useAdmin();
+  const { caseStudies, loading } = useAdmin();
   const cs = caseStudies.find((c) => c.id === id);
+  if (loading) return null;
 
   useSEO({
     title: cs ? `${cs.title} — Case Study | AniRise` : "Case Study | AniRise",

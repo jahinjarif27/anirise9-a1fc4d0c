@@ -97,7 +97,7 @@ export const Footer = () => {
           </ul>
         </div>
       </div>
-      <div className="border-t border-primary-foreground/10">
+      <div className="border-t border-primary-foreground/10 pb-24 lg:pb-0">
         <div className="container py-5 text-xs text-primary-foreground/60 flex flex-wrap items-center justify-between gap-2">
           <p>© {new Date().getFullYear()} AniRise. All rights reserved.</p>
           <p>Visibility — Growth — Success</p>

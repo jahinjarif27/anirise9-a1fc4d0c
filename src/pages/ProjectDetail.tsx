@@ -8,7 +8,7 @@ import { useSEO } from "@/hooks/useSEO";
 
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { portfolio } = useAdmin();
+  const { portfolio, loading } = useAdmin();
   const p = portfolio.find((x) => x.id === id);
 
   useSEO({
@@ -17,6 +17,7 @@ const ProjectDetail = () => {
     path: `/portfolio/${id}`,
   });
 
+  if (loading) return null;
   if (!p) {
     return (
       <div className="min-h-screen bg-background">
