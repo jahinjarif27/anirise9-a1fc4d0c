@@ -49,7 +49,7 @@ export const BottomNav = () => {
   return (
     <>
       <div
-        className={`fixed bottom-3 left-1/2 -translate-x-1/2 z-40 transition-all duration-300 lg:hidden ${
+        className={`fixed bottom-3 left-1/2 -translate-x-1/2 z-40 transition-all duration-300 ${
           visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8 pointer-events-none"
         }`}
         style={{ width: "min(94vw, 440px)" }}
