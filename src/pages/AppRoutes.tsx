@@ -14,10 +14,24 @@ const GraphicsDesignPage = lazy(() => import("./services/GraphicsDesign.tsx"));
 const ComingSoonService = lazy(() => import("./services/ComingSoon.tsx"));
 const StrategyCallPage = lazy(() => import("./StrategyCallPage.tsx"));
 const CaseStudyDetail = lazy(() => import("./CaseStudyDetail.tsx"));
+const ProjectDetail = lazy(() => import("./ProjectDetail.tsx"));
 
 import { Hero } from "@/components/site/Hero";
 import { Services } from "@/components/site/Services";
-import { About } from "@/components/site/About";
+import { Portfolio } from "@/components/site/Portfolio";
+import { Testimonials } from "@/components/site/Testimonials";
+import { Contact } from "@/components/site/Contact";
+import { Blog as BlogSection } from "@/components/site/Blog";
+
+const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title: string }> = {
+  services: { Component: Services, title: "Services" },
+  portfolio: { Component: Portfolio, title: "Projects" },
+  testimonials: { Component: Testimonials, title: "Testimonials" },
+  contact: { Component: Contact, title: "Contact" },
+};
+
+import { Hero } from "@/components/site/Hero";
+import { Services } from "@/components/site/Services";
 import { Portfolio } from "@/components/site/Portfolio";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Contact } from "@/components/site/Contact";
