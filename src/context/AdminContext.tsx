@@ -158,9 +158,18 @@ export type FinalCta = {
   secondaryLabel: string;
   secondaryUrl: string;
 };
-export type HomeBlockKey = "trustStrip" | "stats" | "servicesPreview" | "caseStudies" | "homeFaq" | "finalCta";
+export type HomeBlockKey = "trustStrip" | "stats" | "servicesPreview" | "caseStudies" | "processFlow" | "homeFaq" | "finalCta";
 export type HomeBlocks = Record<HomeBlockKey, boolean>;
-export const HOME_BLOCK_KEYS: HomeBlockKey[] = ["trustStrip", "stats", "servicesPreview", "caseStudies", "homeFaq", "finalCta"];
+export const HOME_BLOCK_KEYS: HomeBlockKey[] = ["trustStrip", "stats", "servicesPreview", "caseStudies", "processFlow", "homeFaq", "finalCta"];
+
+export type ProcessFlowStep = { id: string; icon: string; title: string; chip: string };
+export type ProcessFlow = {
+  eyebrow: string;
+  titleBefore: string;
+  titleAccent: string;
+  blurb: string;
+  steps: ProcessFlowStep[];
+};
 
 type SeoSettings = {
   metaTitle: string;
@@ -284,7 +293,22 @@ const defaultAppearance: Appearance = { headingFont: "Poppins", bodyFont: "Inter
 
 const defaultHomeBlocks: HomeBlocks = {
   trustStrip: true, stats: true, servicesPreview: true,
-  caseStudies: true, homeFaq: true, finalCta: true,
+  caseStudies: true, processFlow: true, homeFaq: true, finalCta: true,
+};
+
+const defaultProcessFlow: ProcessFlow = {
+  eyebrow: "How We Work",
+  titleBefore: "Our 6-Step",
+  titleAccent: "Growth Process",
+  blurb: "A clear, proven path — from understanding your brand to delivering unstoppable growth.",
+  steps: [
+    { id: "pf1", icon: "Users", title: "Understanding Client Requirements & Goals", chip: "Identifying Brand" },
+    { id: "pf2", icon: "Search", title: "Conducting Market Research & Planning Strategy", chip: "Strategy Mapping" },
+    { id: "pf3", icon: "PenTool", title: "Campaign Setup & Content Creation", chip: "Compelling Copywriting" },
+    { id: "pf4", icon: "Rocket", title: "Executing Campaigns, AI Integration & Promotion", chip: "Performance Driven SEO" },
+    { id: "pf5", icon: "Gauge", title: "Monitoring, Optimization & Improvement", chip: "Live Tracking" },
+    { id: "pf6", icon: "TrendingUp", title: "Reporting Results & Client Support", chip: "Unstoppable Growth" },
+  ],
 };
 
 const defaultHomeFaqs: FaqItem[] = [
@@ -450,6 +474,11 @@ type AdminCtx = {
   updateServicePreview: (slug: string, sp: Partial<ServicePreview>) => void;
   serviceContent: Record<string, ServiceContent>;
   updateServiceContent: (slug: string, patch: Partial<ServiceContent>) => void;
+  processFlow: ProcessFlow;
+  updateProcessFlow: (patch: Partial<ProcessFlow>) => void;
+  addProcessFlowStep: () => void;
+  updateProcessFlowStep: (id: string, patch: Partial<ProcessFlowStep>) => void;
+  deleteProcessFlowStep: (id: string) => void;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
@@ -512,6 +541,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
   const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({});
   const [serviceContent, setServiceContent] = useState<Record<string, ServiceContent>>(defaultServiceContent);
+  const [processFlow, setProcessFlow] = useState<ProcessFlow>(defaultProcessFlow);
 
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
@@ -563,6 +593,9 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
             merged[k] = { ...(defaultServiceContent[k] ?? defaultServiceContent["website-seo"]), ...sa.service_content[k] };
           });
           setServiceContent(merged);
+        }
+        if (sa.process_flow && Object.keys(sa.process_flow).length) {
+          setProcessFlow({ ...defaultProcessFlow, ...sa.process_flow, steps: Array.isArray(sa.process_flow.steps) && sa.process_flow.steps.length ? sa.process_flow.steps : defaultProcessFlow.steps });
         }
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
@@ -626,12 +659,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         final_cta: finalCta as any,
         service_previews: servicePreviews as any,
         service_content: serviceContent as any,
+        process_flow: processFlow as any,
         updated_at: new Date().toISOString(),
       }).eq("id", 1).then(({ error }) => {
         if (error) console.error("[site_settings] save failed", error);
       });
     }, 500);
-  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews, serviceContent]);
+  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews, serviceContent, processFlow]);
 
   // ---------------------------------------------------------------
   // Live document.head effects (unchanged)
@@ -881,6 +915,14 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       return { ...prev, [slug]: { ...base, ...patch } };
     });
 
+  const updateProcessFlow = (patch: Partial<ProcessFlow>) => setProcessFlow((prev) => ({ ...prev, ...patch }));
+  const addProcessFlowStep = () =>
+    setProcessFlow((prev) => ({ ...prev, steps: [...prev.steps, { id: newId(), icon: "Sparkles", title: "New step", chip: "Tag" }] }));
+  const updateProcessFlowStep = (id: string, patch: Partial<ProcessFlowStep>) =>
+    setProcessFlow((prev) => ({ ...prev, steps: prev.steps.map((s) => (s.id === id ? { ...s, ...patch } : s)) }));
+  const deleteProcessFlowStep = (id: string) =>
+    setProcessFlow((prev) => ({ ...prev, steps: prev.steps.filter((s) => s.id !== id) }));
+
   const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
     const staticPaths = ["/", "/services", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
     const blogPaths = slugs.map((s) => `/blog/${s}`);
@@ -928,6 +970,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         finalCta, updateFinalCta,
         servicePreviews, updateServicePreview,
         serviceContent, updateServiceContent,
+        processFlow, updateProcessFlow, addProcessFlowStep, updateProcessFlowStep, deleteProcessFlowStep,
       }}
     >
       {children}

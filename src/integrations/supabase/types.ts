@@ -167,6 +167,7 @@ export type Database = {
           id: number
           page_location: Json
           portfolio: Json
+          process_flow: Json
           section_groups: Json
           seo: Json
           service_content: Json
@@ -190,6 +191,7 @@ export type Database = {
           id?: number
           page_location?: Json
           portfolio?: Json
+          process_flow?: Json
           section_groups?: Json
           seo?: Json
           service_content?: Json
@@ -213,6 +215,7 @@ export type Database = {
           id?: number
           page_location?: Json
           portfolio?: Json
+          process_flow?: Json
           section_groups?: Json
           seo?: Json
           service_content?: Json

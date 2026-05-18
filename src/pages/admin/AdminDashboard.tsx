@@ -57,6 +57,7 @@ const HOME_BLOCKS = [
   { key: "stats", label: "Stats band" },
   { key: "servicesPreview", label: "Services preview" },
   { key: "caseStudies", label: "Case studies" },
+  { key: "processFlow", label: "Process flow (6-step)" },
   { key: "homeFaq", label: "Home FAQ" },
   { key: "finalCta", label: "Final CTA" },
 ] as const;
@@ -157,6 +158,7 @@ const AdminDashboard = () => {
     finalCta, updateFinalCta,
     servicePreviews, updateServicePreview,
     serviceContent, updateServiceContent,
+    processFlow, updateProcessFlow, addProcessFlowStep, updateProcessFlowStep, deleteProcessFlowStep,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
@@ -523,6 +525,33 @@ const AdminDashboard = () => {
             </div>
           ))}
         </div>
+      </>);
+
+      if (blockKey === "processFlow") return wrap("6-step growth process bento grid on the home page (heading text + each step's icon, title and tag).", <>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <Field label="Eyebrow"><Input value={processFlow.eyebrow} onChange={(e) => updateProcessFlow({ eyebrow: e.target.value })} /></Field>
+          <Field label="Title (before accent)"><Input value={processFlow.titleBefore} onChange={(e) => updateProcessFlow({ titleBefore: e.target.value })} /></Field>
+          <Field label="Title accent"><Input value={processFlow.titleAccent} onChange={(e) => updateProcessFlow({ titleAccent: e.target.value })} /></Field>
+          <div className="sm:col-span-2"><Field label="Subtitle / blurb"><Textarea rows={2} value={processFlow.blurb} onChange={(e) => updateProcessFlow({ blurb: e.target.value })} /></Field></div>
+        </div>
+        <div className="flex items-center justify-between pt-3 border-t border-border/60">
+          <p className="text-sm font-semibold">Steps</p>
+          <Button size="sm" onClick={() => { addProcessFlowStep(); toast.success("Step added"); }}><Plus className="h-4 w-4" /> Add step</Button>
+        </div>
+        <div className="space-y-3">
+          {processFlow.steps.map((s, i) => (
+            <div key={s.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+              <p className="text-[11px] font-bold text-muted-foreground">Step {String(i + 1).padStart(2, "0")}</p>
+              <div className="grid sm:grid-cols-2 gap-2">
+                <Field label="Icon (lucide name)"><Input value={s.icon} onChange={(e) => updateProcessFlowStep(s.id, { icon: e.target.value })} placeholder="e.g. Users, Rocket, Gauge" /></Field>
+                <Field label="Chip / tag"><Input value={s.chip} onChange={(e) => updateProcessFlowStep(s.id, { chip: e.target.value })} /></Field>
+              </div>
+              <Field label="Title"><Textarea rows={2} value={s.title} onChange={(e) => updateProcessFlowStep(s.id, { title: e.target.value })} /></Field>
+              <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteProcessFlowStep(s.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] text-muted-foreground">Tip: lucide icon names are case-sensitive (e.g. <code>Rocket</code>, <code>TrendingUp</code>). See lucide.dev/icons.</p>
       </>);
 
       if (blockKey === "homeFaq") return wrap("Brand/general questions on the home page.", <>
