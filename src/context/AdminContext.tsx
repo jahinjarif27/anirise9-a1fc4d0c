@@ -854,6 +854,8 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const updateCaseStudy = (id: string, c: Partial<CaseStudy>) => setCaseStudies((prev) => prev.map((x) => x.id === id ? { ...x, ...c } : x));
   const deleteCaseStudy = (id: string) => setCaseStudies((prev) => prev.filter((x) => x.id !== id));
   const updateFinalCta = (c: Partial<FinalCta>) => setFinalCta((prev) => ({ ...prev, ...c }));
+  const updateServicePreview = (slug: string, sp: Partial<ServicePreview>) =>
+    setServicePreviews((prev) => ({ ...prev, [slug]: { image: "", imageAlt: "", ...(prev[slug] || {}), ...sp } }));
 
   const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
     const staticPaths = ["/", "/services", "/about", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
