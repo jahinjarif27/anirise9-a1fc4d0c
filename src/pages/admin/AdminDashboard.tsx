@@ -51,6 +51,24 @@ const SITE_PAGES = [
   { key: "contact", label: "Contact" },
 ];
 
+const HOME_BLOCKS = [
+  { key: "trustStrip", label: "Trust strip" },
+  { key: "stats", label: "Stats band" },
+  { key: "servicesPreview", label: "Services preview" },
+  { key: "caseStudies", label: "Case studies" },
+  { key: "homeFaq", label: "Home FAQ" },
+  { key: "finalCta", label: "Final CTA" },
+] as const;
+
+const SITE_SERVICES = [
+  { slug: "website-seo", label: "Website SEO" },
+  { slug: "ecommerce-seo", label: "Ecommerce SEO" },
+  { slug: "graphics-design", label: "Graphics Design" },
+  { slug: "website-development", label: "Website Development" },
+  { slug: "social-media-marketing", label: "Social Media Marketing" },
+  { slug: "digital-marketing", label: "Digital Marketing" },
+];
+
 const AdminDashboard = () => {
   const {
     isAuthed, logout, posts, addPost, updatePost, deletePost,
@@ -448,6 +466,164 @@ const AdminDashboard = () => {
       </div>
     );
 
+    // Home builder block editors (sub-pages of the Home page)
+    if (activePage.startsWith("hb:")) {
+      const blockKey = activePage.slice(3) as typeof HOME_BLOCKS[number]["key"];
+      const meta = HOME_BLOCKS.find((b) => b.key === blockKey);
+      if (!meta) return <p className="text-sm text-muted-foreground">Block not found.</p>;
+      const enabledToggle = (
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
+          <Switch checked={homeBlocks[blockKey]} onCheckedChange={(v) => { setHomeBlock(blockKey, v); toast.success("Updated"); }} />
+          <span className="text-sm font-medium">{homeBlocks[blockKey] ? "Visible" : "Hidden"}</span>
+        </div>
+      );
+
+      const Wrap = ({ children, subtitle }: { children: React.ReactNode; subtitle: string }) => (
+        <Card className="p-5 sm:p-6 space-y-4">
+          <SectionHeader icon={Layers} title={meta.label} subtitle={subtitle} action={enabledToggle} />
+          {children}
+        </Card>
+      );
+
+      if (blockKey === "trustStrip") return (
+        <Wrap subtitle="Client logos / brand names marquee on the home page.">
+          <div className="flex justify-end">
+            <Button size="sm" onClick={() => { addTrustLogo({ name: "New Brand", image: "" }); toast.success("Logo added"); }}><Plus className="h-4 w-4" /> Add logo</Button>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {trustLogos.map((t) => (
+              <div key={t.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                <Input placeholder="Brand name" value={t.name} onChange={(e) => updateTrustLogo(t.id, { name: e.target.value })} />
+                <ImageUpload value={t.image} onChange={(url) => updateTrustLogo(t.id, { image: url })} />
+                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteTrustLogo(t.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+              </div>
+            ))}
+          </div>
+        </Wrap>
+      );
+
+      if (blockKey === "stats") return (
+        <Wrap subtitle='Boro number gula (e.g. "15+" / "Projects Delivered").'>
+          <div className="flex justify-end">
+            <Button size="sm" onClick={() => { addStat({ value: "0+", label: "New metric" }); toast.success("Stat added"); }}><Plus className="h-4 w-4" /> Add stat</Button>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {stats.map((s) => (
+              <div key={s.id} className="p-3 rounded-xl border border-border/60 bg-card grid grid-cols-[100px_1fr_auto] gap-2 items-center">
+                <Input value={s.value} onChange={(e) => updateStat(s.id, { value: e.target.value })} placeholder="Value" />
+                <Input value={s.label} onChange={(e) => updateStat(s.id, { label: e.target.value })} placeholder="Label" />
+                <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteStat(s.id)}><Trash2 className="h-4 w-4" /></Button>
+              </div>
+            ))}
+          </div>
+        </Wrap>
+      );
+
+      if (blockKey === "servicesPreview") return (
+        <Wrap subtitle="Auto-scrolling services cards section. Card content comes from the Services list.">
+          <p className="text-sm text-muted-foreground">Edit the section title/intro from the <button className="text-accent underline" onClick={() => setActivePage("services")}>Services page</button>. Individual cards come from code.</p>
+        </Wrap>
+      );
+
+      if (blockKey === "caseStudies") return (
+        <Wrap subtitle="2–3 ta best work with metric.">
+          <div className="flex justify-end">
+            <Button size="sm" onClick={() => { addCaseStudy({ title: "New case study", metric: "+100%", description: "", image: "", link: "/portfolio" }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add case study</Button>
+          </div>
+          <div className="space-y-3">
+            {caseStudies.map((c) => (
+              <div key={c.id} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
+                <div className="grid sm:grid-cols-2 gap-2">
+                  <Input value={c.title} onChange={(e) => updateCaseStudy(c.id, { title: e.target.value })} placeholder="Title" />
+                  <Input value={c.metric} onChange={(e) => updateCaseStudy(c.id, { metric: e.target.value })} placeholder="Metric (e.g. +180% traffic)" />
+                </div>
+                <Textarea value={c.description} onChange={(e) => updateCaseStudy(c.id, { description: e.target.value })} placeholder="Short description" rows={2} />
+                <Input value={c.link} onChange={(e) => updateCaseStudy(c.id, { link: e.target.value })} placeholder="Link URL (e.g. /portfolio)" />
+                <ImageUpload value={c.image} onChange={(url) => updateCaseStudy(c.id, { image: url })} />
+                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+              </div>
+            ))}
+          </div>
+        </Wrap>
+      );
+
+      if (blockKey === "homeFaq") return (
+        <Wrap subtitle="Brand/general questions on the home page.">
+          <div className="flex justify-end">
+            <Button size="sm" onClick={() => { addHomeFaq({ question: "New question?", answer: "Answer..." }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add FAQ</Button>
+          </div>
+          <div className="space-y-3">
+            {homeFaqs.map((f) => (
+              <div key={f.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                <Input value={f.question} onChange={(e) => updateHomeFaq(f.id, { question: e.target.value })} placeholder="Question" />
+                <Textarea value={f.answer} onChange={(e) => updateHomeFaq(f.id, { answer: e.target.value })} placeholder="Answer" rows={2} />
+                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteHomeFaq(f.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+              </div>
+            ))}
+          </div>
+        </Wrap>
+      );
+
+      if (blockKey === "finalCta") return (
+        <Wrap subtitle="Bottom-of-page banner with primary + secondary CTAs.">
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div className="sm:col-span-2"><Field label="Headline"><Input value={finalCta.headline} onChange={(e) => updateFinalCta({ headline: e.target.value })} /></Field></div>
+            <div className="sm:col-span-2"><Field label="Subline"><Textarea rows={2} value={finalCta.subline} onChange={(e) => updateFinalCta({ subline: e.target.value })} /></Field></div>
+            <Field label="Primary button label"><Input value={finalCta.primaryLabel} onChange={(e) => updateFinalCta({ primaryLabel: e.target.value })} /></Field>
+            <Field label="Primary button URL"><Input value={finalCta.primaryUrl} onChange={(e) => updateFinalCta({ primaryUrl: e.target.value })} /></Field>
+            <Field label="Secondary button label"><Input value={finalCta.secondaryLabel} onChange={(e) => updateFinalCta({ secondaryLabel: e.target.value })} /></Field>
+            <Field label="Secondary button URL"><Input value={finalCta.secondaryUrl} onChange={(e) => updateFinalCta({ secondaryUrl: e.target.value })} /></Field>
+          </div>
+        </Wrap>
+      );
+
+      return null;
+    }
+
+    // Service page editors
+    if (activePage.startsWith("svc:")) {
+      const slug = activePage.slice(4);
+      const svc = SITE_SERVICES.find((s) => s.slug === slug);
+      if (!svc) return <p className="text-sm text-muted-foreground">Service not found.</p>;
+      const faqs = serviceFaqs[slug] || [];
+      return (
+        <div className="space-y-4">
+          <Card className="p-5 sm:p-6 space-y-4">
+            <SectionHeader
+              icon={Layers}
+              title={svc.label}
+              subtitle={`Service page — /services/${slug}`}
+              action={
+                <Button asChild variant="outline" size="sm"><Link to={`/services/${slug}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
+              }
+            />
+            <p className="text-sm text-muted-foreground">Page layout & copy are managed in code. Use the FAQ editor below to add/edit questions shown on this service page.</p>
+          </Card>
+
+          <Card className="p-5 sm:p-6 space-y-4">
+            <SectionHeader
+              icon={FileText}
+              title="Service FAQ"
+              subtitle={`${faqs.length} question${faqs.length === 1 ? "" : "s"}`}
+              action={
+                <Button size="sm" onClick={() => { addServiceFaq(slug, { question: "New question?", answer: "Answer..." }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add FAQ</Button>
+              }
+            />
+            <div className="space-y-3">
+              {faqs.map((f) => (
+                <div key={f.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                  <Input value={f.question} onChange={(e) => updateServiceFaq(slug, f.id, { question: e.target.value })} placeholder="Question" />
+                  <Textarea value={f.answer} onChange={(e) => updateServiceFaq(slug, f.id, { answer: e.target.value })} placeholder="Answer" rows={2} />
+                  <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteServiceFaq(slug, f.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+                </div>
+              ))}
+              {!faqs.length && <p className="text-xs text-muted-foreground">No FAQs yet. Add one to get started.</p>}
+            </div>
+          </Card>
+        </div>
+      );
+    }
+
     const builtInPages: Record<string, { icon: any; title: string; subtitle: string; fields: { label: string; key: string; multiline?: boolean }[]; image?: { label: string; key: string; altKey: string; aspect: string } }> = {
       hero: {
         icon: Sparkles, title: "Hero section", subtitle: "Top-of-page headline and intro",
@@ -677,7 +853,7 @@ const AdminDashboard = () => {
           <TabsList className="h-auto flex-wrap justify-start">
             <TabsTrigger value="overview"><TrendingUp className="h-4 w-4 mr-1" /> Overview</TabsTrigger>
             <TabsTrigger value="pages"><Layout className="h-4 w-4 mr-1" /> Pages</TabsTrigger>
-            <TabsTrigger value="home"><Home className="h-4 w-4 mr-1" /> Home Builder</TabsTrigger>
+            
             <TabsTrigger value="leads">
               <Inbox className="h-4 w-4 mr-1" /> Leads
               {leads.length > 0 && (
@@ -777,57 +953,55 @@ const AdminDashboard = () => {
           <TabsContent value="pages" className="space-y-6">
             <div className="grid lg:grid-cols-[280px_1fr] gap-5">
               <Card className="p-0 h-fit lg:sticky lg:top-20 overflow-hidden">
-                <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Layers className="h-4 w-4 text-accent" />
-                    <span className="text-sm font-bold">Site structure</span>
-                  </div>
-                  <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => {
-                    const label = prompt("Section group name?");
-                    if (!label) return;
-                    const k = addSectionGroup(label);
-                    setOpenGroups((p) => ({ ...p, [k]: true }));
-                    toast.success("Group added");
-                  }}>
-                    <Plus className="h-3.5 w-3.5" /> Group
-                  </Button>
+                <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-accent" />
+                  <span className="text-sm font-bold">Site pages</span>
                 </div>
 
                 <div className="p-2 space-y-1">
-                  {sectionGroups.map((grp) => {
-                    const isOpen = openGroups[grp.key] ?? false;
-                    const builtins = SITE_PAGES.filter((p) => (pageLocation[p.key] ?? "home") === grp.key);
-                    const customs = customPages.filter((p) => (p.groupKey ?? "") === grp.key);
-                    const homesecs = grp.isHome ? homeSections : homeSections.filter((s) => s.groupKey === grp.key);
-                    const total = builtins.length + customs.length + homesecs.length;
+                  {/* HOME page group */}
+                  {(() => {
+                    const isOpen = openGroups["home"] ?? true;
+                    const customHomeSections = homeSections.filter((s) => (s.groupKey ?? "home") === "home" || !s.groupKey);
                     return (
-                      <Collapsible key={grp.key} open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, [grp.key]: v }))}>
-                        <div className="flex items-center gap-1">
-                          <CollapsibleTrigger className="group flex-1 text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
-                            <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
-                            {grp.isHome ? <Home className="h-3.5 w-3.5 text-accent" /> : <Layers className="h-3.5 w-3.5 text-accent" />}
-                            <span className="flex-1 truncate">{grp.label}</span>
-                            <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{total}</Badge>
-                          </CollapsibleTrigger>
-                          {!grp.isHome && (
-                            <button title="Delete group" onClick={() => { if (confirm(`Delete group "${grp.label}"?`)) { deleteSectionGroup(grp.id); toast.success("Group deleted"); } }}
-                              className="h-8 w-8 grid place-items-center rounded-lg hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors">
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          )}
-                        </div>
-                        <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                      <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, home: v }))}>
+                        <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                          <Home className="h-3.5 w-3.5 text-accent" />
+                          <span className="flex-1 truncate">Home page</span>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{1 + HOME_BLOCKS.length + customHomeSections.length}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
                           <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
-                            {builtins.map((p) => (
-                              <li key={p.key}>
-                                <button onClick={() => setActivePage(p.key)}
-                                  className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm transition-colors flex items-center gap-2 ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
-                                  <FileText className="h-3 w-3 opacity-60" />
-                                  <span className="truncate">{p.label}</span>
-                                </button>
-                              </li>
-                            ))}
-                            {homesecs.map((s) => (
+                            <li>
+                              <button onClick={() => setActivePage("hero")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "hero" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <FileText className="h-3 w-3 opacity-60" />
+                                <span className="truncate">Hero</span>
+                              </button>
+                            </li>
+                            {HOME_BLOCKS.map((b) => {
+                              const key = `hb:${b.key}`;
+                              const on = homeBlocks[b.key];
+                              return (
+                                <li key={b.key}>
+                                  <button onClick={() => setActivePage(key)}
+                                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                    <FileEdit className="h-3 w-3 opacity-60" />
+                                    <span className="truncate flex-1">{b.label}</span>
+                                    {!on && <Badge variant="outline" className="h-4 px-1 text-[9px]">Off</Badge>}
+                                  </button>
+                                </li>
+                              );
+                            })}
+                            <li>
+                              <button onClick={() => setActivePage("blog")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "blog" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <FileText className="h-3 w-3 opacity-60" />
+                                <span className="truncate">Blog section</span>
+                              </button>
+                            </li>
+                            {customHomeSections.map((s) => (
                               <li key={s.id}>
                                 <button onClick={() => setActivePage(`homesec:${s.id}`)}
                                   className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `homesec:${s.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
@@ -837,7 +1011,109 @@ const AdminDashboard = () => {
                                 </button>
                               </li>
                             ))}
-                            {customs.map((p) => (
+                            <li>
+                              <button onClick={() => {
+                                const id = Date.now().toString();
+                                addHomeSection({ title: "New section", body: "", image: "", imageAlt: "", enabled: true });
+                                setTimeout(() => setActivePage(`homesec:${id}`), 0);
+                                toast.success("Custom section added");
+                              }}
+                                className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 transition-colors">
+                                <Plus className="h-3 w-3" /> Add custom section
+                              </button>
+                            </li>
+                          </ul>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    );
+                  })()}
+
+                  {/* SERVICES group */}
+                  {(() => {
+                    const isOpen = openGroups["services"] ?? true;
+                    return (
+                      <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, services: v }))}>
+                        <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                          <Layers className="h-3.5 w-3.5 text-accent" />
+                          <span className="flex-1 truncate">Services</span>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{1 + SITE_SERVICES.length}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
+                            <li>
+                              <button onClick={() => setActivePage("services")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "services" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <FileText className="h-3 w-3 opacity-60" />
+                                <span className="truncate">Services overview</span>
+                              </button>
+                            </li>
+                            {SITE_SERVICES.map((s) => {
+                              const key = `svc:${s.slug}`;
+                              const count = (serviceFaqs[s.slug] || []).length;
+                              return (
+                                <li key={s.slug}>
+                                  <button onClick={() => setActivePage(key)}
+                                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                    <FileText className="h-3 w-3 opacity-60" />
+                                    <span className="truncate flex-1">{s.label}</span>
+                                    <span className="text-[10px] text-muted-foreground">{count} FAQ</span>
+                                  </button>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    );
+                  })()}
+
+                  {/* Other built-in pages */}
+                  {(() => {
+                    const isOpen = openGroups["other"] ?? true;
+                    const others = ["about", "portfolio", "testimonials", "contact"];
+                    return (
+                      <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, other: v }))}>
+                        <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                          <Globe className="h-3.5 w-3.5 text-accent" />
+                          <span className="flex-1 truncate">Other pages</span>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{others.length}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
+                            {others.map((k) => {
+                              const p = SITE_PAGES.find((x) => x.key === k)!;
+                              return (
+                                <li key={k}>
+                                  <button onClick={() => setActivePage(k)}
+                                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === k ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                    <FileText className="h-3 w-3 opacity-60" />
+                                    <span className="truncate">{p.label}</span>
+                                  </button>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    );
+                  })()}
+
+                  {/* Custom pages */}
+                  {(() => {
+                    const isOpen = openGroups["custom"] ?? true;
+                    return (
+                      <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, custom: v }))}>
+                        <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                          <FileCog className="h-3.5 w-3.5 text-accent" />
+                          <span className="flex-1 truncate">Custom pages</span>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{customPages.length}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
+                            {customPages.map((p) => (
                               <li key={p.id}>
                                 <button onClick={() => setActivePage(`custom:${p.id}`)}
                                   className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
@@ -852,12 +1128,12 @@ const AdminDashboard = () => {
                                 const id = Date.now().toString();
                                 addCustomPage({
                                   title: "New Page", slug: `new-page-${id.slice(-4)}`, parent: "",
-                                  navLocation: ["menu"], image: "", imageAlt: "", body: "",
+                                  navLocation: ["navbar"], image: "", imageAlt: "", body: "",
                                   seo: { metaTitle: "New Page", metaDescription: "", metaKeywords: "" },
-                                  published: false, groupKey: grp.key,
+                                  published: false, groupKey: "",
                                 });
                                 setTimeout(() => setActivePage(`custom:${id}`), 0);
-                                toast.success("Page added to " + grp.label);
+                                toast.success("Page added");
                               }}
                                 className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 transition-colors">
                                 <Plus className="h-3 w-3" /> Add page
@@ -867,223 +1143,11 @@ const AdminDashboard = () => {
                         </CollapsibleContent>
                       </Collapsible>
                     );
-                  })}
-                </div>
-
-                <div className="border-t border-border bg-secondary/20 p-2">
-                  <div className="flex items-center justify-between px-2 py-1.5">
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Standalone</span>
-                    </div>
-                  </div>
-                  <ul className="space-y-0.5">
-                    {SITE_PAGES.filter((p) => (pageLocation[p.key] ?? "home") === "").map((p) => (
-                      <li key={p.key}>
-                        <button onClick={() => setActivePage(p.key)}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
-                          <span className="truncate flex-1">{p.label}</span>
-                          <span className="text-[10px] font-mono text-muted-foreground">/{p.key}</span>
-                        </button>
-                      </li>
-                    ))}
-                    {customPages.filter((p) => (p.groupKey ?? "") === "").map((p) => (
-                      <li key={p.id}>
-                        <button onClick={() => setActivePage(`custom:${p.id}`)}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
-                          <span className="truncate flex-1">{p.title || p.slug}</span>
-                          {!p.published && <Badge variant="outline" className="h-4 px-1 text-[9px]">Draft</Badge>}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button size="sm" variant="ghost" className="h-8 px-2 mt-1 w-full justify-start text-xs" onClick={() => {
-                    const id = Date.now().toString();
-                    addCustomPage({
-                      title: "New Page", slug: `new-page-${id.slice(-4)}`, parent: "",
-                      navLocation: ["navbar"], image: "", imageAlt: "", body: "",
-                      seo: { metaTitle: "New Page", metaDescription: "", metaKeywords: "" },
-                      published: false, groupKey: "",
-                    });
-                    setTimeout(() => setActivePage(`custom:${id}`), 0);
-                    toast.success("Standalone page created");
-                  }}>
-                    <Plus className="h-3.5 w-3.5" /> Add standalone page
-                  </Button>
+                  })()}
                 </div>
               </Card>
               <div>{renderPageEditor()}</div>
             </div>
-          </TabsContent>
-
-          {/* HOME BUILDER */}
-          <TabsContent value="home" className="space-y-6">
-            <Card className="p-5">
-              <div className="flex items-start gap-3 mb-4">
-                <div className="h-11 w-11 rounded-xl bg-gradient-accent text-accent-foreground grid place-items-center">
-                  <Home className="h-5 w-5" />
-                </div>
-                <div>
-                  <h2 className="font-bold text-lg">Home page builder</h2>
-                  <p className="text-sm text-muted-foreground">Toggle, edit, and order shob home page section ek jaygai.</p>
-                </div>
-              </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {([
-                  { k: "trustStrip", label: "Trust strip" },
-                  { k: "stats", label: "Stats band" },
-                  { k: "servicesPreview", label: "Services preview" },
-                  { k: "caseStudies", label: "Case studies" },
-                  { k: "homeFaq", label: "Home FAQ" },
-                  { k: "finalCta", label: "Final CTA" },
-                ] as const).map((b) => (
-                  <div key={b.k} className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-border/60 bg-secondary/40">
-                    <span className="text-sm font-semibold">{b.label}</span>
-                    <Switch checked={homeBlocks[b.k]} onCheckedChange={(v) => { setHomeBlock(b.k, v); toast.success("Updated"); }} />
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Trust logos */}
-            <Card className="p-5 space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div>
-                  <h3 className="font-bold">Trust strip — client logos</h3>
-                  <p className="text-xs text-muted-foreground">Image upload korle logo, na korle name text dekhabe.</p>
-                </div>
-                <Button size="sm" onClick={() => { addTrustLogo({ name: "New Brand", image: "" }); toast.success("Logo added"); }}><Plus className="h-4 w-4" /> Add logo</Button>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {trustLogos.map((t) => (
-                  <div key={t.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
-                    <Input placeholder="Brand name" value={t.name} onChange={(e) => updateTrustLogo(t.id, { name: e.target.value })} />
-                    <ImageUpload value={t.image} onChange={(url) => updateTrustLogo(t.id, { image: url })} />
-                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteTrustLogo(t.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Stats */}
-            <Card className="p-5 space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div>
-                  <h3 className="font-bold">Stats band</h3>
-                  <p className="text-xs text-muted-foreground">Boro number gula (e.g. "15+" / "Projects Delivered").</p>
-                </div>
-                <Button size="sm" onClick={() => { addStat({ value: "0+", label: "New metric" }); toast.success("Stat added"); }}><Plus className="h-4 w-4" /> Add stat</Button>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {stats.map((s) => (
-                  <div key={s.id} className="p-3 rounded-xl border border-border/60 bg-card grid grid-cols-[100px_1fr_auto] gap-2 items-center">
-                    <Input value={s.value} onChange={(e) => updateStat(s.id, { value: e.target.value })} placeholder="Value" />
-                    <Input value={s.label} onChange={(e) => updateStat(s.id, { label: e.target.value })} placeholder="Label" />
-                    <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteStat(s.id)}><Trash2 className="h-4 w-4" /></Button>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Case studies */}
-            <Card className="p-5 space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div>
-                  <h3 className="font-bold">Featured case studies</h3>
-                  <p className="text-xs text-muted-foreground">2–3 ta best work with metric.</p>
-                </div>
-                <Button size="sm" onClick={() => { addCaseStudy({ title: "New case study", metric: "+100%", description: "", image: "", link: "/portfolio" }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add case study</Button>
-              </div>
-              <div className="space-y-3">
-                {caseStudies.map((c) => (
-                  <div key={c.id} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
-                    <div className="grid sm:grid-cols-2 gap-2">
-                      <Input value={c.title} onChange={(e) => updateCaseStudy(c.id, { title: e.target.value })} placeholder="Title" />
-                      <Input value={c.metric} onChange={(e) => updateCaseStudy(c.id, { metric: e.target.value })} placeholder="Metric (e.g. +180% traffic)" />
-                    </div>
-                    <Textarea value={c.description} onChange={(e) => updateCaseStudy(c.id, { description: e.target.value })} placeholder="Short description" rows={2} />
-                    <Input value={c.link} onChange={(e) => updateCaseStudy(c.id, { link: e.target.value })} placeholder="Link URL (e.g. /portfolio)" />
-                    <ImageUpload value={c.image} onChange={(url) => updateCaseStudy(c.id, { image: url })} />
-                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Home FAQ */}
-            <Card className="p-5 space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div>
-                  <h3 className="font-bold">Home FAQ</h3>
-                  <p className="text-xs text-muted-foreground">Brand/general questions. Service-specific FAQ niche.</p>
-                </div>
-                <Button size="sm" onClick={() => { addHomeFaq({ question: "New question?", answer: "Answer..." }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add FAQ</Button>
-              </div>
-              <div className="space-y-3">
-                {homeFaqs.map((f) => (
-                  <div key={f.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
-                    <Input value={f.question} onChange={(e) => updateHomeFaq(f.id, { question: e.target.value })} placeholder="Question" />
-                    <Textarea value={f.answer} onChange={(e) => updateHomeFaq(f.id, { answer: e.target.value })} placeholder="Answer" rows={2} />
-                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteHomeFaq(f.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Service FAQs */}
-            <Card className="p-5 space-y-4">
-              <h3 className="font-bold">Service page FAQs</h3>
-              <p className="text-xs text-muted-foreground">Each service page-er jonno alada question/answer.</p>
-              {["website-seo", "ecommerce-seo", "graphics-design", "website-development", "social-media-marketing", "digital-marketing"].map((slug) => (
-                <Collapsible key={slug}>
-                  <CollapsibleTrigger className="w-full flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary text-left">
-                    <span className="font-semibold text-sm">{slug} <span className="text-muted-foreground">({(serviceFaqs[slug] || []).length})</span></span>
-                    <ChevronRight className="h-4 w-4 transition-transform data-[state=open]:rotate-90" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-3 space-y-3">
-                    {(serviceFaqs[slug] || []).map((f) => (
-                      <div key={f.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
-                        <Input value={f.question} onChange={(e) => updateServiceFaq(slug, f.id, { question: e.target.value })} placeholder="Question" />
-                        <Textarea value={f.answer} onChange={(e) => updateServiceFaq(slug, f.id, { answer: e.target.value })} placeholder="Answer" rows={2} />
-                        <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteServiceFaq(slug, f.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
-                      </div>
-                    ))}
-                    <Button size="sm" variant="outline" onClick={() => { addServiceFaq(slug, { question: "New question?", answer: "Answer..." }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add to {slug}</Button>
-                  </CollapsibleContent>
-                </Collapsible>
-              ))}
-            </Card>
-
-            {/* Final CTA */}
-            <Card className="p-5 space-y-3">
-              <h3 className="font-bold">Final CTA banner</h3>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div className="sm:col-span-2">
-                  <label className="text-xs font-semibold mb-1 block">Headline</label>
-                  <Input value={finalCta.headline} onChange={(e) => updateFinalCta({ headline: e.target.value })} />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="text-xs font-semibold mb-1 block">Subline</label>
-                  <Textarea rows={2} value={finalCta.subline} onChange={(e) => updateFinalCta({ subline: e.target.value })} />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold mb-1 block">Primary button label</label>
-                  <Input value={finalCta.primaryLabel} onChange={(e) => updateFinalCta({ primaryLabel: e.target.value })} />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold mb-1 block">Primary button URL</label>
-                  <Input value={finalCta.primaryUrl} onChange={(e) => updateFinalCta({ primaryUrl: e.target.value })} />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold mb-1 block">Secondary button label</label>
-                  <Input value={finalCta.secondaryLabel} onChange={(e) => updateFinalCta({ secondaryLabel: e.target.value })} />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold mb-1 block">Secondary button URL</label>
-                  <Input value={finalCta.secondaryUrl} onChange={(e) => updateFinalCta({ secondaryUrl: e.target.value })} />
-                </div>
-              </div>
-            </Card>
           </TabsContent>
 
           {/* LEADS */}
