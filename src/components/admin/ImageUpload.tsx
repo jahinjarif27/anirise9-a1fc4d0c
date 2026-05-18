@@ -36,7 +36,7 @@ export const ImageUpload = ({ value, onChange, label = "Image", aspect = "aspect
   return (
     <div>
       <label className="text-sm font-medium mb-2 block">{label}</label>
-      <div className={`relative w-full ${aspect} rounded-xl border-2 border-dashed border-border bg-secondary/30 overflow-hidden`}>
+      <div className={`relative w-full max-w-md ${aspect} rounded-xl border-2 border-dashed border-border bg-secondary/30 overflow-hidden`}>
         {value ? (
           <img src={value} alt={label} className="absolute inset-0 w-full h-full object-cover" />
         ) : (
