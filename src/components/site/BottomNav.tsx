@@ -55,11 +55,11 @@ export const BottomNav = () => {
         style={{ width: "min(94vw, 440px)" }}
       >
         <nav className="relative bg-background/95 backdrop-blur-md shadow-elegant rounded-full border border-border/60 px-2 py-2 grid grid-cols-5 items-center">
-          <button onClick={() => go("/")} className="flex flex-col items-center gap-0.5 py-1 text-foreground/80 hover:text-accent">
+          <button onClick={() => go("/")} className={itemCls("/")}>
             <Home className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">HOME</span>
           </button>
-          <button onClick={() => go("/services")} className="flex flex-col items-center gap-0.5 py-1 text-foreground/80 hover:text-accent">
+          <button onClick={() => go("/services")} className={itemCls("/services")}>
             <LayoutGrid className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">SERVICES</span>
           </button>
@@ -72,7 +72,7 @@ export const BottomNav = () => {
               <img src={logo} alt="AniRise" className="h-full w-full object-cover" />
             </button>
           </div>
-          <button onClick={() => go("/portfolio")} className="flex flex-col items-center gap-0.5 py-1 text-foreground/80 hover:text-accent">
+          <button onClick={() => go("/portfolio")} className={itemCls("/portfolio")}>
             <Briefcase className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">PROJECTS</span>
           </button>
