@@ -751,7 +751,7 @@ const AdminDashboard = () => {
               </div>
             </Card>
           )}
-          <SeoBlock pageKey={activePage} />
+          <SeoBlock pageKey={activePage} seo={seo} updatePageSeo={updatePageSeo} content={content} />
         </div>
       );
     }
