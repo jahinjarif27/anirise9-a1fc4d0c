@@ -594,6 +594,9 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
           });
           setServiceContent(merged);
         }
+        if (sa.process_flow && Object.keys(sa.process_flow).length) {
+          setProcessFlow({ ...defaultProcessFlow, ...sa.process_flow, steps: Array.isArray(sa.process_flow.steps) && sa.process_flow.steps.length ? sa.process_flow.steps : defaultProcessFlow.steps });
+        }
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
       if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
