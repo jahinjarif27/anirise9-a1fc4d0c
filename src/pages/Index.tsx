@@ -10,6 +10,7 @@ import { CaseStudies } from "@/components/site/home/CaseStudies";
 import { HomeFAQ } from "@/components/site/home/HomeFAQ";
 import { FinalCTA } from "@/components/site/home/FinalCTA";
 import { StrategyCall } from "@/components/site/home/StrategyCall";
+import { WhyChooseAniRise } from "@/components/site/home/WhyChooseAniRise";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 
