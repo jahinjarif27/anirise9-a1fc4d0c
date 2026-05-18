@@ -13,6 +13,7 @@ const EcommerceSEOPage = lazy(() => import("./services/EcommerceSEO.tsx"));
 const GraphicsDesignPage = lazy(() => import("./services/GraphicsDesign.tsx"));
 const ComingSoonService = lazy(() => import("./services/ComingSoon.tsx"));
 const StrategyCallPage = lazy(() => import("./StrategyCallPage.tsx"));
+const CaseStudyDetail = lazy(() => import("./CaseStudyDetail.tsx"));
 
 import { Hero } from "@/components/site/Hero";
 import { Services } from "@/components/site/Services";
