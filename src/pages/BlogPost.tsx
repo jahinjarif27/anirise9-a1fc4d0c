@@ -9,7 +9,7 @@ import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 const BlogPostPage = () => {
   const { slug } = useParams();
-  const { posts, seo, loading } = useAdmin();
+  const { posts, seo } = useAdmin();
   const post = posts.find((p) => p.slug === slug);
   const override = seo.pageSeo?.[`blog/${slug ?? ""}`];
 
@@ -38,7 +38,7 @@ const BlogPostPage = () => {
       : undefined,
   });
 
-  if (loading) return null;
+  
 
   if (!post) {
     return (

@@ -26,6 +26,7 @@ import { Blog as BlogSection } from "@/components/site/Blog";
 const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title: string }> = {
   services: { Component: Services, title: "Services" },
   portfolio: { Component: Portfolio, title: "Projects" },
+  projects: { Component: Portfolio, title: "Projects" },
   testimonials: { Component: Testimonials, title: "Testimonials" },
   contact: { Component: Contact, title: "Contact" },
 };

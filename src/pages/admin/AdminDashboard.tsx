@@ -69,6 +69,66 @@ const SITE_SERVICES = [
   { slug: "digital-marketing", label: "Digital Marketing" },
 ];
 
+// Module-level helpers (defined OUTSIDE the dashboard so input focus is not lost on re-render)
+const SectionHeader = ({ icon: Icon, title, subtitle, action }: { icon: any; title: string; subtitle: string; action?: React.ReactNode }) => (
+  <div className="flex items-center justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
+    <div className="flex items-center gap-3">
+      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
+        <Icon className="h-5 w-5" />
+      </div>
+      <div>
+        <h3 className="font-bold leading-tight">{title}</h3>
+        <p className="text-xs text-muted-foreground">{subtitle}</p>
+      </div>
+    </div>
+    {action}
+  </div>
+);
+
+const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div>
+    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">{label}</label>
+    {children}
+  </div>
+);
+
+const SeoBlock = ({
+  pageKey, hideAuto = false, seo, updatePageSeo, content,
+}: {
+  pageKey: string; hideAuto?: boolean;
+  seo: any; updatePageSeo: (key: string, patch: any) => void; content: any;
+}) => {
+  const s = seo.pageSeo[pageKey] || { metaTitle: "", metaDescription: "", metaKeywords: "" };
+  return (
+    <Card className="p-5 sm:p-6 space-y-3">
+      <div className="flex items-center gap-2">
+        <Search className="h-4 w-4" />
+        <h4 className="font-bold">Page SEO</h4>
+        {!hideAuto && (
+          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => {
+            const title = content[`${pageKey}Headline`] || content[`${pageKey}Title`] || s.metaTitle;
+            const desc = content[`${pageKey}Blurb`] || content[`${pageKey}Tagline`] || s.metaDescription;
+            updatePageSeo(pageKey, { metaTitle: title, metaDescription: desc });
+            toast.success("Auto-filled from page content");
+          }}><Sparkles className="h-4 w-4" /> Auto-generate</Button>
+        )}
+      </div>
+      <div>
+        <label className="text-xs font-medium mb-1 block">Meta title <span className="text-muted-foreground">({s.metaTitle.length}/60)</span></label>
+        <Input value={s.metaTitle} onChange={(e) => updatePageSeo(pageKey, { metaTitle: e.target.value })} />
+      </div>
+      <div>
+        <label className="text-xs font-medium mb-1 block">Meta description <span className="text-muted-foreground">({s.metaDescription.length}/160)</span></label>
+        <Textarea rows={3} value={s.metaDescription} onChange={(e) => updatePageSeo(pageKey, { metaDescription: e.target.value })} />
+      </div>
+      <div>
+        <label className="text-xs font-medium mb-1 block">Meta keywords</label>
+        <Input value={s.metaKeywords} onChange={(e) => updatePageSeo(pageKey, { metaKeywords: e.target.value })} />
+      </div>
+    </Card>
+  );
+};
+
 const AdminDashboard = () => {
   const {
     isAuthed, logout, posts, addPost, updatePost, deletePost,
@@ -264,78 +324,6 @@ const AdminDashboard = () => {
 
   if (!isAuthed) return <AdminLogin />;
 
-  const LocationSelector = ({ pageKey, optional = false }: { pageKey: string; optional?: boolean }) => {
-    const current = pageLocation[pageKey] ?? (optional ? "" : "home");
-    return (
-      <Card className="p-4 sm:p-5 flex items-start sm:items-center justify-between gap-3 flex-col sm:flex-row bg-gradient-to-br from-secondary/40 to-secondary/10 border-dashed">
-        <div className="flex items-start gap-3">
-          <div className="h-9 w-9 rounded-lg bg-accent/15 text-accent grid place-items-center shrink-0">
-            <MapPin className="h-4 w-4" />
-          </div>
-          <div>
-            <p className="font-bold text-sm">Page location</p>
-            <p className="text-xs text-muted-foreground">
-              Where this page lives in the site structure.
-            </p>
-          </div>
-        </div>
-        <Select value={current || "__standalone"} onValueChange={(v) => {
-          setPageLocation(pageKey, v === "__standalone" ? "" : v);
-          toast.success("Location updated");
-        }}>
-          <SelectTrigger className="w-full sm:w-[220px] h-10 bg-background">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {sectionGroups.map((g) => (
-              <SelectItem key={g.key} value={g.key}>
-                <span className="inline-flex items-center gap-2">
-                  {g.isHome ? <Home className="h-3.5 w-3.5" /> : <Layers className="h-3.5 w-3.5" />}
-                  {g.label}
-                </span>
-              </SelectItem>
-            ))}
-            <SelectItem value="__standalone">
-              <span className="inline-flex items-center gap-2"><Globe className="h-3.5 w-3.5" /> Standalone route</span>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </Card>
-    );
-  };
-
-  const SeoBlock = ({ pageKey, hideAuto = false }: { pageKey: string; hideAuto?: boolean }) => {
-    const s = seo.pageSeo[pageKey] || { metaTitle: "", metaDescription: "", metaKeywords: "" };
-    return (
-      <Card className="p-5 sm:p-6 space-y-3">
-        <div className="flex items-center gap-2">
-          <Search className="h-4 w-4" />
-          <h4 className="font-bold">Page SEO</h4>
-          {!hideAuto && (
-            <Button size="sm" variant="ghost" className="ml-auto" onClick={() => {
-              const title = (content as any)[`${pageKey}Headline`] || (content as any)[`${pageKey}Title`] || s.metaTitle;
-              const desc = (content as any)[`${pageKey}Blurb`] || (content as any)[`${pageKey}Tagline`] || s.metaDescription;
-              updatePageSeo(pageKey, { metaTitle: title, metaDescription: desc });
-              toast.success("Auto-filled from page content");
-            }}><Sparkles className="h-4 w-4" /> Auto-generate</Button>
-          )}
-        </div>
-        <div>
-          <label className="text-xs font-medium mb-1 block">Meta title <span className="text-muted-foreground">({s.metaTitle.length}/60)</span></label>
-          <Input value={s.metaTitle} onChange={(e) => updatePageSeo(pageKey, { metaTitle: e.target.value })} />
-        </div>
-        <div>
-          <label className="text-xs font-medium mb-1 block">Meta description <span className="text-muted-foreground">({s.metaDescription.length}/160)</span></label>
-          <Textarea rows={3} value={s.metaDescription} onChange={(e) => updatePageSeo(pageKey, { metaDescription: e.target.value })} />
-        </div>
-        <div>
-          <label className="text-xs font-medium mb-1 block">Meta keywords</label>
-          <Input value={s.metaKeywords} onChange={(e) => updatePageSeo(pageKey, { metaKeywords: e.target.value })} />
-        </div>
-      </Card>
-    );
-  };
-
   const renderPageEditor = () => {
     if (activePage.startsWith("custom:")) {
       const id = activePage.slice(7);
@@ -440,32 +428,10 @@ const AdminDashboard = () => {
               <Button variant="hero" size="sm" onClick={() => toast.success("Saved")}><Save className="h-4 w-4" /> Save</Button>
             </div>
           </Card>
-          <SeoBlock pageKey={cpSeoKey} hideAuto />
+          <SeoBlock pageKey={cpSeoKey} hideAuto seo={seo} updatePageSeo={updatePageSeo} content={content} />
         </div>
       );
     }
-
-    const SectionHeader = ({ icon: Icon, title, subtitle, action }: { icon: any; title: string; subtitle: string; action?: React.ReactNode }) => (
-      <div className="flex items-center justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
-            <Icon className="h-5 w-5" />
-          </div>
-          <div>
-            <h3 className="font-bold leading-tight">{title}</h3>
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
-          </div>
-        </div>
-        {action}
-      </div>
-    );
-
-    const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-      <div>
-        <label className="text-xs font-semibold mb-1.5 block text-foreground/80">{label}</label>
-        {children}
-      </div>
-    );
 
     // Home builder block editors (sub-pages of the Home page)
     if (activePage.startsWith("hb:")) {
@@ -479,120 +445,109 @@ const AdminDashboard = () => {
         </div>
       );
 
-      const Wrap = ({ children, subtitle }: { children: React.ReactNode; subtitle: string }) => (
+      const wrap = (subtitle: string, children: React.ReactNode) => (
         <Card className="p-5 sm:p-6 space-y-4">
           <SectionHeader icon={Layers} title={meta.label} subtitle={subtitle} action={enabledToggle} />
           {children}
         </Card>
       );
 
-      if (blockKey === "trustStrip") return (
-        <Wrap subtitle="Client logos / brand names marquee on the home page.">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { addTrustLogo({ name: "New Brand", image: "" }); toast.success("Logo added"); }}><Plus className="h-4 w-4" /> Add logo</Button>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-3">
-            {trustLogos.map((t) => (
-              <div key={t.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
-                <Input placeholder="Brand name" value={t.name} onChange={(e) => updateTrustLogo(t.id, { name: e.target.value })} />
-                <ImageUpload value={t.image} onChange={(url) => updateTrustLogo(t.id, { image: url })} />
-                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteTrustLogo(t.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
-              </div>
-            ))}
-          </div>
-        </Wrap>
-      );
 
-      if (blockKey === "stats") return (
-        <Wrap subtitle='Boro number gula (e.g. "15+" / "Projects Delivered").'>
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { addStat({ value: "0+", label: "New metric" }); toast.success("Stat added"); }}><Plus className="h-4 w-4" /> Add stat</Button>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-3">
-            {stats.map((s) => (
-              <div key={s.id} className="p-3 rounded-xl border border-border/60 bg-card grid grid-cols-[100px_1fr_auto] gap-2 items-center">
-                <Input value={s.value} onChange={(e) => updateStat(s.id, { value: e.target.value })} placeholder="Value" />
-                <Input value={s.label} onChange={(e) => updateStat(s.id, { label: e.target.value })} placeholder="Label" />
-                <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteStat(s.id)}><Trash2 className="h-4 w-4" /></Button>
-              </div>
-            ))}
-          </div>
-        </Wrap>
-      );
+      if (blockKey === "trustStrip") return wrap("Client logos / brand names marquee on the home page.", <>
+        <div className="flex justify-end">
+          <Button size="sm" onClick={() => { addTrustLogo({ name: "New Brand", image: "" }); toast.success("Logo added"); }}><Plus className="h-4 w-4" /> Add logo</Button>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {trustLogos.map((t) => (
+            <div key={t.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+              <Input placeholder="Brand name" value={t.name} onChange={(e) => updateTrustLogo(t.id, { name: e.target.value })} />
+              <ImageUpload value={t.image} onChange={(url) => updateTrustLogo(t.id, { image: url })} />
+              <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteTrustLogo(t.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+            </div>
+          ))}
+        </div>
+      </>);
 
-      if (blockKey === "servicesPreview") return (
-        <Wrap subtitle="Auto-scrolling services cards on home. Add an image + alt text for each service card.">
-          <p className="text-sm text-muted-foreground">Section title/intro is edited on the <button className="text-accent underline" onClick={() => setActivePage("services")}>Services page</button>.</p>
-          <div className="space-y-3">
-            {SITE_SERVICES.map((s) => {
-              const sp = servicePreviews[s.slug] || { image: "", imageAlt: "" };
-              return (
-                <div key={s.slug} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold text-foreground">{s.label}</p>
-                    <span className="text-xs text-muted-foreground">/{s.slug}</span>
-                  </div>
-                  <ImageUpload value={sp.image} onChange={(url) => updateServicePreview(s.slug, { image: url })} />
-                  <Input value={sp.imageAlt} onChange={(e) => updateServicePreview(s.slug, { imageAlt: e.target.value })} placeholder="Image alt text (for SEO)" />
+      if (blockKey === "stats") return wrap('Boro number gula (e.g. "15+" / "Projects Delivered").', <>
+        <div className="flex justify-end">
+          <Button size="sm" onClick={() => { addStat({ value: "0+", label: "New metric" }); toast.success("Stat added"); }}><Plus className="h-4 w-4" /> Add stat</Button>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {stats.map((s) => (
+            <div key={s.id} className="p-3 rounded-xl border border-border/60 bg-card grid grid-cols-[100px_1fr_auto] gap-2 items-center">
+              <Input value={s.value} onChange={(e) => updateStat(s.id, { value: e.target.value })} placeholder="Value" />
+              <Input value={s.label} onChange={(e) => updateStat(s.id, { label: e.target.value })} placeholder="Label" />
+              <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteStat(s.id)}><Trash2 className="h-4 w-4" /></Button>
+            </div>
+          ))}
+        </div>
+      </>);
+
+      if (blockKey === "servicesPreview") return wrap("Auto-scrolling services cards on home. Add an image + alt text for each service card.", <>
+        <p className="text-sm text-muted-foreground">Section title/intro is edited on the <button className="text-accent underline" onClick={() => setActivePage("services")}>Services page</button>.</p>
+        <div className="space-y-3">
+          {SITE_SERVICES.map((s) => {
+            const sp = servicePreviews[s.slug] || { image: "", imageAlt: "" };
+            return (
+              <div key={s.slug} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold text-foreground">{s.label}</p>
+                  <span className="text-xs text-muted-foreground">/{s.slug}</span>
                 </div>
-              );
-            })}
-          </div>
-        </Wrap>
-      );
-
-      if (blockKey === "caseStudies") return (
-        <Wrap subtitle="Each card opens its own case study page (/case-studies/:id).">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { addCaseStudy({ title: "New case study", metric: "+100%", description: "", image: "", link: "", imageAlt: "", body: "" }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add case study</Button>
-          </div>
-          <div className="space-y-3">
-            {caseStudies.map((c) => (
-              <div key={c.id} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
-                <div className="grid sm:grid-cols-2 gap-2">
-                  <Input value={c.title} onChange={(e) => updateCaseStudy(c.id, { title: e.target.value })} placeholder="Title" />
-                  <Input value={c.metric} onChange={(e) => updateCaseStudy(c.id, { metric: e.target.value })} placeholder="Metric (e.g. +180% traffic)" />
-                </div>
-                <Textarea value={c.description} onChange={(e) => updateCaseStudy(c.id, { description: e.target.value })} placeholder="Short description (card)" rows={2} />
-                <ImageUpload value={c.image} onChange={(url) => updateCaseStudy(c.id, { image: url })} />
-                <Input value={c.imageAlt || ""} onChange={(e) => updateCaseStudy(c.id, { imageAlt: e.target.value })} placeholder="Image alt text" />
-                <Textarea value={c.body || ""} onChange={(e) => updateCaseStudy(c.id, { body: e.target.value })} placeholder="Full case study content (shown on detail page)" rows={6} />
-                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+                <ImageUpload value={sp.image} onChange={(url) => updateServicePreview(s.slug, { image: url })} />
+                <Input value={sp.imageAlt} onChange={(e) => updateServicePreview(s.slug, { imageAlt: e.target.value })} placeholder="Image alt text (for SEO)" />
               </div>
-            ))}
-          </div>
-        </Wrap>
-      );
+            );
+          })}
+        </div>
+      </>);
 
-      if (blockKey === "homeFaq") return (
-        <Wrap subtitle="Brand/general questions on the home page.">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { addHomeFaq({ question: "New question?", answer: "Answer..." }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add FAQ</Button>
-          </div>
-          <div className="space-y-3">
-            {homeFaqs.map((f) => (
-              <div key={f.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
-                <Input value={f.question} onChange={(e) => updateHomeFaq(f.id, { question: e.target.value })} placeholder="Question" />
-                <Textarea value={f.answer} onChange={(e) => updateHomeFaq(f.id, { answer: e.target.value })} placeholder="Answer" rows={2} />
-                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteHomeFaq(f.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+      if (blockKey === "caseStudies") return wrap("Each card opens its own case study page (/case-studies/:id).", <>
+        <div className="flex justify-end">
+          <Button size="sm" onClick={() => { addCaseStudy({ title: "New case study", metric: "+100%", description: "", image: "", link: "", imageAlt: "", body: "" }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add case study</Button>
+        </div>
+        <div className="space-y-3">
+          {caseStudies.map((c) => (
+            <div key={c.id} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
+              <div className="grid sm:grid-cols-2 gap-2">
+                <Input value={c.title} onChange={(e) => updateCaseStudy(c.id, { title: e.target.value })} placeholder="Title" />
+                <Input value={c.metric} onChange={(e) => updateCaseStudy(c.id, { metric: e.target.value })} placeholder="Metric (e.g. +180% traffic)" />
               </div>
-            ))}
-          </div>
-        </Wrap>
-      );
+              <Textarea value={c.description} onChange={(e) => updateCaseStudy(c.id, { description: e.target.value })} placeholder="Short description (card)" rows={2} />
+              <ImageUpload value={c.image} onChange={(url) => updateCaseStudy(c.id, { image: url })} />
+              <Input value={c.imageAlt || ""} onChange={(e) => updateCaseStudy(c.id, { imageAlt: e.target.value })} placeholder="Image alt text" />
+              <Textarea value={c.body || ""} onChange={(e) => updateCaseStudy(c.id, { body: e.target.value })} placeholder="Full case study content (shown on detail page)" rows={6} />
+              <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+            </div>
+          ))}
+        </div>
+      </>);
 
-      if (blockKey === "finalCta") return (
-        <Wrap subtitle="Bottom-of-page banner with primary + secondary CTAs.">
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div className="sm:col-span-2"><Field label="Headline"><Input value={finalCta.headline} onChange={(e) => updateFinalCta({ headline: e.target.value })} /></Field></div>
-            <div className="sm:col-span-2"><Field label="Subline"><Textarea rows={2} value={finalCta.subline} onChange={(e) => updateFinalCta({ subline: e.target.value })} /></Field></div>
-            <Field label="Primary button label"><Input value={finalCta.primaryLabel} onChange={(e) => updateFinalCta({ primaryLabel: e.target.value })} /></Field>
-            <Field label="Primary button URL"><Input value={finalCta.primaryUrl} onChange={(e) => updateFinalCta({ primaryUrl: e.target.value })} /></Field>
-            <Field label="Secondary button label"><Input value={finalCta.secondaryLabel} onChange={(e) => updateFinalCta({ secondaryLabel: e.target.value })} /></Field>
-            <Field label="Secondary button URL"><Input value={finalCta.secondaryUrl} onChange={(e) => updateFinalCta({ secondaryUrl: e.target.value })} /></Field>
-          </div>
-        </Wrap>
-      );
+      if (blockKey === "homeFaq") return wrap("Brand/general questions on the home page.", <>
+        <div className="flex justify-end">
+          <Button size="sm" onClick={() => { addHomeFaq({ question: "New question?", answer: "Answer..." }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add FAQ</Button>
+        </div>
+        <div className="space-y-3">
+          {homeFaqs.map((f) => (
+            <div key={f.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+              <Input value={f.question} onChange={(e) => updateHomeFaq(f.id, { question: e.target.value })} placeholder="Question" />
+              <Textarea value={f.answer} onChange={(e) => updateHomeFaq(f.id, { answer: e.target.value })} placeholder="Answer" rows={2} />
+              <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteHomeFaq(f.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+            </div>
+          ))}
+        </div>
+      </>);
+
+      if (blockKey === "finalCta") return wrap("Bottom-of-page banner with primary + secondary CTAs.", <>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div className="sm:col-span-2"><Field label="Headline"><Input value={finalCta.headline} onChange={(e) => updateFinalCta({ headline: e.target.value })} /></Field></div>
+          <div className="sm:col-span-2"><Field label="Subline"><Textarea rows={2} value={finalCta.subline} onChange={(e) => updateFinalCta({ subline: e.target.value })} /></Field></div>
+          <Field label="Primary button label"><Input value={finalCta.primaryLabel} onChange={(e) => updateFinalCta({ primaryLabel: e.target.value })} /></Field>
+          <Field label="Primary button URL"><Input value={finalCta.primaryUrl} onChange={(e) => updateFinalCta({ primaryUrl: e.target.value })} /></Field>
+          <Field label="Secondary button label"><Input value={finalCta.secondaryLabel} onChange={(e) => updateFinalCta({ secondaryLabel: e.target.value })} /></Field>
+          <Field label="Secondary button URL"><Input value={finalCta.secondaryUrl} onChange={(e) => updateFinalCta({ secondaryUrl: e.target.value })} /></Field>
+        </div>
+      </>);
 
       return null;
     }
@@ -740,7 +695,7 @@ const AdminDashboard = () => {
       const c: any = content;
       return (
         <div className="space-y-4">
-          <LocationSelector pageKey={activePage} />
+          
           <Card className="p-5 sm:p-6 space-y-5">
             <SectionHeader icon={cfg.icon} title={cfg.title} subtitle={cfg.subtitle} />
             <div className="space-y-4">
@@ -796,7 +751,7 @@ const AdminDashboard = () => {
               </div>
             </Card>
           )}
-          <SeoBlock pageKey={activePage} />
+          <SeoBlock pageKey={activePage} seo={seo} updatePageSeo={updatePageSeo} content={content} />
         </div>
       );
     }
@@ -870,7 +825,7 @@ const AdminDashboard = () => {
             })}
           </div>
         </Card>
-        <SeoBlock pageKey="home" />
+        <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} content={content} />
       </div>
     );
   };
