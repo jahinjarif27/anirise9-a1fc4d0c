@@ -4,6 +4,7 @@ import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { Contact } from "@/components/site/Contact";
 import { useSEO } from "@/hooks/useSEO";
+import { useAdmin } from "@/context/AdminContext";
 
 type Props = {
   Section: ComponentType;
@@ -20,9 +21,11 @@ const SECTION_DESCRIPTIONS: Record<string, string> = {
 };
 
 export const SectionPage = ({ Section, title, sectionKey }: Props) => {
+  const { seo } = useAdmin();
+  const override = sectionKey ? seo.pageSeo?.[sectionKey] : undefined;
   useSEO({
-    title: title ? `${title} — AniRise` : "AniRise",
-    description: sectionKey ? SECTION_DESCRIPTIONS[sectionKey] : undefined,
+    title: override?.metaTitle || (title ? `${title} — AniRise` : "AniRise"),
+    description: override?.metaDescription || (sectionKey ? SECTION_DESCRIPTIONS[sectionKey] : undefined),
     path: sectionKey ? `/${sectionKey}` : undefined,
   });
 
