@@ -455,7 +455,29 @@ const AdminDashboard = () => {
               <Button variant="hero" size="sm" onClick={() => toast.success("Saved")}><Save className="h-4 w-4" /> Save</Button>
             </div>
           </Card>
-          <SeoBlock pageKey={cpSeoKey} seo={seo} updatePageSeo={updatePageSeo} />
+          <Card className="p-5 sm:p-6 space-y-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Search className="h-4 w-4" />
+              <h4 className="font-bold">Page SEO</h4>
+              <span className="text-[11px] text-muted-foreground">/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span>
+              <Button size="sm" variant="hero" className="ml-auto" onClick={() => toast.success(`SEO saved for /${cp.slug} — live on next page load`)}>
+                <Save className="h-4 w-4" /> Save SEO
+              </Button>
+            </div>
+            <p className="text-[11px] text-muted-foreground -mt-1">These tags ship in the <code>&lt;head&gt;</code> of this page so Google can rank it correctly.</p>
+            <div>
+              <label className="text-xs font-medium mb-1 block">Meta title <span className={(cp.seo?.metaTitle?.length || 0) > 60 ? "text-destructive" : "text-muted-foreground"}>({cp.seo?.metaTitle?.length || 0}/60)</span></label>
+              <Input value={cp.seo?.metaTitle || ""} onChange={(e) => updateCustomPage(cp.id, { seo: { ...(cp.seo || { metaTitle: "", metaDescription: "", metaKeywords: "" }), metaTitle: e.target.value } })} />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block">Meta description <span className={(cp.seo?.metaDescription?.length || 0) > 160 ? "text-destructive" : "text-muted-foreground"}>({cp.seo?.metaDescription?.length || 0}/160)</span></label>
+              <Textarea rows={3} value={cp.seo?.metaDescription || ""} onChange={(e) => updateCustomPage(cp.id, { seo: { ...(cp.seo || { metaTitle: "", metaDescription: "", metaKeywords: "" }), metaDescription: e.target.value } })} />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block">Meta keywords <span className="text-muted-foreground">(optional)</span></label>
+              <Input value={cp.seo?.metaKeywords || ""} onChange={(e) => updateCustomPage(cp.id, { seo: { ...(cp.seo || { metaTitle: "", metaDescription: "", metaKeywords: "" }), metaKeywords: e.target.value } })} />
+            </div>
+          </Card>
         </div>
       );
     }
