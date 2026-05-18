@@ -541,6 +541,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
   const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({});
   const [serviceContent, setServiceContent] = useState<Record<string, ServiceContent>>(defaultServiceContent);
+  const [processFlow, setProcessFlow] = useState<ProcessFlow>(defaultProcessFlow);
 
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
