@@ -148,7 +148,32 @@ export const SECTION_KEYS: SectionKey[] = ["hero", "services", "about", "portfol
 export type FaqItem = { id: string; question: string; answer: string };
 export type StatItem = { id: string; value: string; label: string };
 export type TrustLogo = { id: string; name: string; image: string };
-export type CaseStudy = { id: string; title: string; metric: string; description: string; image: string; link: string; imageAlt?: string; body?: string };
+export type CaseStudyStat = { id: string; label: string; value: string };
+export type CaseStudyTable = { title?: string; headers: string[]; rows: string[][] };
+export type CaseStudyChartPoint = { id: string; label: string; value: number };
+export type CaseStudyChart = { title?: string; type: "bar" | "line"; data: CaseStudyChartPoint[] };
+export type CaseStudy = {
+  id: string;
+  title: string;
+  metric: string;
+  description: string;
+  image: string;
+  link: string;
+  imageAlt?: string;
+  body?: string;
+  // rich detail page fields (all optional)
+  eyebrow?: string;
+  intro?: string;
+  client?: string;
+  industry?: string;
+  duration?: string;
+  challenge?: string;
+  solution?: string;
+  results?: string;
+  stats?: CaseStudyStat[];
+  table?: CaseStudyTable;
+  chart?: CaseStudyChart;
+};
 export type ServicePreview = { image: string; imageAlt: string };
 export type FinalCta = {
   headline: string;
