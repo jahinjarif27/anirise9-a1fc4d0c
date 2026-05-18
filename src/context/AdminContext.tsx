@@ -915,6 +915,14 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       return { ...prev, [slug]: { ...base, ...patch } };
     });
 
+  const updateProcessFlow = (patch: Partial<ProcessFlow>) => setProcessFlow((prev) => ({ ...prev, ...patch }));
+  const addProcessFlowStep = () =>
+    setProcessFlow((prev) => ({ ...prev, steps: [...prev.steps, { id: newId(), icon: "Sparkles", title: "New step", chip: "Tag" }] }));
+  const updateProcessFlowStep = (id: string, patch: Partial<ProcessFlowStep>) =>
+    setProcessFlow((prev) => ({ ...prev, steps: prev.steps.map((s) => (s.id === id ? { ...s, ...patch } : s)) }));
+  const deleteProcessFlowStep = (id: string) =>
+    setProcessFlow((prev) => ({ ...prev, steps: prev.steps.filter((s) => s.id !== id) }));
+
   const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
     const staticPaths = ["/", "/services", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
     const blogPaths = slugs.map((s) => `/blog/${s}`);
