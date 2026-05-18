@@ -12,6 +12,7 @@ import { HomeFAQ } from "@/components/site/home/HomeFAQ";
 import { FinalCTA } from "@/components/site/home/FinalCTA";
 import { StrategyCall } from "@/components/site/home/StrategyCall";
 import { WhyChooseAniRise } from "@/components/site/home/WhyChooseAniRise";
+import { ProcessSteps } from "@/components/site/home/ProcessSteps";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 
@@ -42,6 +43,7 @@ const Index = () => {
         {homeBlocks.servicesPreview && <ServicesPreview />}
         <About />
         {homeBlocks.caseStudies && <CaseStudies />}
+        <ProcessSteps />
         <WhyChooseAniRise />
         <StrategyCall />
         {homeBlocks.homeFaq && <HomeFAQ />}
