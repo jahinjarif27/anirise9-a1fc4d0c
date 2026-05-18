@@ -606,12 +606,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         trust_logos: trustLogos as any,
         case_studies: caseStudies as any,
         final_cta: finalCta as any,
+        service_previews: servicePreviews as any,
         updated_at: new Date().toISOString(),
       }).eq("id", 1).then(({ error }) => {
         if (error) console.error("[site_settings] save failed", error);
       });
     }, 500);
-  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta]);
+  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews]);
 
   // ---------------------------------------------------------------
   // Live document.head effects (unchanged)
