@@ -69,6 +69,66 @@ const SITE_SERVICES = [
   { slug: "digital-marketing", label: "Digital Marketing" },
 ];
 
+// Module-level helpers (defined OUTSIDE the dashboard so input focus is not lost on re-render)
+const SectionHeader = ({ icon: Icon, title, subtitle, action }: { icon: any; title: string; subtitle: string; action?: React.ReactNode }) => (
+  <div className="flex items-center justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
+    <div className="flex items-center gap-3">
+      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
+        <Icon className="h-5 w-5" />
+      </div>
+      <div>
+        <h3 className="font-bold leading-tight">{title}</h3>
+        <p className="text-xs text-muted-foreground">{subtitle}</p>
+      </div>
+    </div>
+    {action}
+  </div>
+);
+
+const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div>
+    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">{label}</label>
+    {children}
+  </div>
+);
+
+const SeoBlock = ({
+  pageKey, hideAuto = false, seo, updatePageSeo, content,
+}: {
+  pageKey: string; hideAuto?: boolean;
+  seo: any; updatePageSeo: (key: string, patch: any) => void; content: any;
+}) => {
+  const s = seo.pageSeo[pageKey] || { metaTitle: "", metaDescription: "", metaKeywords: "" };
+  return (
+    <Card className="p-5 sm:p-6 space-y-3">
+      <div className="flex items-center gap-2">
+        <Search className="h-4 w-4" />
+        <h4 className="font-bold">Page SEO</h4>
+        {!hideAuto && (
+          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => {
+            const title = content[`${pageKey}Headline`] || content[`${pageKey}Title`] || s.metaTitle;
+            const desc = content[`${pageKey}Blurb`] || content[`${pageKey}Tagline`] || s.metaDescription;
+            updatePageSeo(pageKey, { metaTitle: title, metaDescription: desc });
+            toast.success("Auto-filled from page content");
+          }}><Sparkles className="h-4 w-4" /> Auto-generate</Button>
+        )}
+      </div>
+      <div>
+        <label className="text-xs font-medium mb-1 block">Meta title <span className="text-muted-foreground">({s.metaTitle.length}/60)</span></label>
+        <Input value={s.metaTitle} onChange={(e) => updatePageSeo(pageKey, { metaTitle: e.target.value })} />
+      </div>
+      <div>
+        <label className="text-xs font-medium mb-1 block">Meta description <span className="text-muted-foreground">({s.metaDescription.length}/160)</span></label>
+        <Textarea rows={3} value={s.metaDescription} onChange={(e) => updatePageSeo(pageKey, { metaDescription: e.target.value })} />
+      </div>
+      <div>
+        <label className="text-xs font-medium mb-1 block">Meta keywords</label>
+        <Input value={s.metaKeywords} onChange={(e) => updatePageSeo(pageKey, { metaKeywords: e.target.value })} />
+      </div>
+    </Card>
+  );
+};
+
 const AdminDashboard = () => {
   const {
     isAuthed, logout, posts, addPost, updatePost, deletePost,
