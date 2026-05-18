@@ -902,6 +902,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         trustLogos, addTrustLogo, updateTrustLogo, deleteTrustLogo,
         caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
         finalCta, updateFinalCta,
+        servicePreviews, updateServicePreview,
       }}
     >
       {children}
