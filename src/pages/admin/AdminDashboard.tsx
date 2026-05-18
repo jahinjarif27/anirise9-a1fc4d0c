@@ -1042,6 +1042,13 @@ const AdminDashboard = () => {
                               );
                             })}
                             <li>
+                              <button onClick={() => setActivePage("about")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "about" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <FileEdit className="h-3 w-3 opacity-60" />
+                                <span className="truncate">About section</span>
+                              </button>
+                            </li>
+                            <li>
                               <button onClick={() => setActivePage("blog")}
                                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "blog" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
                                 <FileText className="h-3 w-3 opacity-60" />
