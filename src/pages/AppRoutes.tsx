@@ -31,18 +31,9 @@ const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title
   contact: { Component: Contact, title: "Contact" },
 };
 
-const RouteFallback = () => (
-  <div className="min-h-screen grid place-items-center bg-background">
-    <div className="flex flex-col items-center gap-3">
-      <img src="/favicon.jpg" alt="AniRise" className="h-12 w-12 rounded-full animate-pulse" />
-      <span className="text-sm text-muted-foreground">Loading…</span>
-    </div>
-  </div>
-);
-
 export const AppRoutes = () => {
   return (
-    <Suspense fallback={<RouteFallback />}>
+    <Suspense fallback={null}>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/blog" element={<BlogPage />} />
