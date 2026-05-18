@@ -38,23 +38,7 @@ const BlogPostPage = () => {
       : undefined,
   });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="pt-32 pb-20 container max-w-3xl">
-          <div className="animate-pulse space-y-4">
-            <div className="h-6 w-24 bg-muted rounded" />
-            <div className="h-12 w-3/4 bg-muted rounded" />
-            <div className="h-64 bg-muted rounded-2xl" />
-            <div className="h-4 w-full bg-muted rounded" />
-            <div className="h-4 w-5/6 bg-muted rounded" />
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  if (loading) return null;
 
   if (!post) {
     return (
