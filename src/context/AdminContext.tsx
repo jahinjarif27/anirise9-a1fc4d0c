@@ -6,6 +6,8 @@ import logoImg from "@/assets/anirise-logo.jpg";
 import portfolio1 from "@/assets/portfolio-1.jpg";
 import portfolio2 from "@/assets/portfolio-2.jpg";
 import portfolio3 from "@/assets/portfolio-3.jpg";
+import { defaultServiceContent, ServiceContent } from "@/data/serviceContentDefaults";
+export type { ServiceContent } from "@/data/serviceContentDefaults";
 
 // ============================================================
 // Types (exported API unchanged so existing UI keeps working)
@@ -446,6 +448,8 @@ type AdminCtx = {
   updateFinalCta: (c: Partial<FinalCta>) => void;
   servicePreviews: Record<string, ServicePreview>;
   updateServicePreview: (slug: string, sp: Partial<ServicePreview>) => void;
+  serviceContent: Record<string, ServiceContent>;
+  updateServiceContent: (slug: string, patch: Partial<ServiceContent>) => void;
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
@@ -507,6 +511,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(defaultCaseStudies);
   const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
   const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({});
+  const [serviceContent, setServiceContent] = useState<Record<string, ServiceContent>>(defaultServiceContent);
 
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
@@ -552,6 +557,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (Array.isArray(sa.case_studies) && sa.case_studies.length) setCaseStudies(sa.case_studies);
         if (sa.final_cta && Object.keys(sa.final_cta).length) setFinalCta({ ...defaultFinalCta, ...sa.final_cta });
         if (sa.service_previews && Object.keys(sa.service_previews).length) setServicePreviews(sa.service_previews);
+        if (sa.service_content && Object.keys(sa.service_content).length) {
+          const merged: Record<string, ServiceContent> = { ...defaultServiceContent };
+          Object.keys(sa.service_content).forEach((k) => {
+            merged[k] = { ...(defaultServiceContent[k] ?? defaultServiceContent["website-seo"]), ...sa.service_content[k] };
+          });
+          setServiceContent(merged);
+        }
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
       if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
