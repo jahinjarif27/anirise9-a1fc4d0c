@@ -953,57 +953,55 @@ const AdminDashboard = () => {
           <TabsContent value="pages" className="space-y-6">
             <div className="grid lg:grid-cols-[280px_1fr] gap-5">
               <Card className="p-0 h-fit lg:sticky lg:top-20 overflow-hidden">
-                <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Layers className="h-4 w-4 text-accent" />
-                    <span className="text-sm font-bold">Site structure</span>
-                  </div>
-                  <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => {
-                    const label = prompt("Section group name?");
-                    if (!label) return;
-                    const k = addSectionGroup(label);
-                    setOpenGroups((p) => ({ ...p, [k]: true }));
-                    toast.success("Group added");
-                  }}>
-                    <Plus className="h-3.5 w-3.5" /> Group
-                  </Button>
+                <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-accent" />
+                  <span className="text-sm font-bold">Site pages</span>
                 </div>
 
                 <div className="p-2 space-y-1">
-                  {sectionGroups.map((grp) => {
-                    const isOpen = openGroups[grp.key] ?? false;
-                    const builtins = SITE_PAGES.filter((p) => (pageLocation[p.key] ?? "home") === grp.key);
-                    const customs = customPages.filter((p) => (p.groupKey ?? "") === grp.key);
-                    const homesecs = grp.isHome ? homeSections : homeSections.filter((s) => s.groupKey === grp.key);
-                    const total = builtins.length + customs.length + homesecs.length;
+                  {/* HOME page group */}
+                  {(() => {
+                    const isOpen = openGroups["home"] ?? true;
+                    const customHomeSections = homeSections.filter((s) => (s.groupKey ?? "home") === "home" || !s.groupKey);
                     return (
-                      <Collapsible key={grp.key} open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, [grp.key]: v }))}>
-                        <div className="flex items-center gap-1">
-                          <CollapsibleTrigger className="group flex-1 text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
-                            <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
-                            {grp.isHome ? <Home className="h-3.5 w-3.5 text-accent" /> : <Layers className="h-3.5 w-3.5 text-accent" />}
-                            <span className="flex-1 truncate">{grp.label}</span>
-                            <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{total}</Badge>
-                          </CollapsibleTrigger>
-                          {!grp.isHome && (
-                            <button title="Delete group" onClick={() => { if (confirm(`Delete group "${grp.label}"?`)) { deleteSectionGroup(grp.id); toast.success("Group deleted"); } }}
-                              className="h-8 w-8 grid place-items-center rounded-lg hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors">
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          )}
-                        </div>
-                        <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                      <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, home: v }))}>
+                        <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                          <Home className="h-3.5 w-3.5 text-accent" />
+                          <span className="flex-1 truncate">Home page</span>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{1 + HOME_BLOCKS.length + customHomeSections.length}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
                           <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
-                            {builtins.map((p) => (
-                              <li key={p.key}>
-                                <button onClick={() => setActivePage(p.key)}
-                                  className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm transition-colors flex items-center gap-2 ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
-                                  <FileText className="h-3 w-3 opacity-60" />
-                                  <span className="truncate">{p.label}</span>
-                                </button>
-                              </li>
-                            ))}
-                            {homesecs.map((s) => (
+                            <li>
+                              <button onClick={() => setActivePage("hero")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "hero" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <FileText className="h-3 w-3 opacity-60" />
+                                <span className="truncate">Hero</span>
+                              </button>
+                            </li>
+                            {HOME_BLOCKS.map((b) => {
+                              const key = `hb:${b.key}`;
+                              const on = homeBlocks[b.key];
+                              return (
+                                <li key={b.key}>
+                                  <button onClick={() => setActivePage(key)}
+                                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                    <FileEdit className="h-3 w-3 opacity-60" />
+                                    <span className="truncate flex-1">{b.label}</span>
+                                    {!on && <Badge variant="outline" className="h-4 px-1 text-[9px]">Off</Badge>}
+                                  </button>
+                                </li>
+                              );
+                            })}
+                            <li>
+                              <button onClick={() => setActivePage("blog")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "blog" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <FileText className="h-3 w-3 opacity-60" />
+                                <span className="truncate">Blog section</span>
+                              </button>
+                            </li>
+                            {customHomeSections.map((s) => (
                               <li key={s.id}>
                                 <button onClick={() => setActivePage(`homesec:${s.id}`)}
                                   className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `homesec:${s.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
@@ -1013,7 +1011,109 @@ const AdminDashboard = () => {
                                 </button>
                               </li>
                             ))}
-                            {customs.map((p) => (
+                            <li>
+                              <button onClick={() => {
+                                const id = Date.now().toString();
+                                addHomeSection({ title: "New section", body: "", image: "", imageAlt: "", enabled: true });
+                                setTimeout(() => setActivePage(`homesec:${id}`), 0);
+                                toast.success("Custom section added");
+                              }}
+                                className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 transition-colors">
+                                <Plus className="h-3 w-3" /> Add custom section
+                              </button>
+                            </li>
+                          </ul>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    );
+                  })()}
+
+                  {/* SERVICES group */}
+                  {(() => {
+                    const isOpen = openGroups["services"] ?? true;
+                    return (
+                      <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, services: v }))}>
+                        <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                          <Layers className="h-3.5 w-3.5 text-accent" />
+                          <span className="flex-1 truncate">Services</span>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{1 + SITE_SERVICES.length}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
+                            <li>
+                              <button onClick={() => setActivePage("services")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "services" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <FileText className="h-3 w-3 opacity-60" />
+                                <span className="truncate">Services overview</span>
+                              </button>
+                            </li>
+                            {SITE_SERVICES.map((s) => {
+                              const key = `svc:${s.slug}`;
+                              const count = (serviceFaqs[s.slug] || []).length;
+                              return (
+                                <li key={s.slug}>
+                                  <button onClick={() => setActivePage(key)}
+                                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                    <FileText className="h-3 w-3 opacity-60" />
+                                    <span className="truncate flex-1">{s.label}</span>
+                                    <span className="text-[10px] text-muted-foreground">{count} FAQ</span>
+                                  </button>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    );
+                  })()}
+
+                  {/* Other built-in pages */}
+                  {(() => {
+                    const isOpen = openGroups["other"] ?? true;
+                    const others = ["about", "portfolio", "testimonials", "contact"];
+                    return (
+                      <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, other: v }))}>
+                        <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                          <Globe className="h-3.5 w-3.5 text-accent" />
+                          <span className="flex-1 truncate">Other pages</span>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{others.length}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
+                            {others.map((k) => {
+                              const p = SITE_PAGES.find((x) => x.key === k)!;
+                              return (
+                                <li key={k}>
+                                  <button onClick={() => setActivePage(k)}
+                                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === k ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                    <FileText className="h-3 w-3 opacity-60" />
+                                    <span className="truncate">{p.label}</span>
+                                  </button>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    );
+                  })()}
+
+                  {/* Custom pages */}
+                  {(() => {
+                    const isOpen = openGroups["custom"] ?? true;
+                    return (
+                      <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, custom: v }))}>
+                        <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                          <FileCog className="h-3.5 w-3.5 text-accent" />
+                          <span className="flex-1 truncate">Custom pages</span>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{customPages.length}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
+                            {customPages.map((p) => (
                               <li key={p.id}>
                                 <button onClick={() => setActivePage(`custom:${p.id}`)}
                                   className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
@@ -1028,12 +1128,12 @@ const AdminDashboard = () => {
                                 const id = Date.now().toString();
                                 addCustomPage({
                                   title: "New Page", slug: `new-page-${id.slice(-4)}`, parent: "",
-                                  navLocation: ["menu"], image: "", imageAlt: "", body: "",
+                                  navLocation: ["navbar"], image: "", imageAlt: "", body: "",
                                   seo: { metaTitle: "New Page", metaDescription: "", metaKeywords: "" },
-                                  published: false, groupKey: grp.key,
+                                  published: false, groupKey: "",
                                 });
                                 setTimeout(() => setActivePage(`custom:${id}`), 0);
-                                toast.success("Page added to " + grp.label);
+                                toast.success("Page added");
                               }}
                                 className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 transition-colors">
                                 <Plus className="h-3 w-3" /> Add page
@@ -1043,49 +1143,7 @@ const AdminDashboard = () => {
                         </CollapsibleContent>
                       </Collapsible>
                     );
-                  })}
-                </div>
-
-                <div className="border-t border-border bg-secondary/20 p-2">
-                  <div className="flex items-center justify-between px-2 py-1.5">
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Standalone</span>
-                    </div>
-                  </div>
-                  <ul className="space-y-0.5">
-                    {SITE_PAGES.filter((p) => (pageLocation[p.key] ?? "home") === "").map((p) => (
-                      <li key={p.key}>
-                        <button onClick={() => setActivePage(p.key)}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === p.key ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
-                          <span className="truncate flex-1">{p.label}</span>
-                          <span className="text-[10px] font-mono text-muted-foreground">/{p.key}</span>
-                        </button>
-                      </li>
-                    ))}
-                    {customPages.filter((p) => (p.groupKey ?? "") === "").map((p) => (
-                      <li key={p.id}>
-                        <button onClick={() => setActivePage(`custom:${p.id}`)}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `custom:${p.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
-                          <span className="truncate flex-1">{p.title || p.slug}</span>
-                          {!p.published && <Badge variant="outline" className="h-4 px-1 text-[9px]">Draft</Badge>}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button size="sm" variant="ghost" className="h-8 px-2 mt-1 w-full justify-start text-xs" onClick={() => {
-                    const id = Date.now().toString();
-                    addCustomPage({
-                      title: "New Page", slug: `new-page-${id.slice(-4)}`, parent: "",
-                      navLocation: ["navbar"], image: "", imageAlt: "", body: "",
-                      seo: { metaTitle: "New Page", metaDescription: "", metaKeywords: "" },
-                      published: false, groupKey: "",
-                    });
-                    setTimeout(() => setActivePage(`custom:${id}`), 0);
-                    toast.success("Standalone page created");
-                  }}>
-                    <Plus className="h-3.5 w-3.5" /> Add standalone page
-                  </Button>
+                  })()}
                 </div>
               </Card>
               <div>{renderPageEditor()}</div>
