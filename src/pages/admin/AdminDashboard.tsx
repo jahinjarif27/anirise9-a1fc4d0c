@@ -455,7 +455,7 @@ const AdminDashboard = () => {
               <Button variant="hero" size="sm" onClick={() => toast.success("Saved")}><Save className="h-4 w-4" /> Save</Button>
             </div>
           </Card>
-          <SeoBlock pageKey={cpSeoKey} hideAuto seo={seo} updatePageSeo={updatePageSeo} content={content} />
+          <SeoBlock pageKey={cpSeoKey} seo={seo} updatePageSeo={updatePageSeo} />
         </div>
       );
     }
@@ -811,7 +811,7 @@ const AdminDashboard = () => {
               </div>
             </Card>
           )}
-          <SeoBlock pageKey={activePage} seo={seo} updatePageSeo={updatePageSeo} content={content} />
+          <SeoBlock pageKey={activePage} seo={seo} updatePageSeo={updatePageSeo} />
         </div>
       );
     }
@@ -885,7 +885,7 @@ const AdminDashboard = () => {
             })}
           </div>
         </Card>
-        <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} content={content} />
+        <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} />
       </div>
     );
   };
