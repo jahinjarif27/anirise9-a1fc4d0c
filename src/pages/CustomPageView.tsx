@@ -9,7 +9,7 @@ import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 export const CustomPageView = () => {
   const { slug } = useParams();
-  const { customPages } = useAdmin();
+  const { customPages, loading } = useAdmin();
   const page = customPages.find((p) => p.slug === slug && p.published);
 
   useSEO({
@@ -19,14 +19,21 @@ export const CustomPageView = () => {
     image: page?.image || undefined,
   });
 
-
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="pt-32 pb-16" />
+      </div>
+    );
+  }
   if (!page) return <NotFound />;
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-32 pb-16">
-        <article className="container max-w-4xl">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-foreground">{page.title}</h1>
+        <article className="container max-w-4xl px-4 break-words">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-foreground break-words">{page.title}</h1>
           {page.image && <img src={page.image} alt={page.imageAlt} className="rounded-2xl w-full mb-8 shadow-elegant" />}
           {page.body && <MarkdownContent content={page.body} />}
         </article>
