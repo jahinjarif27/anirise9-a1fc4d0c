@@ -40,7 +40,6 @@ export const AdminLogin = () => {
           className="h-12 text-lg md:text-base"
         />
         <Button type="submit" variant="hero" className="w-full rounded-full">Login</Button>
-        <p className="text-xs text-muted-foreground text-center">Demo password: <span className="font-mono font-semibold">1122</span></p>
       </form>
     </div>
   );
