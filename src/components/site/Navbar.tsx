@@ -11,14 +11,14 @@ import { toast } from "sonner";
 import { useAdmin } from "@/context/AdminContext";
 
 const SECTION_LABELS: Record<string, string> = {
-  hero: "Home", services: "Services", about: "About", portfolio: "Portfolio",
+  hero: "Home", services: "Services", portfolio: "Projects",
   blog: "Blog", testimonials: "Testimonials", contact: "Contact",
 };
 
 export const Navbar = () => {
   const { contact, pageLocation, customPages } = useAdmin();
 
-  const sectionKeys = ["hero", "services", "about", "portfolio", "blog", "testimonials", "contact"];
+  const sectionKeys = ["hero", "services", "portfolio", "blog", "testimonials", "contact"];
   const links = sectionKeys.map((k) => {
     const label = SECTION_LABELS[k];
     if (k === "hero") return { label, href: "/" };
