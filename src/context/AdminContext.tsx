@@ -561,18 +561,22 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         createdAt: new Date(r.created_at).getTime(),
       })));
       if (visitsRes.data) {
-        setVisits(visitsRes.data.length);
-        // group by day for last 14 days
-        const buckets: Record<string, number> = {};
+        // Unique visitors (30d): distinct visitor_id, falling back to row id for legacy rows.
+        const uniqueIds = new Set<string>();
+        visitsRes.data.forEach((v: any, i: number) => uniqueIds.add(v.visitor_id || `legacy-${i}`));
+        setVisits(uniqueIds.size);
+
+        // Daily unique visitors for last 14 days
+        const buckets: Record<string, Set<string>> = {};
         for (let i = 13; i >= 0; i--) {
           const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-          buckets[d] = 0;
+          buckets[d] = new Set();
         }
-        visitsRes.data.forEach((v: any) => {
+        visitsRes.data.forEach((v: any, i: number) => {
           const d = new Date(v.created_at).toISOString().slice(0, 10);
-          if (d in buckets) buckets[d]++;
+          if (d in buckets) buckets[d].add(v.visitor_id || `legacy-${i}`);
         });
-        setVisitSeries(Object.entries(buckets).map(([day, visits]) => ({ day: day.slice(5), visits })));
+        setVisitSeries(Object.entries(buckets).map(([day, set]) => ({ day: day.slice(5), visits: set.size })));
       }
 
       setLoading(false);
