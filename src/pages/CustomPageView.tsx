@@ -7,20 +7,14 @@ import { useSEO } from "@/hooks/useSEO";
 import NotFound from "./NotFound";
 import { MarkdownContent } from "@/components/site/MarkdownContent";
 
-export const CustomPageView = () => {
-  const { slug } = useParams();
-  const { customPages, loading } = useAdmin();
-  const page = customPages.find((p) => p.slug === slug && p.published);
-
+function CustomPageContent({ page }: { page: NonNullable<ReturnType<typeof useAdmin>["customPages"][number]> }) {
   useSEO({
-    title: page?.seo?.metaTitle || (page ? `${page.title} — AniRise` : "AniRise"),
-    description: page?.seo?.metaDescription || (page?.body ? page.body.slice(0, 158) : undefined),
-    path: page ? `/${page.slug}` : undefined,
-    image: page?.image || undefined,
+    title: page.seo?.metaTitle || `${page.title} — AniRise`,
+    description: page.seo?.metaDescription || (page.body ? page.body.slice(0, 158) : undefined),
+    path: `/${page.slug}`,
+    image: page.image || undefined,
   });
 
-  if (loading) return null;
-  if (!page) return <NotFound />;
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -35,6 +29,16 @@ export const CustomPageView = () => {
       <WhatsAppButton />
     </div>
   );
+}
+
+export const CustomPageView = () => {
+  const { slug } = useParams();
+  const { customPages, loading } = useAdmin();
+  const page = customPages.find((p) => p.slug === slug && p.published);
+
+  if (loading) return null;
+  if (!page) return <NotFound />;
+  return <CustomPageContent page={page} />;
 };
 
 export default CustomPageView;

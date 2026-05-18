@@ -1,8 +1,15 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { useSEO } from "@/hooks/useSEO";
 
 const NotFound = () => {
   const location = useLocation();
+
+  useSEO({
+    title: "404 — Page Not Found | AniRise",
+    description:
+      "The page you are looking for does not exist. Return to AniRise home and continue exploring our SEO and web services.",
+  });
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
