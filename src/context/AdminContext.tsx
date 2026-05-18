@@ -58,6 +58,8 @@ export type PortfolioItem = {
   imageAlt: string;
   tag: string;
   title: string;
+  description?: string;
+  body?: string;
 };
 
 export type Redirect = {
