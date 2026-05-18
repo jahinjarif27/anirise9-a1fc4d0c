@@ -18,7 +18,7 @@ export const HomeLoader = () => {
 
         {/* Center-out fill line */}
         <div className="relative h-[3px] w-48 bg-muted rounded-full overflow-hidden">
-          <div className="absolute top-0 left-1/2 h-full w-0 bg-gradient-accent rounded-full -translate-x-1/2 animate-[loader-fill_0.7s_ease-in-out_infinite]" />
+          <div className="absolute top-0 left-1/2 h-full w-0 bg-gradient-accent rounded-full -translate-x-1/2 animate-[loader-fill_0.3s_ease-out_forwards]" />
         </div>
       </div>
 
