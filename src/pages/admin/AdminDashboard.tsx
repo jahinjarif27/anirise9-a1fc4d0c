@@ -695,7 +695,7 @@ const AdminDashboard = () => {
       const c: any = content;
       return (
         <div className="space-y-4">
-          <LocationSelector pageKey={activePage} />
+          
           <Card className="p-5 sm:p-6 space-y-5">
             <SectionHeader icon={cfg.icon} title={cfg.title} subtitle={cfg.subtitle} />
             <div className="space-y-4">
