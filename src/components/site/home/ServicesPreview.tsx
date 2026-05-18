@@ -67,7 +67,8 @@ export const ServicesPreview = () => {
                 {s.desc}
               </p>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
