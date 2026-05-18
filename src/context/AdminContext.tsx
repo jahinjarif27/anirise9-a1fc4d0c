@@ -625,12 +625,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         case_studies: caseStudies as any,
         final_cta: finalCta as any,
         service_previews: servicePreviews as any,
+        service_content: serviceContent as any,
         updated_at: new Date().toISOString(),
       }).eq("id", 1).then(({ error }) => {
         if (error) console.error("[site_settings] save failed", error);
       });
     }, 500);
-  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews]);
+  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews, serviceContent]);
 
   // ---------------------------------------------------------------
   // Live document.head effects (unchanged)
@@ -874,6 +875,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const updateFinalCta = (c: Partial<FinalCta>) => setFinalCta((prev) => ({ ...prev, ...c }));
   const updateServicePreview = (slug: string, sp: Partial<ServicePreview>) =>
     setServicePreviews((prev) => ({ ...prev, [slug]: { image: "", imageAlt: "", ...(prev[slug] || {}), ...sp } }));
+  const updateServiceContent = (slug: string, patch: Partial<ServiceContent>) =>
+    setServiceContent((prev) => {
+      const base = prev[slug] ?? defaultServiceContent[slug] ?? defaultServiceContent["website-seo"];
+      return { ...prev, [slug]: { ...base, ...patch } };
+    });
 
   const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
     const staticPaths = ["/", "/services", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
@@ -921,6 +927,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy,
         finalCta, updateFinalCta,
         servicePreviews, updateServicePreview,
+        serviceContent, updateServiceContent,
       }}
     >
       {children}
