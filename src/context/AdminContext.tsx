@@ -158,9 +158,18 @@ export type FinalCta = {
   secondaryLabel: string;
   secondaryUrl: string;
 };
-export type HomeBlockKey = "trustStrip" | "stats" | "servicesPreview" | "caseStudies" | "homeFaq" | "finalCta";
+export type HomeBlockKey = "trustStrip" | "stats" | "servicesPreview" | "caseStudies" | "processFlow" | "homeFaq" | "finalCta";
 export type HomeBlocks = Record<HomeBlockKey, boolean>;
-export const HOME_BLOCK_KEYS: HomeBlockKey[] = ["trustStrip", "stats", "servicesPreview", "caseStudies", "homeFaq", "finalCta"];
+export const HOME_BLOCK_KEYS: HomeBlockKey[] = ["trustStrip", "stats", "servicesPreview", "caseStudies", "processFlow", "homeFaq", "finalCta"];
+
+export type ProcessFlowStep = { id: string; icon: string; title: string; chip: string };
+export type ProcessFlow = {
+  eyebrow: string;
+  titleBefore: string;
+  titleAccent: string;
+  blurb: string;
+  steps: ProcessFlowStep[];
+};
 
 type SeoSettings = {
   metaTitle: string;
