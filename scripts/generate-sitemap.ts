@@ -6,6 +6,10 @@ import { resolve } from "path";
 import { initialPosts } from "../src/data/blog";
 
 const BASE_URL = "https://anirise.com.bd";
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://xlrmuspmekwbtnyeutxz.supabase.co";
+const SUPABASE_KEY =
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhscm11c3BtZWt3YnRueWV1dHh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTUzMzUsImV4cCI6MjA5NDU5MTMzNX0.7hnEy_HPG4rzOZBeF7k6iPP0c51ohnoedXAsTA_Wisw";
 
 interface SitemapEntry {
   path: string;
@@ -24,6 +28,7 @@ const staticEntries: SitemapEntry[] = [
   { path: "/testimonials", changefreq: "monthly", priority: "0.7", lastmod: today },
   { path: "/contact", changefreq: "monthly", priority: "0.8", lastmod: today },
   { path: "/blog", changefreq: "weekly", priority: "0.9", lastmod: today },
+  { path: "/strategy-call", changefreq: "monthly", priority: "0.8", lastmod: today },
   { path: "/services/website-seo", changefreq: "monthly", priority: "0.9", lastmod: today },
   { path: "/services/ecommerce-seo", changefreq: "monthly", priority: "0.9", lastmod: today },
   { path: "/services/graphics-design", changefreq: "monthly", priority: "0.9", lastmod: today },
@@ -36,7 +41,30 @@ const blogEntries: SitemapEntry[] = initialPosts.map((p) => ({
   lastmod: p.date || today,
 }));
 
-const entries = [...staticEntries, ...blogEntries];
+async function fetchDynamicEntries(): Promise<SitemapEntry[]> {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=portfolio,case_studies,custom_pages`,
+      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } },
+    );
+    if (!res.ok) return [];
+    const rows = (await res.json()) as Array<{
+      portfolio?: Array<{ id: string }>;
+      case_studies?: Array<{ id: string }>;
+      custom_pages?: Array<{ slug: string; parent?: string; published?: boolean }>;
+    }>;
+    const row = rows[0] || {};
+    const out: SitemapEntry[] = [];
+    (row.portfolio || []).forEach((p) => p?.id && out.push({ path: `/portfolio/${p.id}`, changefreq: "monthly", priority: "0.7", lastmod: today }));
+    (row.case_studies || []).forEach((c) => c?.id && out.push({ path: `/case-studies/${c.id}`, changefreq: "monthly", priority: "0.7", lastmod: today }));
+    (row.custom_pages || []).filter((p) => p.published && p.slug).forEach((p) =>
+      out.push({ path: `/${p.parent ? p.parent + "/" : ""}${p.slug}`, changefreq: "monthly", priority: "0.6", lastmod: today }),
+    );
+    return out;
+  } catch {
+    return [];
+  }
+}
 
 function generateSitemap(entries: SitemapEntry[]) {
   const urls = entries.map((e) =>
@@ -60,5 +88,9 @@ function generateSitemap(entries: SitemapEntry[]) {
   ].join("\n");
 }
 
-writeFileSync(resolve("public/sitemap.xml"), generateSitemap(entries));
-console.log(`sitemap.xml written (${entries.length} entries)`);
+(async () => {
+  const dynamicEntries = await fetchDynamicEntries();
+  const entries = [...staticEntries, ...blogEntries, ...dynamicEntries];
+  writeFileSync(resolve("public/sitemap.xml"), generateSitemap(entries));
+  console.log(`sitemap.xml written (${entries.length} entries)`);
+})();
