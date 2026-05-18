@@ -1122,10 +1122,56 @@ const AdminDashboard = () => {
                     );
                   })()}
 
+                  {/* PROJECTS group */}
+                  {(() => {
+                    const isOpen = openGroups["projects"] ?? true;
+                    return (
+                      <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, projects: v }))}>
+                        <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                          <ImgIcon className="h-3.5 w-3.5 text-accent" />
+                          <span className="flex-1 truncate">Projects</span>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{1 + portfolio.length}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
+                            <li>
+                              <button onClick={() => setActivePage("portfolio")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "portfolio" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <FileText className="h-3 w-3 opacity-60" />
+                                <span className="truncate">Projects page</span>
+                              </button>
+                            </li>
+                            {portfolio.map((it) => (
+                              <li key={it.id}>
+                                <button onClick={() => setActivePage(`proj:${it.id}`)}
+                                  className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `proj:${it.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                  <FileEdit className="h-3 w-3 opacity-60" />
+                                  <span className="truncate flex-1">{it.title || "Untitled"}</span>
+                                </button>
+                              </li>
+                            ))}
+                            <li>
+                              <button onClick={() => {
+                                const id = Date.now().toString();
+                                addPortfolioItem({ image: "", imageAlt: "", tag: "New tag", title: "New project", description: "", body: "" });
+                                setTimeout(() => setActivePage(`proj:${id}`), 0);
+                                toast.success("Project added");
+                              }}
+                                className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 transition-colors">
+                                <Plus className="h-3 w-3" /> Add project
+                              </button>
+                            </li>
+                          </ul>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    );
+                  })()}
+
                   {/* Other built-in pages */}
                   {(() => {
                     const isOpen = openGroups["other"] ?? true;
-                    const others = ["about", "portfolio", "testimonials", "contact"];
+                    const others = ["testimonials", "contact"];
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, other: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
