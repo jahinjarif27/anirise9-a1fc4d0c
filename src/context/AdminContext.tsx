@@ -521,7 +521,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
         supabase.from("blog_posts").select("*").order("date", { ascending: false }),
         supabase.from("leads").select("*").order("created_at", { ascending: false }),
-        supabase.from("page_visits").select("created_at").gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString()),
+        supabase.from("page_visits").select("created_at, visitor_id").gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString()),
         supabase.from("reviews").select("*").order("created_at", { ascending: false }),
       ]);
       if (!alive) return;
@@ -561,18 +561,22 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         createdAt: new Date(r.created_at).getTime(),
       })));
       if (visitsRes.data) {
-        setVisits(visitsRes.data.length);
-        // group by day for last 14 days
-        const buckets: Record<string, number> = {};
+        // Unique visitors (30d): distinct visitor_id, falling back to row id for legacy rows.
+        const uniqueIds = new Set<string>();
+        visitsRes.data.forEach((v: any, i: number) => uniqueIds.add(v.visitor_id || `legacy-${i}`));
+        setVisits(uniqueIds.size);
+
+        // Daily unique visitors for last 14 days
+        const buckets: Record<string, Set<string>> = {};
         for (let i = 13; i >= 0; i--) {
           const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-          buckets[d] = 0;
+          buckets[d] = new Set();
         }
-        visitsRes.data.forEach((v: any) => {
+        visitsRes.data.forEach((v: any, i: number) => {
           const d = new Date(v.created_at).toISOString().slice(0, 10);
-          if (d in buckets) buckets[d]++;
+          if (d in buckets) buckets[d].add(v.visitor_id || `legacy-${i}`);
         });
-        setVisitSeries(Object.entries(buckets).map(([day, visits]) => ({ day: day.slice(5), visits })));
+        setVisitSeries(Object.entries(buckets).map(([day, set]) => ({ day: day.slice(5), visits: set.size })));
       }
 
       setLoading(false);

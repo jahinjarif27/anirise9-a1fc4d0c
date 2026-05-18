@@ -104,18 +104,21 @@ export type Database = {
           id: string
           path: string
           user_agent: string | null
+          visitor_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           path: string
           user_agent?: string | null
+          visitor_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           path?: string
           user_agent?: string | null
+          visitor_id?: string | null
         }
         Relationships: []
       }
