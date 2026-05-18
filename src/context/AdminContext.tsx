@@ -60,11 +60,22 @@ export type ProjectChartPoint = { id: string; label: string; value: number };
 export type ProjectChart = { title?: string; type: "area" | "bar"; data: ProjectChartPoint[] };
 export type GalleryImage = { id: string; image: string; alt: string };
 
+export const PROJECT_CATEGORIES = [
+  "Website SEO",
+  "Ecommerce SEO",
+  "Website Development",
+  "Social Media Marketing",
+  "Graphics Design",
+  "Digital Marketing",
+] as const;
+export type ProjectCategory = typeof PROJECT_CATEGORIES[number];
+
 export type PortfolioItem = {
   id: string;
   image: string;
   imageAlt: string;
   tag: string;
+  category?: string;
   title: string;
   description?: string;
   body?: string;
@@ -291,6 +302,7 @@ const defaultPortfolio: PortfolioItem[] = [
     image: portfolio1,
     imageAlt: "Ecommerce SEO case study cover",
     tag: "Ecommerce SEO",
+    category: "Ecommerce SEO",
     title: "Online Store Growth",
     description: "Shopify store er full SEO overhaul — product schema, faceted nav fix, ar conversion-focused copy diye revenue dramatic boost.",
     eyebrow: "Shopify · Fashion retail",
@@ -347,7 +359,8 @@ const defaultPortfolio: PortfolioItem[] = [
     id: "p2",
     image: portfolio2,
     imageAlt: "SEO analytics dashboard preview",
-    tag: "SEO Analytics",
+    tag: "Website SEO",
+    category: "Website SEO",
     title: "Ranked Page #1 in 90 Days",
     description: "Competitive B2B SaaS keyword er jonno 90-din-er sprint — content cluster + digital PR diye position #1.",
     eyebrow: "B2B SaaS · 90-day sprint",
@@ -401,7 +414,8 @@ const defaultPortfolio: PortfolioItem[] = [
     id: "p3",
     image: portfolio3,
     imageAlt: "Brand website redesign mockup",
-    tag: "Web Development",
+    tag: "Website Development",
+    category: "Website Development",
     title: "Brand Website Redesign",
     description: "Legacy WordPress site theke modern headless Next.js stack e migration — speed, conversion ar SEO all-in-one.",
     eyebrow: "Web · Headless rebuild",

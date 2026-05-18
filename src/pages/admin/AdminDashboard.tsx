@@ -26,7 +26,7 @@ import { ServiceContentEditor } from "@/components/admin/ServiceContentEditor";
 import { Switch } from "@/components/ui/switch";
 import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
-import { SECTION_KEYS, SectionKey } from "@/context/AdminContext";
+import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES } from "@/context/AdminContext";
 
 const visitData = Array.from({ length: 14 }, (_, i) => ({
   day: `D${i + 1}`,
@@ -794,7 +794,15 @@ const AdminDashboard = () => {
 
             <div className="grid sm:grid-cols-2 gap-3">
               <Field label="Title"><Input value={it.title} onChange={(e) => updatePortfolioItem(it.id, { title: e.target.value })} /></Field>
-              <Field label="Tag / category"><Input value={it.tag} onChange={(e) => updatePortfolioItem(it.id, { tag: e.target.value })} /></Field>
+              <Field label="Tag (badge on card)"><Input value={it.tag} onChange={(e) => updatePortfolioItem(it.id, { tag: e.target.value })} /></Field>
+              <Field label="Category (for filter tabs)">
+                <Select value={it.category || ""} onValueChange={(v) => updatePortfolioItem(it.id, { category: v })}>
+                  <SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger>
+                  <SelectContent>
+                    {PROJECT_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </Field>
               <Field label="Eyebrow (small label above title)"><Input value={it.eyebrow || ""} onChange={(e) => updatePortfolioItem(it.id, { eyebrow: e.target.value })} placeholder="e.g. Shopify · Fashion retail" /></Field>
               <Field label="Live URL (optional)"><Input value={it.liveUrl || ""} onChange={(e) => updatePortfolioItem(it.id, { liveUrl: e.target.value })} placeholder="https://..." /></Field>
               <Field label="Client"><Input value={it.client || ""} onChange={(e) => updatePortfolioItem(it.id, { client: e.target.value })} /></Field>
