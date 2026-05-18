@@ -19,14 +19,7 @@ export const CustomPageView = () => {
     image: page?.image || undefined,
   });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="pt-32 pb-16" />
-      </div>
-    );
-  }
+  if (loading) return null;
   if (!page) return <NotFound />;
   return (
     <div className="min-h-screen bg-background">
