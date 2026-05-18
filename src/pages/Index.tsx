@@ -22,7 +22,7 @@ const Index = () => {
   const { pageLocation, homeSections, customPages, homeBlocks, seo, loading } = useAdmin();
   const [minDelay, setMinDelay] = useState(true);
   useEffect(() => {
-    const t = setTimeout(() => setMinDelay(false), 600);
+    const t = setTimeout(() => setMinDelay(false), 300);
     return () => clearTimeout(t);
   }, []);
   const showLoader = loading || minDelay;
