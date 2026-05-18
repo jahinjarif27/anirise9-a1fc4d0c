@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useAdmin } from "@/context/AdminContext";
 
 export const Contact = () => {
-  const { content, contact, addLead } = useAdmin();
+  const { content, contact } = useAdmin();
   const [form, setForm] = useState({ name: "", email: "", phone: "", service: "", message: "" });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -21,14 +21,19 @@ export const Contact = () => {
       toast.error("Please enter a valid phone number.");
       return;
     }
-    addLead({
-      name: form.name.trim().slice(0, 100),
-      email: form.email.trim().slice(0, 255),
-      phone: phoneDigits.slice(0, 20),
-      service: form.service.trim().slice(0, 100),
-      message: form.message.trim().slice(0, 1000),
-    });
-    toast.success("Message sent! We'll get back to you within 24 hours.");
+    const subject = `New enquiry from ${form.name.trim()}${form.service ? ` — ${form.service.trim()}` : ""}`;
+    const body = [
+      `Name: ${form.name.trim()}`,
+      `Email: ${form.email.trim()}`,
+      `Phone: ${phoneDigits}`,
+      `Service: ${form.service.trim() || "-"}`,
+      "",
+      "Message:",
+      form.message.trim(),
+    ].join("\n");
+    const to = contact.email || "hello@anirise.com";
+    window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    toast.success("Opening your email app to send the message.");
     setForm({ name: "", email: "", phone: "", service: "", message: "" });
   };
 
