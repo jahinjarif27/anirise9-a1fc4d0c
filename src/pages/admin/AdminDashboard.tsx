@@ -51,6 +51,24 @@ const SITE_PAGES = [
   { key: "contact", label: "Contact" },
 ];
 
+const HOME_BLOCKS = [
+  { key: "trustStrip", label: "Trust strip" },
+  { key: "stats", label: "Stats band" },
+  { key: "servicesPreview", label: "Services preview" },
+  { key: "caseStudies", label: "Case studies" },
+  { key: "homeFaq", label: "Home FAQ" },
+  { key: "finalCta", label: "Final CTA" },
+] as const;
+
+const SITE_SERVICES = [
+  { slug: "website-seo", label: "Website SEO" },
+  { slug: "ecommerce-seo", label: "Ecommerce SEO" },
+  { slug: "graphics-design", label: "Graphics Design" },
+  { slug: "website-development", label: "Website Development" },
+  { slug: "social-media-marketing", label: "Social Media Marketing" },
+  { slug: "digital-marketing", label: "Digital Marketing" },
+];
+
 const AdminDashboard = () => {
   const {
     isAuthed, logout, posts, addPost, updatePost, deletePost,
