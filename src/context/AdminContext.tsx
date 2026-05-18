@@ -148,7 +148,32 @@ export const SECTION_KEYS: SectionKey[] = ["hero", "services", "about", "portfol
 export type FaqItem = { id: string; question: string; answer: string };
 export type StatItem = { id: string; value: string; label: string };
 export type TrustLogo = { id: string; name: string; image: string };
-export type CaseStudy = { id: string; title: string; metric: string; description: string; image: string; link: string; imageAlt?: string; body?: string };
+export type CaseStudyStat = { id: string; label: string; value: string };
+export type CaseStudyTable = { title?: string; headers: string[]; rows: string[][] };
+export type CaseStudyChartPoint = { id: string; label: string; value: number };
+export type CaseStudyChart = { title?: string; type: "bar" | "line"; data: CaseStudyChartPoint[] };
+export type CaseStudy = {
+  id: string;
+  title: string;
+  metric: string;
+  description: string;
+  image: string;
+  link: string;
+  imageAlt?: string;
+  body?: string;
+  // rich detail page fields (all optional)
+  eyebrow?: string;
+  intro?: string;
+  client?: string;
+  industry?: string;
+  duration?: string;
+  challenge?: string;
+  solution?: string;
+  results?: string;
+  stats?: CaseStudyStat[];
+  table?: CaseStudyTable;
+  chart?: CaseStudyChart;
+};
 export type ServicePreview = { image: string; imageAlt: string };
 export type FinalCta = {
   headline: string;
@@ -360,8 +385,86 @@ const defaultTrustLogos: TrustLogo[] = [
 ];
 
 const defaultCaseStudies: CaseStudy[] = [
-  { id: "cs1", title: "Local Brand SEO Sprint", metric: "+180% organic traffic", description: "3 maser moddhe organic traffic prai 3x — high-intent keyword targeting and on-page optimization e.", image: portfolio1, link: "/portfolio" },
-  { id: "cs2", title: "Ecommerce Revenue Lift", metric: "3x leads", description: "Product schema + category restructure er moddhe lead 3 gun briddhi.", image: portfolio2, link: "/portfolio" },
+  {
+    id: "cs1",
+    title: "Local Brand SEO Sprint",
+    metric: "+180% organic traffic",
+    description: "3 maser moddhe organic traffic prai 3x — high-intent keyword targeting and on-page optimization e.",
+    image: portfolio1,
+    link: "/portfolio",
+    eyebrow: "SEO case study",
+    intro: "Ekta local lifestyle brand-er jonno 90-din-er sprint — technical fix, content cluster ar link strategy diye organic traffic prai tin gun kora hoyeche.",
+    client: "Local Lifestyle Brand",
+    industry: "D2C / Retail",
+    duration: "90 days",
+    challenge: "Brand-er site rank korchhilo na top 50 te-o, page speed kharap chhilo ar product page-e proper schema chhilo na.",
+    solution: "Full technical audit, on-page rewrite, internal linking restructure, ar 12 ta high-intent blog cluster publish kora hoyeche.",
+    results: "3 maser moddhe organic traffic 2.8x, top-10 keyword 4 theke 38 te giyeche, ar lead form submission proti maashe doubled.",
+    stats: [
+      { id: "s1", label: "Organic traffic", value: "+180%" },
+      { id: "s2", label: "Top-10 keywords", value: "4 → 38" },
+      { id: "s3", label: "Monthly leads", value: "2x" },
+      { id: "s4", label: "Bounce rate", value: "-22%" },
+    ],
+    table: {
+      title: "Before vs After (90 days)",
+      headers: ["Metric", "Before", "After"],
+      rows: [
+        ["Organic sessions / mo", "3,200", "8,950"],
+        ["Indexed pages", "42", "118"],
+        ["Avg. position", "47", "14"],
+        ["Domain authority", "12", "24"],
+      ],
+    },
+    chart: {
+      title: "Monthly organic sessions",
+      type: "line",
+      data: [
+        { id: "m1", label: "Mo 1", value: 3200 },
+        { id: "m2", label: "Mo 2", value: 4100 },
+        { id: "m3", label: "Mo 3", value: 8950 },
+      ],
+    },
+  },
+  {
+    id: "cs2",
+    title: "Ecommerce Revenue Lift",
+    metric: "3x leads",
+    description: "Product schema + category restructure er moddhe lead 3 gun briddhi.",
+    image: portfolio2,
+    link: "/portfolio",
+    eyebrow: "Ecommerce case study",
+    intro: "Ekta multi-category ecommerce store-er jonno schema implementation, category restructure ar conversion-focused CRO diye revenue track e ene fela hoyeche.",
+    client: "Multi-category Ecommerce",
+    industry: "Ecommerce",
+    duration: "120 days",
+    challenge: "Category pages indexing problem, duplicate meta, ar checkout funnel-e high drop-off chhilo.",
+    solution: "Product/Category schema, canonical fix, category URL restructure, ar checkout simplification.",
+    results: "Lead 3x, revenue per visitor 64% briddhi, ar cart abandonment 18% kome.",
+    stats: [
+      { id: "s1", label: "Leads", value: "3x" },
+      { id: "s2", label: "Revenue / visitor", value: "+64%" },
+      { id: "s3", label: "Cart abandonment", value: "-18%" },
+    ],
+    table: {
+      title: "Quarterly impact",
+      headers: ["Quarter", "Sessions", "Conversions", "Revenue"],
+      rows: [
+        ["Q1", "12,400", "184", "৳2.1L"],
+        ["Q2", "21,800", "412", "৳4.8L"],
+        ["Q3", "34,200", "742", "৳9.2L"],
+      ],
+    },
+    chart: {
+      title: "Quarterly conversions",
+      type: "bar",
+      data: [
+        { id: "q1", label: "Q1", value: 184 },
+        { id: "q2", label: "Q2", value: 412 },
+        { id: "q3", label: "Q3", value: 742 },
+      ],
+    },
+  },
 ];
 
 const defaultFinalCta: FinalCta = {
