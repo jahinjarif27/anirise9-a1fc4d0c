@@ -166,7 +166,7 @@ const AdminDashboard = () => {
   const [device, setDevice] = useState<DeviceKey>("desktop");
   const [blogMode, setBlogMode] = useState<"simple" | "editor">("simple");
   const [activePage, setActivePage] = useState<string>("hero");
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ home: true });
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const previewWrapRef = useRef<HTMLDivElement>(null);
   const [wrapWidth, setWrapWidth] = useState(1000);
 
@@ -963,7 +963,7 @@ const AdminDashboard = () => {
                 <div className="p-2 space-y-1">
                   {/* HOME page group */}
                   {(() => {
-                    const isOpen = openGroups["home"] ?? true;
+                    const isOpen = openGroups["home"] ?? false;
                     const customHomeSections = homeSections.filter((s) => (s.groupKey ?? "home") === "home" || !s.groupKey);
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, home: v }))}>
@@ -1039,7 +1039,7 @@ const AdminDashboard = () => {
 
                   {/* SERVICES group */}
                   {(() => {
-                    const isOpen = openGroups["services"] ?? true;
+                    const isOpen = openGroups["services"] ?? false;
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, services: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
@@ -1079,7 +1079,7 @@ const AdminDashboard = () => {
 
                   {/* PROJECTS group */}
                   {(() => {
-                    const isOpen = openGroups["projects"] ?? true;
+                    const isOpen = openGroups["projects"] ?? false;
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, projects: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
@@ -1125,7 +1125,7 @@ const AdminDashboard = () => {
 
                   {/* Other built-in pages */}
                   {(() => {
-                    const isOpen = openGroups["other"] ?? true;
+                    const isOpen = openGroups["other"] ?? false;
                     const others = ["testimonials", "contact"];
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, other: v }))}>
@@ -1157,7 +1157,7 @@ const AdminDashboard = () => {
 
                   {/* Custom pages */}
                   {(() => {
-                    const isOpen = openGroups["custom"] ?? true;
+                    const isOpen = openGroups["custom"] ?? false;
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, custom: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
