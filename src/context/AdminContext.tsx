@@ -549,6 +549,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (Array.isArray(sa.trust_logos) && sa.trust_logos.length) setTrustLogos(sa.trust_logos);
         if (Array.isArray(sa.case_studies) && sa.case_studies.length) setCaseStudies(sa.case_studies);
         if (sa.final_cta && Object.keys(sa.final_cta).length) setFinalCta({ ...defaultFinalCta, ...sa.final_cta });
+        if (sa.service_previews && Object.keys(sa.service_previews).length) setServicePreviews(sa.service_previews);
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
       if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
