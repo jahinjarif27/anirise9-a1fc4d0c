@@ -466,6 +466,164 @@ const AdminDashboard = () => {
       </div>
     );
 
+    // Home builder block editors (sub-pages of the Home page)
+    if (activePage.startsWith("hb:")) {
+      const blockKey = activePage.slice(3) as typeof HOME_BLOCKS[number]["key"];
+      const meta = HOME_BLOCKS.find((b) => b.key === blockKey);
+      if (!meta) return <p className="text-sm text-muted-foreground">Block not found.</p>;
+      const enabledToggle = (
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
+          <Switch checked={homeBlocks[blockKey]} onCheckedChange={(v) => { setHomeBlock(blockKey, v); toast.success("Updated"); }} />
+          <span className="text-sm font-medium">{homeBlocks[blockKey] ? "Visible" : "Hidden"}</span>
+        </div>
+      );
+
+      const Wrap = ({ children, subtitle }: { children: React.ReactNode; subtitle: string }) => (
+        <Card className="p-5 sm:p-6 space-y-4">
+          <SectionHeader icon={Layers} title={meta.label} subtitle={subtitle} action={enabledToggle} />
+          {children}
+        </Card>
+      );
+
+      if (blockKey === "trustStrip") return (
+        <Wrap subtitle="Client logos / brand names marquee on the home page.">
+          <div className="flex justify-end">
+            <Button size="sm" onClick={() => { addTrustLogo({ name: "New Brand", image: "" }); toast.success("Logo added"); }}><Plus className="h-4 w-4" /> Add logo</Button>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {trustLogos.map((t) => (
+              <div key={t.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                <Input placeholder="Brand name" value={t.name} onChange={(e) => updateTrustLogo(t.id, { name: e.target.value })} />
+                <ImageUpload value={t.image} onChange={(url) => updateTrustLogo(t.id, { image: url })} />
+                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteTrustLogo(t.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+              </div>
+            ))}
+          </div>
+        </Wrap>
+      );
+
+      if (blockKey === "stats") return (
+        <Wrap subtitle='Boro number gula (e.g. "15+" / "Projects Delivered").'>
+          <div className="flex justify-end">
+            <Button size="sm" onClick={() => { addStat({ value: "0+", label: "New metric" }); toast.success("Stat added"); }}><Plus className="h-4 w-4" /> Add stat</Button>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {stats.map((s) => (
+              <div key={s.id} className="p-3 rounded-xl border border-border/60 bg-card grid grid-cols-[100px_1fr_auto] gap-2 items-center">
+                <Input value={s.value} onChange={(e) => updateStat(s.id, { value: e.target.value })} placeholder="Value" />
+                <Input value={s.label} onChange={(e) => updateStat(s.id, { label: e.target.value })} placeholder="Label" />
+                <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteStat(s.id)}><Trash2 className="h-4 w-4" /></Button>
+              </div>
+            ))}
+          </div>
+        </Wrap>
+      );
+
+      if (blockKey === "servicesPreview") return (
+        <Wrap subtitle="Auto-scrolling services cards section. Card content comes from the Services list.">
+          <p className="text-sm text-muted-foreground">Edit the section title/intro from the <button className="text-accent underline" onClick={() => setActivePage("services")}>Services page</button>. Individual cards come from code.</p>
+        </Wrap>
+      );
+
+      if (blockKey === "caseStudies") return (
+        <Wrap subtitle="2–3 ta best work with metric.">
+          <div className="flex justify-end">
+            <Button size="sm" onClick={() => { addCaseStudy({ title: "New case study", metric: "+100%", description: "", image: "", link: "/portfolio" }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add case study</Button>
+          </div>
+          <div className="space-y-3">
+            {caseStudies.map((c) => (
+              <div key={c.id} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
+                <div className="grid sm:grid-cols-2 gap-2">
+                  <Input value={c.title} onChange={(e) => updateCaseStudy(c.id, { title: e.target.value })} placeholder="Title" />
+                  <Input value={c.metric} onChange={(e) => updateCaseStudy(c.id, { metric: e.target.value })} placeholder="Metric (e.g. +180% traffic)" />
+                </div>
+                <Textarea value={c.description} onChange={(e) => updateCaseStudy(c.id, { description: e.target.value })} placeholder="Short description" rows={2} />
+                <Input value={c.link} onChange={(e) => updateCaseStudy(c.id, { link: e.target.value })} placeholder="Link URL (e.g. /portfolio)" />
+                <ImageUpload value={c.image} onChange={(url) => updateCaseStudy(c.id, { image: url })} />
+                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+              </div>
+            ))}
+          </div>
+        </Wrap>
+      );
+
+      if (blockKey === "homeFaq") return (
+        <Wrap subtitle="Brand/general questions on the home page.">
+          <div className="flex justify-end">
+            <Button size="sm" onClick={() => { addHomeFaq({ question: "New question?", answer: "Answer..." }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add FAQ</Button>
+          </div>
+          <div className="space-y-3">
+            {homeFaqs.map((f) => (
+              <div key={f.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                <Input value={f.question} onChange={(e) => updateHomeFaq(f.id, { question: e.target.value })} placeholder="Question" />
+                <Textarea value={f.answer} onChange={(e) => updateHomeFaq(f.id, { answer: e.target.value })} placeholder="Answer" rows={2} />
+                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteHomeFaq(f.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+              </div>
+            ))}
+          </div>
+        </Wrap>
+      );
+
+      if (blockKey === "finalCta") return (
+        <Wrap subtitle="Bottom-of-page banner with primary + secondary CTAs.">
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div className="sm:col-span-2"><Field label="Headline"><Input value={finalCta.headline} onChange={(e) => updateFinalCta({ headline: e.target.value })} /></Field></div>
+            <div className="sm:col-span-2"><Field label="Subline"><Textarea rows={2} value={finalCta.subline} onChange={(e) => updateFinalCta({ subline: e.target.value })} /></Field></div>
+            <Field label="Primary button label"><Input value={finalCta.primaryLabel} onChange={(e) => updateFinalCta({ primaryLabel: e.target.value })} /></Field>
+            <Field label="Primary button URL"><Input value={finalCta.primaryUrl} onChange={(e) => updateFinalCta({ primaryUrl: e.target.value })} /></Field>
+            <Field label="Secondary button label"><Input value={finalCta.secondaryLabel} onChange={(e) => updateFinalCta({ secondaryLabel: e.target.value })} /></Field>
+            <Field label="Secondary button URL"><Input value={finalCta.secondaryUrl} onChange={(e) => updateFinalCta({ secondaryUrl: e.target.value })} /></Field>
+          </div>
+        </Wrap>
+      );
+
+      return null;
+    }
+
+    // Service page editors
+    if (activePage.startsWith("svc:")) {
+      const slug = activePage.slice(4);
+      const svc = SITE_SERVICES.find((s) => s.slug === slug);
+      if (!svc) return <p className="text-sm text-muted-foreground">Service not found.</p>;
+      const faqs = serviceFaqs[slug] || [];
+      return (
+        <div className="space-y-4">
+          <Card className="p-5 sm:p-6 space-y-4">
+            <SectionHeader
+              icon={Layers}
+              title={svc.label}
+              subtitle={`Service page — /services/${slug}`}
+              action={
+                <Button asChild variant="outline" size="sm"><Link to={`/services/${slug}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
+              }
+            />
+            <p className="text-sm text-muted-foreground">Page layout & copy are managed in code. Use the FAQ editor below to add/edit questions shown on this service page.</p>
+          </Card>
+
+          <Card className="p-5 sm:p-6 space-y-4">
+            <SectionHeader
+              icon={FileText}
+              title="Service FAQ"
+              subtitle={`${faqs.length} question${faqs.length === 1 ? "" : "s"}`}
+              action={
+                <Button size="sm" onClick={() => { addServiceFaq(slug, { question: "New question?", answer: "Answer..." }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add FAQ</Button>
+              }
+            />
+            <div className="space-y-3">
+              {faqs.map((f) => (
+                <div key={f.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                  <Input value={f.question} onChange={(e) => updateServiceFaq(slug, f.id, { question: e.target.value })} placeholder="Question" />
+                  <Textarea value={f.answer} onChange={(e) => updateServiceFaq(slug, f.id, { answer: e.target.value })} placeholder="Answer" rows={2} />
+                  <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteServiceFaq(slug, f.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
+                </div>
+              ))}
+              {!faqs.length && <p className="text-xs text-muted-foreground">No FAQs yet. Add one to get started.</p>}
+            </div>
+          </Card>
+        </div>
+      );
+    }
+
     const builtInPages: Record<string, { icon: any; title: string; subtitle: string; fields: { label: string; key: string; multiline?: boolean }[]; image?: { label: string; key: string; altKey: string; aspect: string } }> = {
       hero: {
         icon: Sparkles, title: "Hero section", subtitle: "Top-of-page headline and intro",
