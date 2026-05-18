@@ -774,28 +774,161 @@ const AdminDashboard = () => {
       const pid = activePage.slice(5);
       const it = portfolio.find((x) => x.id === pid);
       if (!it) return <p className="text-sm text-muted-foreground">Project not found.</p>;
+      const metrics = it.metrics || [];
+      const deliverables = it.deliverables || [];
+      const techStack = it.techStack || [];
+      const gallery = it.gallery || [];
+      const table = it.table || { title: "", headers: ["Metric", "Before", "After"], rows: [["", "", ""]] };
+      const chart = it.chart || { title: "", type: "area" as const, data: [] };
+      const updateTable = (patch: Partial<typeof table>) => updatePortfolioItem(it.id, { table: { ...table, ...patch } });
+      const updateChart = (patch: Partial<typeof chart>) => updatePortfolioItem(it.id, { chart: { ...chart, ...patch } });
       return (
         <div className="space-y-4">
-          <Card className="p-5 sm:p-6 space-y-4">
+          <Card className="p-5 sm:p-6 space-y-5">
             <SectionHeader
               icon={ImgIcon}
               title={it.title || "Untitled project"}
               subtitle={`Project detail page — /portfolio/${it.id}`}
-              action={
-                <Button asChild variant="outline" size="sm"><Link to={`/portfolio/${it.id}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
-              }
+              action={<Button asChild variant="outline" size="sm"><Link to={`/portfolio/${it.id}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>}
             />
+
             <div className="grid sm:grid-cols-2 gap-3">
               <Field label="Title"><Input value={it.title} onChange={(e) => updatePortfolioItem(it.id, { title: e.target.value })} /></Field>
               <Field label="Tag / category"><Input value={it.tag} onChange={(e) => updatePortfolioItem(it.id, { tag: e.target.value })} /></Field>
+              <Field label="Eyebrow (small label above title)"><Input value={it.eyebrow || ""} onChange={(e) => updatePortfolioItem(it.id, { eyebrow: e.target.value })} placeholder="e.g. Shopify · Fashion retail" /></Field>
+              <Field label="Live URL (optional)"><Input value={it.liveUrl || ""} onChange={(e) => updatePortfolioItem(it.id, { liveUrl: e.target.value })} placeholder="https://..." /></Field>
+              <Field label="Client"><Input value={it.client || ""} onChange={(e) => updatePortfolioItem(it.id, { client: e.target.value })} /></Field>
+              <Field label="Role"><Input value={it.role || ""} onChange={(e) => updatePortfolioItem(it.id, { role: e.target.value })} placeholder="e.g. Lead SEO & CRO partner" /></Field>
+              <Field label="Timeline"><Input value={it.timeline || ""} onChange={(e) => updatePortfolioItem(it.id, { timeline: e.target.value })} placeholder="e.g. 10 weeks" /></Field>
             </div>
+
             <ImageUpload label="Cover image" value={it.image} onChange={(v) => updatePortfolioItem(it.id, { image: v })} aspect="aspect-[4/3]" altValue={it.imageAlt} onAltChange={(v) => updatePortfolioItem(it.id, { imageAlt: v })} />
-            <Field label="Short description (card + detail intro)">
-              <Textarea rows={3} value={it.description || ""} onChange={(e) => updatePortfolioItem(it.id, { description: e.target.value })} />
+
+            <Field label="Short description (card + summary)">
+              <Textarea rows={2} value={it.description || ""} onChange={(e) => updatePortfolioItem(it.id, { description: e.target.value })} />
             </Field>
-            <Field label="Full content (shown on detail page)">
-              <Textarea rows={10} placeholder="Full case content. Plain text or basic Markdown." value={it.body || ""} onChange={(e) => updatePortfolioItem(it.id, { body: e.target.value })} />
+            <Field label="Intro / lead paragraph (big text under title)">
+              <Textarea rows={3} value={it.intro || ""} onChange={(e) => updatePortfolioItem(it.id, { intro: e.target.value })} />
             </Field>
+
+            <div className="grid sm:grid-cols-3 gap-3">
+              <Field label="Overview"><Textarea rows={5} value={it.overview || ""} onChange={(e) => updatePortfolioItem(it.id, { overview: e.target.value })} /></Field>
+              <Field label="Approach"><Textarea rows={5} value={it.approach || ""} onChange={(e) => updatePortfolioItem(it.id, { approach: e.target.value })} /></Field>
+              <Field label="Outcome"><Textarea rows={5} value={it.outcome || ""} onChange={(e) => updatePortfolioItem(it.id, { outcome: e.target.value })} /></Field>
+            </div>
+
+            {/* Tech stack */}
+            <div className="space-y-2 border-t border-border/60 pt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">Tech stack (chips)</p>
+                <Button size="sm" variant="outline" onClick={() => updatePortfolioItem(it.id, { techStack: [...techStack, ""] })}><Plus className="h-3 w-3" /> Add tech</Button>
+              </div>
+              {techStack.map((t, idx) => (
+                <div key={idx} className="flex gap-2">
+                  <Input value={t} onChange={(e) => { const next = [...techStack]; next[idx] = e.target.value; updatePortfolioItem(it.id, { techStack: next }); }} placeholder="e.g. Next.js" />
+                  <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updatePortfolioItem(it.id, { techStack: techStack.filter((_, i) => i !== idx) })}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              ))}
+            </div>
+
+            {/* Deliverables */}
+            <div className="space-y-2 border-t border-border/60 pt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">Deliverables (checklist)</p>
+                <Button size="sm" variant="outline" onClick={() => updatePortfolioItem(it.id, { deliverables: [...deliverables, ""] })}><Plus className="h-3 w-3" /> Add item</Button>
+              </div>
+              {deliverables.map((d, idx) => (
+                <div key={idx} className="flex gap-2">
+                  <Input value={d} onChange={(e) => { const next = [...deliverables]; next[idx] = e.target.value; updatePortfolioItem(it.id, { deliverables: next }); }} placeholder="e.g. Figma design system" />
+                  <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updatePortfolioItem(it.id, { deliverables: deliverables.filter((_, i) => i !== idx) })}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              ))}
+            </div>
+
+            {/* Metrics */}
+            <div className="space-y-2 border-t border-border/60 pt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">Metric cards (big numbers)</p>
+                <Button size="sm" variant="outline" onClick={() => updatePortfolioItem(it.id, { metrics: [...metrics, { id: `m${Date.now()}`, label: "New metric", value: "+0%" }] })}><Plus className="h-3 w-3" /> Add metric</Button>
+              </div>
+              {metrics.map((s, idx) => (
+                <div key={s.id} className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                  <Input value={s.value} onChange={(e) => { const next = [...metrics]; next[idx] = { ...s, value: e.target.value }; updatePortfolioItem(it.id, { metrics: next }); }} placeholder="Value (+180%)" />
+                  <Input value={s.label} onChange={(e) => { const next = [...metrics]; next[idx] = { ...s, label: e.target.value }; updatePortfolioItem(it.id, { metrics: next }); }} placeholder="Label" />
+                  <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updatePortfolioItem(it.id, { metrics: metrics.filter((x) => x.id !== s.id) })}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              ))}
+            </div>
+
+            {/* Chart */}
+            <div className="space-y-2 border-t border-border/60 pt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">Chart</p>
+                <div className="flex items-center gap-2">
+                  <select className="text-xs rounded-md border border-input bg-background px-2 py-1" value={chart.type} onChange={(e) => updateChart({ type: e.target.value as "area" | "bar" })}>
+                    <option value="area">Area</option>
+                    <option value="bar">Bar</option>
+                  </select>
+                  <Button size="sm" variant="outline" onClick={() => updateChart({ data: [...chart.data, { id: `p${Date.now()}`, label: "New", value: 0 }] })}><Plus className="h-3 w-3" /> Add point</Button>
+                </div>
+              </div>
+              <Input value={chart.title || ""} onChange={(e) => updateChart({ title: e.target.value })} placeholder="Chart title" />
+              {chart.data.map((pt, idx) => (
+                <div key={pt.id} className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                  <Input value={pt.label} onChange={(e) => { const next = [...chart.data]; next[idx] = { ...pt, label: e.target.value }; updateChart({ data: next }); }} placeholder="Label" />
+                  <Input type="number" value={pt.value} onChange={(e) => { const next = [...chart.data]; next[idx] = { ...pt, value: Number(e.target.value) }; updateChart({ data: next }); }} placeholder="Value" />
+                  <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updateChart({ data: chart.data.filter((x) => x.id !== pt.id) })}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              ))}
+            </div>
+
+            {/* Table */}
+            <div className="space-y-2 border-t border-border/60 pt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">Comparison table</p>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" onClick={() => updateTable({ headers: [...table.headers, "Col"], rows: table.rows.map((r) => [...r, ""]) })}><Plus className="h-3 w-3" /> Column</Button>
+                  <Button size="sm" variant="outline" onClick={() => updateTable({ rows: [...table.rows, table.headers.map(() => "")] })}><Plus className="h-3 w-3" /> Row</Button>
+                </div>
+              </div>
+              <Input value={table.title || ""} onChange={(e) => updateTable({ title: e.target.value })} placeholder="Table title" />
+              <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${table.headers.length}, minmax(0,1fr)) auto` }}>
+                {table.headers.map((h, i) => (
+                  <Input key={`h${i}`} value={h} onChange={(e) => { const next = [...table.headers]; next[i] = e.target.value; updateTable({ headers: next }); }} placeholder={`Header ${i + 1}`} className="font-semibold" />
+                ))}
+                <div />
+                {table.rows.map((row, ri) => (
+                  <Fragment key={`r${ri}`}>
+                    {table.headers.map((_, ci) => (
+                      <Input key={`r${ri}c${ci}`} value={row[ci] || ""} onChange={(e) => { const next = table.rows.map((r) => [...r]); next[ri][ci] = e.target.value; updateTable({ rows: next }); }} placeholder="..." />
+                    ))}
+                    <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updateTable({ rows: table.rows.filter((_, i) => i !== ri) })}><Trash2 className="h-4 w-4" /></Button>
+                  </Fragment>
+                ))}
+              </div>
+              {table.headers.length > 1 && (
+                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => updateTable({ headers: table.headers.slice(0, -1), rows: table.rows.map((r) => r.slice(0, -1)) })}><Trash2 className="h-3 w-3" /> Remove last column</Button>
+              )}
+            </div>
+
+            {/* Gallery */}
+            <div className="space-y-2 border-t border-border/60 pt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">Gallery images</p>
+                <Button size="sm" variant="outline" onClick={() => updatePortfolioItem(it.id, { gallery: [...gallery, { id: `g${Date.now()}`, image: "", alt: "" }] })}><Plus className="h-3 w-3" /> Add image</Button>
+              </div>
+              {gallery.map((g, idx) => (
+                <div key={g.id} className="space-y-2 p-3 rounded-lg border border-border/50">
+                  <ImageUpload value={g.image} onChange={(v) => { const next = [...gallery]; next[idx] = { ...g, image: v }; updatePortfolioItem(it.id, { gallery: next }); }} aspect="aspect-[4/3]" altValue={g.alt} onAltChange={(v) => { const next = [...gallery]; next[idx] = { ...g, alt: v }; updatePortfolioItem(it.id, { gallery: next }); }} />
+                  <Button size="sm" variant="ghost" className="text-destructive" onClick={() => updatePortfolioItem(it.id, { gallery: gallery.filter((x) => x.id !== g.id) })}><Trash2 className="h-3 w-3" /> Remove image</Button>
+                </div>
+              ))}
+            </div>
+
+            <Field label="Extra long-form content (optional, appended at the bottom)">
+              <Textarea rows={6} placeholder="Plain text or basic Markdown." value={it.body || ""} onChange={(e) => updatePortfolioItem(it.id, { body: e.target.value })} />
+            </Field>
+
             <div className="flex justify-end pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deletePortfolioItem(it.id); setActivePage("portfolio"); toast.success("Project deleted"); }}>
                 <Trash2 className="h-4 w-4 text-destructive" /> Delete project
