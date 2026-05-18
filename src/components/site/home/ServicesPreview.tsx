@@ -45,7 +45,7 @@ export const ServicesPreview = () => {
           {loop.map((s, idx) => (
             <Link
               key={`${s.slug}-${idx}`}
-              to="/portfolio"
+              to={`/services/${s.slug}`}
               className="group/card block w-[280px] sm:w-[320px] shrink-0 bg-gradient-to-br from-accent/20 via-card to-accent/10 rounded-3xl p-6 shadow-elegant border border-primary-foreground/10 hover:scale-[1.02] transition-smooth"
             >
               <div className="aspect-square rounded-2xl bg-accent/20 grid place-items-center mb-5 group-hover/card:bg-gradient-accent transition-smooth">
