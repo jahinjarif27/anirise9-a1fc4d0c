@@ -433,28 +433,6 @@ const AdminDashboard = () => {
       );
     }
 
-    const SectionHeader = ({ icon: Icon, title, subtitle, action }: { icon: any; title: string; subtitle: string; action?: React.ReactNode }) => (
-      <div className="flex items-center justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
-            <Icon className="h-5 w-5" />
-          </div>
-          <div>
-            <h3 className="font-bold leading-tight">{title}</h3>
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
-          </div>
-        </div>
-        {action}
-      </div>
-    );
-
-    const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-      <div>
-        <label className="text-xs font-semibold mb-1.5 block text-foreground/80">{label}</label>
-        {children}
-      </div>
-    );
-
     // Home builder block editors (sub-pages of the Home page)
     if (activePage.startsWith("hb:")) {
       const blockKey = activePage.slice(3) as typeof HOME_BLOCKS[number]["key"];
@@ -467,12 +445,13 @@ const AdminDashboard = () => {
         </div>
       );
 
-      const Wrap = ({ children, subtitle }: { children: React.ReactNode; subtitle: string }) => (
+      const wrap = (subtitle: string, children: React.ReactNode) => (
         <Card className="p-5 sm:p-6 space-y-4">
           <SectionHeader icon={Layers} title={meta.label} subtitle={subtitle} action={enabledToggle} />
           {children}
         </Card>
       );
+
 
       if (blockKey === "trustStrip") return (
         <Wrap subtitle="Client logos / brand names marquee on the home page.">
