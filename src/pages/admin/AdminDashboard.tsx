@@ -428,7 +428,7 @@ const AdminDashboard = () => {
               <Button variant="hero" size="sm" onClick={() => toast.success("Saved")}><Save className="h-4 w-4" /> Save</Button>
             </div>
           </Card>
-          <SeoBlock pageKey={cpSeoKey} hideAuto />
+          <SeoBlock pageKey={cpSeoKey} hideAuto seo={seo} updatePageSeo={updatePageSeo} content={content} />
         </div>
       );
     }
