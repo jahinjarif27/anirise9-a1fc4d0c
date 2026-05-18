@@ -54,6 +54,12 @@ type ContactInfo = {
   address: string;
 };
 
+export type ProjectStat = { id: string; label: string; value: string };
+export type ProjectTable = { title?: string; headers: string[]; rows: string[][] };
+export type ProjectChartPoint = { id: string; label: string; value: number };
+export type ProjectChart = { title?: string; type: "area" | "bar"; data: ProjectChartPoint[] };
+export type GalleryImage = { id: string; image: string; alt: string };
+
 export type PortfolioItem = {
   id: string;
   image: string;
@@ -62,6 +68,22 @@ export type PortfolioItem = {
   title: string;
   description?: string;
   body?: string;
+  // rich detail-page fields (all optional)
+  eyebrow?: string;
+  intro?: string;
+  client?: string;
+  role?: string;
+  timeline?: string;
+  liveUrl?: string;
+  overview?: string;
+  approach?: string;
+  outcome?: string;
+  techStack?: string[];
+  deliverables?: string[];
+  metrics?: ProjectStat[];
+  gallery?: GalleryImage[];
+  table?: ProjectTable;
+  chart?: ProjectChart;
 };
 
 export type Redirect = {
