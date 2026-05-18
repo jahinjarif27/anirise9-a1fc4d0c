@@ -730,26 +730,19 @@ const AdminDashboard = () => {
             <Card className="p-5 sm:p-6 space-y-4">
               <SectionHeader
                 icon={ImgIcon}
-                title="Portfolio items"
-                subtitle={`${portfolio.length} item${portfolio.length === 1 ? "" : "s"}`}
+                title="Projects"
+                subtitle={`${portfolio.length} project${portfolio.length === 1 ? "" : "s"} — each opens its own detail page (/portfolio/:id). Edit individual projects from the sidebar.`}
                 action={
-                  <Button variant="hero" size="sm" onClick={() => addPortfolioItem({ image: "", imageAlt: "", tag: "New tag", title: "New project" })}>
-                    <Plus className="h-4 w-4" /> Add item
+                  <Button variant="hero" size="sm" onClick={() => {
+                    const id = Date.now().toString();
+                    addPortfolioItem({ image: "", imageAlt: "", tag: "New tag", title: "New project", description: "", body: "" });
+                    setTimeout(() => setActivePage(`proj:${id}`), 0);
+                    toast.success("Project added");
+                  }}>
+                    <Plus className="h-4 w-4" /> Add project
                   </Button>
                 }
               />
-              <div className="grid sm:grid-cols-2 gap-4">
-                {portfolio.map((it) => (
-                  <Card key={it.id} className="p-4 space-y-3 bg-secondary/30">
-                    <ImageUpload label="Cover image" value={it.image} onChange={(v) => updatePortfolioItem(it.id, { image: v })} aspect="aspect-[4/3]" altValue={it.imageAlt} onAltChange={(v) => updatePortfolioItem(it.id, { imageAlt: v })} />
-                    <Input value={it.tag} onChange={(e) => updatePortfolioItem(it.id, { tag: e.target.value })} placeholder="Tag" />
-                    <Input value={it.title} onChange={(e) => updatePortfolioItem(it.id, { title: e.target.value })} placeholder="Title" />
-                    <Button variant="outline" size="sm" className="w-full" onClick={() => { deletePortfolioItem(it.id); toast.success("Removed"); }}>
-                      <Trash2 className="h-4 w-4 text-destructive" /> Remove
-                    </Button>
-                  </Card>
-                ))}
-              </div>
             </Card>
           )}
           {activePage === "contact" && (
