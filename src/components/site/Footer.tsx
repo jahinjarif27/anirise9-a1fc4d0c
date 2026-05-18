@@ -1,31 +1,65 @@
 import logo from "@/assets/anirise-logo.jpg";
-import { Facebook, Mail, Phone, Instagram } from "lucide-react";
+import { Facebook, Mail, Phone, Instagram, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
+import { services } from "@/data/services";
+
+const pages = [
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Portfolio", href: "/portfolio" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contact", href: "/contact" },
+  { label: "Book A Strategy Call", href: "/strategy-call" },
+];
 
 export const Footer = () => {
   const { contact } = useAdmin();
   return (
     <footer className="bg-primary text-primary-foreground">
-      <div className="container py-14 grid md:grid-cols-3 gap-10">
+      <div className="container py-14 grid md:grid-cols-2 lg:grid-cols-4 gap-10">
         <div>
           <div className="flex items-center gap-3 mb-4">
             <img src={logo} alt="AniRise" width={44} height={44} className="h-11 w-11 rounded-full ring-2 ring-primary-foreground/20" />
             <span className="font-display text-xl font-bold">AniRise</span>
           </div>
-          <p className="text-sm text-primary-foreground/70 max-w-xs">
+          <p className="text-sm text-primary-foreground/70 max-w-xs mb-5">
             Visibility · Growth · Success. Helping brands rise online with SEO, web, and marketing.
           </p>
+          <Link
+            to="/strategy-call"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-accent text-accent-foreground font-bold px-5 py-2.5 text-sm hover:opacity-90 transition-smooth"
+          >
+            Book A Strategy Call <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
+
+        <div>
+          <h4 className="font-semibold mb-4">Pages</h4>
+          <ul className="space-y-2 text-sm text-primary-foreground/70">
+            {pages.map((p) => (
+              <li key={p.href}>
+                <Link to={p.href} className="hover:text-accent transition-smooth">
+                  {p.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div>
           <h4 className="font-semibold mb-4">Services</h4>
           <ul className="space-y-2 text-sm text-primary-foreground/70">
-            <li>Website SEO</li>
-            <li>Ecommerce SEO</li>
-            <li>Website Development</li>
-            <li>Social Media Marketing</li>
-            <li>Graphics Design</li>
+            {services.map((s) => (
+              <li key={s.slug}>
+                <Link to={`/services/${s.slug}`} className="hover:text-accent transition-smooth">
+                  {s.title}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
+
         <div>
           <h4 className="font-semibold mb-4">Connect</h4>
           <ul className="space-y-3 text-sm text-primary-foreground/80">

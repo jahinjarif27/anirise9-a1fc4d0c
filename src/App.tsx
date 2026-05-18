@@ -18,6 +18,8 @@ const RouteEffects = () => {
 const ConditionalBottomNav = () => {
   const { pathname } = useLocation();
   if (pathname.startsWith("/admin")) return null;
+  if (pathname.startsWith("/strategy-call")) return null;
+  if (pathname === "/blog" || pathname.startsWith("/blog/")) return null;
   return <BottomNav />;
 };
 
