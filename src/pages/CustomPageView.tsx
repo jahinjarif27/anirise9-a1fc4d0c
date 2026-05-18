@@ -9,7 +9,7 @@ import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 export const CustomPageView = () => {
   const { slug } = useParams();
-  const { customPages, loading } = useAdmin();
+  const { customPages } = useAdmin();
   const page = customPages.find((p) => p.slug === slug && p.published);
 
   useSEO({
@@ -19,7 +19,6 @@ export const CustomPageView = () => {
     image: page?.image || undefined,
   });
 
-  if (loading) return null;
 
   if (!page) return <NotFound />;
   return (
