@@ -542,9 +542,9 @@ const AdminDashboard = () => {
       );
 
       if (blockKey === "caseStudies") return (
-        <Wrap subtitle="2–3 ta best work with metric.">
+        <Wrap subtitle="Each card opens its own case study page (/case-studies/:id).">
           <div className="flex justify-end">
-            <Button size="sm" onClick={() => { addCaseStudy({ title: "New case study", metric: "+100%", description: "", image: "", link: "/portfolio" }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add case study</Button>
+            <Button size="sm" onClick={() => { addCaseStudy({ title: "New case study", metric: "+100%", description: "", image: "", link: "", imageAlt: "", body: "" }); toast.success("Added"); }}><Plus className="h-4 w-4" /> Add case study</Button>
           </div>
           <div className="space-y-3">
             {caseStudies.map((c) => (
@@ -553,9 +553,10 @@ const AdminDashboard = () => {
                   <Input value={c.title} onChange={(e) => updateCaseStudy(c.id, { title: e.target.value })} placeholder="Title" />
                   <Input value={c.metric} onChange={(e) => updateCaseStudy(c.id, { metric: e.target.value })} placeholder="Metric (e.g. +180% traffic)" />
                 </div>
-                <Textarea value={c.description} onChange={(e) => updateCaseStudy(c.id, { description: e.target.value })} placeholder="Short description" rows={2} />
-                <Input value={c.link} onChange={(e) => updateCaseStudy(c.id, { link: e.target.value })} placeholder="Link URL (e.g. /portfolio)" />
+                <Textarea value={c.description} onChange={(e) => updateCaseStudy(c.id, { description: e.target.value })} placeholder="Short description (card)" rows={2} />
                 <ImageUpload value={c.image} onChange={(url) => updateCaseStudy(c.id, { image: url })} />
+                <Input value={c.imageAlt || ""} onChange={(e) => updateCaseStudy(c.id, { imageAlt: e.target.value })} placeholder="Image alt text" />
+                <Textarea value={c.body || ""} onChange={(e) => updateCaseStudy(c.id, { body: e.target.value })} placeholder="Full case study content (shown on detail page)" rows={6} />
                 <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
               </div>
             ))}
