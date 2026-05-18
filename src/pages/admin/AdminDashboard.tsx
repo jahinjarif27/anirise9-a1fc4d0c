@@ -158,6 +158,7 @@ const AdminDashboard = () => {
     finalCta, updateFinalCta,
     servicePreviews, updateServicePreview,
     serviceContent, updateServiceContent,
+    processFlow, updateProcessFlow, addProcessFlowStep, updateProcessFlowStep, deleteProcessFlowStep,
   } = useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
