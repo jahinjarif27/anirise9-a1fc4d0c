@@ -90,10 +90,10 @@ export const Navbar = () => {
             </span>
           </div>
           <a
-            href="#contact"
+            href="/strategy-call"
             className="inline-flex items-center rounded-full bg-background text-primary font-bold px-4 sm:px-5 py-1.5 text-xs sm:text-sm hover:opacity-90 shrink-0"
           >
-            Contact Now
+            Book A Call
           </a>
         </div>
       </div>
@@ -155,7 +155,7 @@ export const Navbar = () => {
                   </ul>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-3">
                     <Button asChild size="lg" className="sm:flex-1 rounded-full bg-gradient-accent text-accent-foreground hover:opacity-90 min-h-14 h-14 text-base font-bold">
-                      <a href="#contact" onClick={() => setOpen(false)} className="flex items-center justify-center w-full h-full">Hire Us</a>
+                      <a href="/strategy-call" onClick={() => setOpen(false)} className="flex items-center justify-center w-full h-full">Book A Strategy Call</a>
                     </Button>
                     <div className="flex items-center gap-2">
                       {contact.facebook && (
