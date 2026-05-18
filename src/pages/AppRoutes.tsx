@@ -47,6 +47,7 @@ export const AppRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/strategy-call" element={<StrategyCallPage />} />
+        <Route path="/case-studies/:id" element={<CaseStudyDetail />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/services/website-seo" element={<WebsiteSEOPage />} />
         <Route path="/services/ecommerce-seo" element={<EcommerceSEOPage />} />
