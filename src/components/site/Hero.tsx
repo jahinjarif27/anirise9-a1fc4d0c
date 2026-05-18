@@ -22,12 +22,12 @@ export const Hero = () => {
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Button asChild variant="hero" size="xl">
-              <a href="#contact">
-                Get Started <ArrowRight />
+              <a href="#strategy-call">
+                Book A Strategy Call <ArrowRight />
               </a>
             </Button>
             <Button asChild variant="outline" size="xl" className="rounded-full">
-              <a href="#services">Our Services</a>
+              <a href="/services">Our Services</a>
             </Button>
           </div>
 
