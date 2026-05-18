@@ -43,7 +43,7 @@ const Index = () => {
         {homeBlocks.servicesPreview && <ServicesPreview />}
         <About />
         {homeBlocks.caseStudies && <CaseStudies />}
-        <ProcessSteps />
+        {homeBlocks.processFlow && <ProcessSteps />}
         <WhyChooseAniRise />
         <StrategyCall />
         {homeBlocks.homeFaq && <HomeFAQ />}
