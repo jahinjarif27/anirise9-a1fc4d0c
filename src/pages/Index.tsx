@@ -2,6 +2,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
 import { Footer } from "@/components/site/Footer";
 import { Blog } from "@/components/site/Blog";
+import { About } from "@/components/site/About";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { TrustStrip } from "@/components/site/home/TrustStrip";
 import { StatsBand } from "@/components/site/home/StatsBand";
@@ -39,6 +40,7 @@ const Index = () => {
         {homeBlocks.trustStrip && <TrustStrip />}
         {homeBlocks.stats && <StatsBand />}
         {homeBlocks.servicesPreview && <ServicesPreview />}
+        <About />
         {homeBlocks.caseStudies && <CaseStudies />}
         <WhyChooseAniRise />
         <StrategyCall />

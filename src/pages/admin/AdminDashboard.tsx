@@ -641,6 +641,43 @@ const AdminDashboard = () => {
       );
     }
 
+    // Individual project editor
+    if (activePage.startsWith("proj:")) {
+      const pid = activePage.slice(5);
+      const it = portfolio.find((x) => x.id === pid);
+      if (!it) return <p className="text-sm text-muted-foreground">Project not found.</p>;
+      return (
+        <div className="space-y-4">
+          <Card className="p-5 sm:p-6 space-y-4">
+            <SectionHeader
+              icon={ImgIcon}
+              title={it.title || "Untitled project"}
+              subtitle={`Project detail page — /portfolio/${it.id}`}
+              action={
+                <Button asChild variant="outline" size="sm"><Link to={`/portfolio/${it.id}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
+              }
+            />
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Field label="Title"><Input value={it.title} onChange={(e) => updatePortfolioItem(it.id, { title: e.target.value })} /></Field>
+              <Field label="Tag / category"><Input value={it.tag} onChange={(e) => updatePortfolioItem(it.id, { tag: e.target.value })} /></Field>
+            </div>
+            <ImageUpload label="Cover image" value={it.image} onChange={(v) => updatePortfolioItem(it.id, { image: v })} aspect="aspect-[4/3]" altValue={it.imageAlt} onAltChange={(v) => updatePortfolioItem(it.id, { imageAlt: v })} />
+            <Field label="Short description (card + detail intro)">
+              <Textarea rows={3} value={it.description || ""} onChange={(e) => updatePortfolioItem(it.id, { description: e.target.value })} />
+            </Field>
+            <Field label="Full content (shown on detail page)">
+              <Textarea rows={10} placeholder="Full case content. Plain text or basic Markdown." value={it.body || ""} onChange={(e) => updatePortfolioItem(it.id, { body: e.target.value })} />
+            </Field>
+            <div className="flex justify-end pt-3 border-t border-border/60">
+              <Button variant="outline" size="sm" onClick={() => { deletePortfolioItem(it.id); setActivePage("portfolio"); toast.success("Project deleted"); }}>
+                <Trash2 className="h-4 w-4 text-destructive" /> Delete project
+              </Button>
+            </div>
+          </Card>
+        </div>
+      );
+    }
+
     const builtInPages: Record<string, { icon: any; title: string; subtitle: string; fields: { label: string; key: string; multiline?: boolean }[]; image?: { label: string; key: string; altKey: string; aspect: string } }> = {
       hero: {
         icon: Sparkles, title: "Hero section", subtitle: "Top-of-page headline and intro",
@@ -730,26 +767,19 @@ const AdminDashboard = () => {
             <Card className="p-5 sm:p-6 space-y-4">
               <SectionHeader
                 icon={ImgIcon}
-                title="Portfolio items"
-                subtitle={`${portfolio.length} item${portfolio.length === 1 ? "" : "s"}`}
+                title="Projects"
+                subtitle={`${portfolio.length} project${portfolio.length === 1 ? "" : "s"} — each opens its own detail page (/portfolio/:id). Edit individual projects from the sidebar.`}
                 action={
-                  <Button variant="hero" size="sm" onClick={() => addPortfolioItem({ image: "", imageAlt: "", tag: "New tag", title: "New project" })}>
-                    <Plus className="h-4 w-4" /> Add item
+                  <Button variant="hero" size="sm" onClick={() => {
+                    const id = Date.now().toString();
+                    addPortfolioItem({ image: "", imageAlt: "", tag: "New tag", title: "New project", description: "", body: "" });
+                    setTimeout(() => setActivePage(`proj:${id}`), 0);
+                    toast.success("Project added");
+                  }}>
+                    <Plus className="h-4 w-4" /> Add project
                   </Button>
                 }
               />
-              <div className="grid sm:grid-cols-2 gap-4">
-                {portfolio.map((it) => (
-                  <Card key={it.id} className="p-4 space-y-3 bg-secondary/30">
-                    <ImageUpload label="Cover image" value={it.image} onChange={(v) => updatePortfolioItem(it.id, { image: v })} aspect="aspect-[4/3]" altValue={it.imageAlt} onAltChange={(v) => updatePortfolioItem(it.id, { imageAlt: v })} />
-                    <Input value={it.tag} onChange={(e) => updatePortfolioItem(it.id, { tag: e.target.value })} placeholder="Tag" />
-                    <Input value={it.title} onChange={(e) => updatePortfolioItem(it.id, { title: e.target.value })} placeholder="Title" />
-                    <Button variant="outline" size="sm" className="w-full" onClick={() => { deletePortfolioItem(it.id); toast.success("Removed"); }}>
-                      <Trash2 className="h-4 w-4 text-destructive" /> Remove
-                    </Button>
-                  </Card>
-                ))}
-              </div>
             </Card>
           )}
           {activePage === "contact" && (
@@ -1012,6 +1042,13 @@ const AdminDashboard = () => {
                               );
                             })}
                             <li>
+                              <button onClick={() => setActivePage("about")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "about" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <FileEdit className="h-3 w-3 opacity-60" />
+                                <span className="truncate">About section</span>
+                              </button>
+                            </li>
+                            <li>
                               <button onClick={() => setActivePage("blog")}
                                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "blog" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
                                 <FileText className="h-3 w-3 opacity-60" />
@@ -1085,10 +1122,56 @@ const AdminDashboard = () => {
                     );
                   })()}
 
+                  {/* PROJECTS group */}
+                  {(() => {
+                    const isOpen = openGroups["projects"] ?? true;
+                    return (
+                      <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, projects: v }))}>
+                        <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
+                          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                          <ImgIcon className="h-3.5 w-3.5 text-accent" />
+                          <span className="flex-1 truncate">Projects</span>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{1 + portfolio.length}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
+                            <li>
+                              <button onClick={() => setActivePage("portfolio")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "portfolio" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <FileText className="h-3 w-3 opacity-60" />
+                                <span className="truncate">Projects page</span>
+                              </button>
+                            </li>
+                            {portfolio.map((it) => (
+                              <li key={it.id}>
+                                <button onClick={() => setActivePage(`proj:${it.id}`)}
+                                  className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === `proj:${it.id}` ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                  <FileEdit className="h-3 w-3 opacity-60" />
+                                  <span className="truncate flex-1">{it.title || "Untitled"}</span>
+                                </button>
+                              </li>
+                            ))}
+                            <li>
+                              <button onClick={() => {
+                                const id = Date.now().toString();
+                                addPortfolioItem({ image: "", imageAlt: "", tag: "New tag", title: "New project", description: "", body: "" });
+                                setTimeout(() => setActivePage(`proj:${id}`), 0);
+                                toast.success("Project added");
+                              }}
+                                className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 transition-colors">
+                                <Plus className="h-3 w-3" /> Add project
+                              </button>
+                            </li>
+                          </ul>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    );
+                  })()}
+
                   {/* Other built-in pages */}
                   {(() => {
                     const isOpen = openGroups["other"] ?? true;
-                    const others = ["about", "portfolio", "testimonials", "contact"];
+                    const others = ["testimonials", "contact"];
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, other: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
 
 export const Portfolio = () => {
@@ -8,7 +9,7 @@ export const Portfolio = () => {
       <div className="container">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase mb-3">
-            Visit Our Portfolio
+            Our Projects
           </p>
           <h2 className="text-4xl sm:text-5xl font-extrabold text-foreground">{content.portfolioTitle}</h2>
           <p className="mt-4 text-muted-foreground">
@@ -17,9 +18,10 @@ export const Portfolio = () => {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {portfolio.map((it) => (
-            <article
+            <Link
               key={it.id}
-              className="group relative overflow-hidden rounded-2xl shadow-card hover:shadow-elegant transition-smooth"
+              to={`/portfolio/${it.id}`}
+              className="group relative overflow-hidden rounded-2xl shadow-card hover:shadow-elegant transition-smooth block"
             >
               <img
                 src={it.image}
@@ -34,7 +36,7 @@ export const Portfolio = () => {
                 <p className="text-xs font-semibold tracking-widest text-accent uppercase mb-1">{it.tag}</p>
                 <h3 className="text-xl font-bold text-primary-foreground">{it.title}</h3>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </div>

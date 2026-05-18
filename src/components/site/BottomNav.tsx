@@ -7,7 +7,7 @@ import logo from "@/assets/anirise-logo.jpg";
 import { useAdmin } from "@/context/AdminContext";
 
 const SECTION_LABELS: Record<string, string> = {
-  hero: "Home", services: "Services", about: "About", portfolio: "Portfolio",
+  hero: "Home", services: "Services", portfolio: "Projects",
   blog: "Blog", testimonials: "Testimonials", contact: "Contact",
 };
 
@@ -30,7 +30,7 @@ export const BottomNav = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const sectionKeys = ["hero", "services", "about", "portfolio", "blog", "testimonials", "contact"];
+  const sectionKeys = ["hero", "services", "portfolio", "blog", "testimonials", "contact"];
   const allLinks = [
     ...sectionKeys.map((k) => ({
       label: SECTION_LABELS[k],

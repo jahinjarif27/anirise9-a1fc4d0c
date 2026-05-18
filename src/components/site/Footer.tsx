@@ -6,8 +6,7 @@ import { services } from "@/data/services";
 
 const pages = [
   { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Portfolio", href: "/portfolio" },
+  { label: "Projects", href: "/portfolio" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
   { label: "Book A Strategy Call", href: "/strategy-call" },

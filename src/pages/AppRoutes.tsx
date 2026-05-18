@@ -14,10 +14,10 @@ const GraphicsDesignPage = lazy(() => import("./services/GraphicsDesign.tsx"));
 const ComingSoonService = lazy(() => import("./services/ComingSoon.tsx"));
 const StrategyCallPage = lazy(() => import("./StrategyCallPage.tsx"));
 const CaseStudyDetail = lazy(() => import("./CaseStudyDetail.tsx"));
+const ProjectDetail = lazy(() => import("./ProjectDetail.tsx"));
 
 import { Hero } from "@/components/site/Hero";
 import { Services } from "@/components/site/Services";
-import { About } from "@/components/site/About";
 import { Portfolio } from "@/components/site/Portfolio";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Contact } from "@/components/site/Contact";
@@ -25,11 +25,11 @@ import { Blog as BlogSection } from "@/components/site/Blog";
 
 const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title: string }> = {
   services: { Component: Services, title: "Services" },
-  about: { Component: About, title: "About" },
-  portfolio: { Component: Portfolio, title: "Portfolio" },
+  portfolio: { Component: Portfolio, title: "Projects" },
   testimonials: { Component: Testimonials, title: "Testimonials" },
   contact: { Component: Contact, title: "Contact" },
 };
+
 
 export const AppRoutes = () => {
   return (
@@ -39,6 +39,7 @@ export const AppRoutes = () => {
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/strategy-call" element={<StrategyCallPage />} />
         <Route path="/case-studies/:id" element={<CaseStudyDetail />} />
+        <Route path="/portfolio/:id" element={<ProjectDetail />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/services/website-seo" element={<WebsiteSEOPage />} />
         <Route path="/services/ecommerce-seo" element={<EcommerceSEOPage />} />
