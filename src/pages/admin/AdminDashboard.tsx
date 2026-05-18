@@ -1113,14 +1113,16 @@ const AdminDashboard = () => {
                         size="sm"
                         onClick={() => {
                           const esc = (v: string) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+                          const domain = seo.canonicalUrl || "https://anirise.com.bd";
                           const rows = [
-                            ["Date", "Name", "Email", "Phone", "Service", "Message"],
+                            ["Date", "Name", "Email", "Phone", "Service", "Message", "Source"],
                             ...leads.map((l) => [
                               new Date(l.createdAt).toISOString(),
-                              l.name, l.email, l.phone, l.service, l.message,
+                              l.name, l.email, l.phone, l.service, l.message, domain,
                             ]),
                           ];
-                          const csv = rows.map((r) => r.map(esc).join(",")).join("\n");
+                          const meta = `# AniRise Leads Export\n# Domain: ${domain}\n# Exported: ${new Date().toISOString()}\n`;
+                          const csv = meta + rows.map((r) => r.map(esc).join(",")).join("\n");
                           const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
                           const url = URL.createObjectURL(blob);
                           const a = document.createElement("a");
