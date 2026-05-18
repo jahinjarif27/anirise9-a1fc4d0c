@@ -860,7 +860,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     setServicePreviews((prev) => ({ ...prev, [slug]: { image: "", imageAlt: "", ...(prev[slug] || {}), ...sp } }));
 
   const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
-    const staticPaths = ["/", "/services", "/about", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
+    const staticPaths = ["/", "/services", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
     const blogPaths = slugs.map((s) => `/blog/${s}`);
     const customPaths = customSlugs.map((s) => `/${s}`);
     const all = [...staticPaths, ...blogPaths, ...customPaths];
