@@ -4,7 +4,7 @@ import { services } from "@/data/services";
 import { useAdmin } from "@/context/AdminContext";
 
 export const ServicesPreview = () => {
-  const { content } = useAdmin();
+  const { content, servicePreviews } = useAdmin();
   // Duplicate list so marquee loops seamlessly
   const loop = [...services, ...services];
 
