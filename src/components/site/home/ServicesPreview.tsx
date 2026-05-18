@@ -48,7 +48,7 @@ export const ServicesPreview = () => {
             <Link
               key={`${s.slug}-${idx}`}
               to={`/services/${s.slug}`}
-              className="group/card block w-[280px] sm:w-[320px] shrink-0 bg-gradient-to-br from-accent/20 via-card to-accent/10 rounded-3xl p-6 shadow-elegant border border-primary-foreground/10 hover:scale-[1.02] transition-smooth"
+              className="group/card block w-[280px] sm:w-[320px] shrink-0 bg-card rounded-3xl p-6 shadow-elegant hover:scale-[1.02] transition-smooth"
             >
               <div className="aspect-square rounded-2xl bg-accent/20 grid place-items-center mb-5 overflow-hidden group-hover/card:bg-gradient-accent transition-smooth">
                 {sp?.image ? (
