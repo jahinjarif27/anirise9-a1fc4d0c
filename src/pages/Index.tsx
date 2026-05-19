@@ -16,7 +16,7 @@ import { ProcessSteps } from "@/components/site/home/ProcessSteps";
 import { HomeLoader } from "@/components/site/HomeLoader";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const Index = () => {
   const { pageLocation, homeSections, customPages, homeBlocks, seo, loading } = useAdmin();
