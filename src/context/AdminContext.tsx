@@ -220,7 +220,7 @@ export type CaseStudy = {
   table?: CaseStudyTable;
   chart?: CaseStudyChart;
 };
-export type ServicePreview = { image: string; imageAlt: string };
+export type ServicePreview = { image: string; imageAlt: string; title?: string; desc?: string };
 export type FinalCta = {
   headline: string;
   subline: string;
