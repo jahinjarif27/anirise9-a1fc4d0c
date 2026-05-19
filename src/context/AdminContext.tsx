@@ -707,7 +707,7 @@ const defaultHomeMembership: Record<SectionKey, boolean> = {
 
 type AdminCtx = {
   isAuthed: boolean;
-  login: (pw: string) => boolean;
+  login: (pw: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   posts: BlogPost[];
