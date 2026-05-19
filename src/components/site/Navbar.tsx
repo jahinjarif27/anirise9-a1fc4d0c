@@ -49,9 +49,10 @@ export const Navbar = () => {
     }
   };
 
-  const submitAdminPassword = (e: React.FormEvent) => {
+  const submitAdminPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminPw === "1122") {
+    const ok = await login(adminPw);
+    if (ok) {
       setAdminOpen(false);
       setAdminPw("");
       navigate("/admin");
