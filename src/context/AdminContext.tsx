@@ -869,11 +869,10 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [settingsRes, postsRes, leadsRes, visitsRes, reviewsRes] = await Promise.all([
+      // Public-readable tables only. leads + all-reviews + visits load after admin login.
+      const [settingsRes, postsRes, reviewsRes] = await Promise.all([
         supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
         supabase.from("blog_posts").select("*").order("date", { ascending: false }),
-        supabase.from("leads").select("*").order("created_at", { ascending: false }),
-        supabase.from("page_visits").select("created_at, visitor_id").gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString()),
         supabase.from("reviews").select("*").order("created_at", { ascending: false }),
       ]);
       if (!alive) return;
@@ -916,33 +915,28 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         }
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
-      if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
       if (reviewsRes.data) setReviews(reviewsRes.data.map((r: any) => ({
         id: r.id, name: r.name, role: r.role ?? "", quote: r.quote,
         rating: r.rating ?? 5, approved: !!r.approved,
         createdAt: new Date(r.created_at).getTime(),
       })));
-      if (visitsRes.data) {
-        // Unique visitors (30d): distinct visitor_id, falling back to row id for legacy rows.
-        const uniqueIds = new Set<string>();
-        visitsRes.data.forEach((v: any, i: number) => uniqueIds.add(v.visitor_id || `legacy-${i}`));
-        setVisits(uniqueIds.size);
-
-        // Daily unique visitors for last 14 days
-        const buckets: Record<string, Set<string>> = {};
-        for (let i = 13; i >= 0; i--) {
-          const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-          buckets[d] = new Set();
-        }
-        visitsRes.data.forEach((v: any, i: number) => {
-          const d = new Date(v.created_at).toISOString().slice(0, 10);
-          if (d in buckets) buckets[d].add(v.visitor_id || `legacy-${i}`);
-        });
-        setVisitSeries(Object.entries(buckets).map(([day, set]) => ({ day: day.slice(5), visits: set.size })));
-      }
 
       setLoading(false);
-      // Allow the persist effect to fire on subsequent edits
+
+      // Restore admin session from localStorage; ping to validate.
+      const saved = typeof window !== "undefined" ? localStorage.getItem("anirise_admin_token") : null;
+      if (saved) {
+        adminTokenRef.current = saved;
+        const ok = await adminCall("ping");
+        if (ok.ok) {
+          setIsAuthed(true);
+          await loadAdminData();
+        } else {
+          adminTokenRef.current = null;
+          try { localStorage.removeItem("anirise_admin_token"); } catch {}
+        }
+      }
+
       setTimeout(() => { hydrated.current = true; }, 0);
     })();
     return () => { alive = false; };
