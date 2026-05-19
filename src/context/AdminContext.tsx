@@ -1001,35 +1001,35 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!hydrated.current) return;
+    if (!isAuthed) return; // Only admins can persist site_settings now (RLS enforces this server-side too).
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      supabase.from("site_settings").update({
-        content: content as any,
-        contact: contact as any,
-        portfolio: portfolio as any,
-        seo: seo as any,
-        appearance: appearance as any,
-        custom_pages: customPages as any,
-        home_sections: homeSections as any,
-        section_groups: sectionGroups as any,
-        page_location: pageLocation as any,
-        home_membership: homeMembership as any,
-        home_blocks: homeBlocks as any,
-        home_faqs: homeFaqs as any,
-        service_faqs: serviceFaqs as any,
-        stats: stats as any,
-        trust_logos: trustLogos as any,
-        case_studies: caseStudies as any,
-        final_cta: finalCta as any,
-        service_previews: servicePreviews as any,
-        service_content: serviceContent as any,
-        process_flow: processFlow as any,
-        updated_at: new Date().toISOString(),
-      }).eq("id", 1).then(({ error }) => {
-        if (error) console.error("[site_settings] save failed", error);
+      adminCall("update_site_settings", {
+        content,
+        contact,
+        portfolio,
+        seo,
+        appearance,
+        custom_pages: customPages,
+        home_sections: homeSections,
+        section_groups: sectionGroups,
+        page_location: pageLocation,
+        home_membership: homeMembership,
+        home_blocks: homeBlocks,
+        home_faqs: homeFaqs,
+        service_faqs: serviceFaqs,
+        stats,
+        trust_logos: trustLogos,
+        case_studies: caseStudies,
+        final_cta: finalCta,
+        service_previews: servicePreviews,
+        service_content: serviceContent,
+        process_flow: processFlow,
+      }).then((r) => {
+        if (!r.ok) console.error("[site_settings] save failed", r.error);
       });
     }, 500);
-  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews, serviceContent, processFlow]);
+  }, [isAuthed, content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews, serviceContent, processFlow]);
 
   // ---------------------------------------------------------------
   // Live document.head effects (unchanged)
