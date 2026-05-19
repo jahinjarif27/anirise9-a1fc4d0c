@@ -1112,65 +1112,72 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   }, [appearance]);
 
   // ---------------------------------------------------------------
-  // Auth (simple gate, unchanged)
+  // Auth — password verified server-side by admin-login edge function.
   // ---------------------------------------------------------------
-  const login = (pw: string) => { if (pw === "1122") { setIsAuthed(true); return true; } return false; };
-  const logout = () => setIsAuthed(false);
+  const login = async (pw: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-login", { body: { password: pw } });
+      if (error || !data?.token) return false;
+      adminTokenRef.current = data.token;
+      try { localStorage.setItem("anirise_admin_token", data.token); } catch {}
+      setIsAuthed(true);
+      await loadAdminData();
+      return true;
+    } catch (e) {
+      console.error("login failed", e);
+      return false;
+    }
+  };
+  const logout = () => {
+    adminTokenRef.current = null;
+    try { localStorage.removeItem("anirise_admin_token"); } catch {}
+    setIsAuthed(false);
+  };
 
   // ---------------------------------------------------------------
-  // Blog (DB-backed)
+  // Blog (admin-action backed)
   // ---------------------------------------------------------------
   const addPost = async (p: Omit<BlogPost, "id">) => {
-    const { data, error } = await supabase.from("blog_posts").insert(toDbPost(p)).select().single();
-    if (error || !data) return console.error(error);
-    setPosts((prev) => [fromDbPost(data), ...prev]);
+    const r = await adminCall("blog_create", toDbPost(p));
+    if (!r.ok || !r.data) return console.error("blog_create failed", r.error);
+    setPosts((prev) => [fromDbPost(r.data), ...prev]);
   };
   const updatePost = async (id: string, p: Partial<BlogPost>) => {
-    const { data, error } = await supabase.from("blog_posts").update(toDbPost(p)).eq("id", id).select().single();
-    if (error || !data) return console.error(error);
-    setPosts((prev) => prev.map((x) => (x.id === id ? fromDbPost(data) : x)));
+    const r = await adminCall("blog_update", { id, patch: toDbPost(p) });
+    if (!r.ok || !r.data) return console.error("blog_update failed", r.error);
+    setPosts((prev) => prev.map((x) => (x.id === id ? fromDbPost(r.data) : x)));
   };
   const deletePost = async (id: string) => {
-    const { error } = await supabase.from("blog_posts").delete().eq("id", id);
-    if (error) return console.error(error);
+    const r = await adminCall("blog_delete", { id });
+    if (!r.ok) return console.error("blog_delete failed", r.error);
     setPosts((prev) => prev.filter((x) => x.id !== id));
   };
 
   // ---------------------------------------------------------------
-  // Leads (DB-backed)
+  // Leads — public submit goes through submit-lead; admin ops via admin-action
   // ---------------------------------------------------------------
   const addLead = async (l: Omit<Lead, "id" | "createdAt">) => {
-    const { data, error } = await supabase.from("leads").insert(l).select().single();
-    if (error || !data) { console.error(error); return; }
-    setLeads((prev) => [fromDbLead(data), ...prev]);
-    const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
-    supabase.functions.invoke("notify-admin", {
-      body: {
-        subject: `New Lead: ${l.name}`,
-        html: `<h2>New Strategy Call Request</h2>
-<p><b>Name:</b> ${esc(l.name)}</p>
-<p><b>Email:</b> ${esc(l.email)}</p>
-<p><b>Phone:</b> ${esc(l.phone)}</p>
-<p><b>Service:</b> ${esc(l.service || "-")}</p>
-<p><b>Message:</b><br/>${esc(l.message || "-").replace(/\n/g, "<br/>")}</p>`,
-      },
-    }).catch((e) => console.error("notify-admin failed", e));
+    try {
+      const { data, error } = await supabase.functions.invoke("submit-lead", { body: l });
+      if (error || data?.error) console.error("submit-lead failed", error || data?.error);
+    } catch (e) {
+      console.error("submit-lead failed", e);
+    }
   };
   const deleteLead = async (id: string) => {
-    const { error } = await supabase.from("leads").delete().eq("id", id);
-    if (error) return console.error(error);
+    const r = await adminCall("lead_delete", { id });
+    if (!r.ok) return console.error("lead_delete failed", r.error);
     setLeads((prev) => prev.filter((x) => x.id !== id));
   };
   const clearLeads = async () => {
-    const { error } = await supabase.from("leads").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    if (error) return console.error(error);
+    const r = await adminCall("leads_clear");
+    if (!r.ok) return console.error("leads_clear failed", r.error);
     setLeads([]);
   };
   const pruneOldLeads = async (): Promise<number> => {
-    const cutoff = new Date(Date.now() - 90 * 86400000).toISOString();
-    const { data, error } = await supabase.from("leads").delete().lt("created_at", cutoff).select("id");
-    if (error) { console.error(error); return 0; }
-    const removed = data?.length ?? 0;
+    const r = await adminCall("leads_purge_old");
+    if (!r.ok) return 0;
+    const removed = r.data?.removed ?? 0;
     if (removed) {
       const cutoffMs = Date.now() - 90 * 86400000;
       setLeads((prev) => prev.filter((l) => l.createdAt >= cutoffMs));
@@ -1178,38 +1185,23 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     return removed;
   };
 
-  // Reviews (DB-backed)
+  // Reviews — public submit via submit-review; admin moderation via admin-action
   const addReview = async (r: Omit<Review, "id" | "createdAt" | "approved">) => {
-    const { data, error } = await supabase.from("reviews").insert({
-      name: r.name, role: r.role, quote: r.quote, rating: r.rating, approved: false,
-    }).select().single();
-    if (error || !data) { console.error(error); return; }
-    setReviews((prev) => [{
-      id: data.id, name: data.name, role: data.role ?? "", quote: data.quote,
-      rating: data.rating ?? 5, approved: !!data.approved,
-      createdAt: new Date(data.created_at).getTime(),
-    }, ...prev]);
-    const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
-    supabase.functions.invoke("notify-admin", {
-      body: {
-        subject: `New Review (${r.rating}★) from ${r.name}`,
-        html: `<h2>New Review Submitted</h2>
-<p><b>Name:</b> ${esc(r.name)}</p>
-<p><b>Role:</b> ${esc(r.role || "-")}</p>
-<p><b>Rating:</b> ${r.rating} / 5</p>
-<p><b>Review:</b><br/>${esc(r.quote).replace(/\n/g, "<br/>")}</p>
-<p style="color:#666;font-size:13px">Pending approval in admin panel.</p>`,
-      },
-    }).catch((e) => console.error("notify-admin failed", e));
+    try {
+      const { data, error } = await supabase.functions.invoke("submit-review", { body: r });
+      if (error || data?.error) console.error("submit-review failed", error || data?.error);
+    } catch (e) {
+      console.error("submit-review failed", e);
+    }
   };
   const approveReview = async (id: string, approved: boolean) => {
-    const { error } = await supabase.from("reviews").update({ approved }).eq("id", id);
-    if (error) return console.error(error);
+    const r = await adminCall("review_update", { id, patch: { approved } });
+    if (!r.ok) return console.error("review_update failed", r.error);
     setReviews((prev) => prev.map((x) => (x.id === id ? { ...x, approved } : x)));
   };
   const deleteReview = async (id: string) => {
-    const { error } = await supabase.from("reviews").delete().eq("id", id);
-    if (error) return console.error(error);
+    const r = await adminCall("review_delete", { id });
+    if (!r.ok) return console.error("review_delete failed", r.error);
     setReviews((prev) => prev.filter((x) => x.id !== id));
   };
 
