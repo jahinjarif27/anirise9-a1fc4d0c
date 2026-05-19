@@ -20,12 +20,8 @@ import { useEffect, useState } from "react";
 
 const Index = () => {
   const { pageLocation, homeSections, customPages, homeBlocks, seo, loading } = useAdmin();
-  const [minDelay, setMinDelay] = useState(true);
-  useEffect(() => {
-    const t = setTimeout(() => setMinDelay(false), 300);
-    return () => clearTimeout(t);
-  }, []);
-  const showLoader = loading || minDelay;
+  const [animDone, setAnimDone] = useState(false);
+  const showLoader = loading || !animDone;
   const onHome = (k: string) => (pageLocation[k] ?? "home") === "home";
   const pageSeo = seo.pageSeo?.home;
   useSEO({
