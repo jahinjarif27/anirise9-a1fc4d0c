@@ -1142,6 +1142,18 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       rating: data.rating ?? 5, approved: !!data.approved,
       createdAt: new Date(data.created_at).getTime(),
     }, ...prev]);
+    const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+    supabase.functions.invoke("notify-admin", {
+      body: {
+        subject: `New Review (${r.rating}★) from ${r.name}`,
+        html: `<h2>New Review Submitted</h2>
+<p><b>Name:</b> ${esc(r.name)}</p>
+<p><b>Role:</b> ${esc(r.role || "-")}</p>
+<p><b>Rating:</b> ${r.rating} / 5</p>
+<p><b>Review:</b><br/>${esc(r.quote).replace(/\n/g, "<br/>")}</p>
+<p style="color:#666;font-size:13px">Pending approval in admin panel.</p>`,
+      },
+    }).catch((e) => console.error("notify-admin failed", e));
   };
   const approveReview = async (id: string, approved: boolean) => {
     const { error } = await supabase.from("reviews").update({ approved }).eq("id", id);
