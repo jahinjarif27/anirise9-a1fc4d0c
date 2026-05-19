@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, Phone, Search, TrendingUp, Facebook, Instagram } from "lucide-react";
 import logo from "@/assets/anirise-logo.jpg";
 import { Button } from "@/components/ui/button";
@@ -34,19 +34,24 @@ export const Navbar = () => {
   const [pastHero, setPastHero] = useState(false);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const [clicks, setClicks] = useState<number[]>([]);
   const [adminOpen, setAdminOpen] = useState(false);
   const [adminPw, setAdminPw] = useState("");
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleLogoClick = (e: React.MouseEvent) => {
-    const now = Date.now();
-    const recent = [...clicks, now].filter((t) => now - t < 800);
-    setClicks(recent);
-    if (recent.length >= 2) {
-      e.preventDefault();
-      setClicks([]);
+    e.preventDefault();
+    clickCountRef.current += 1;
+    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+    if (clickCountRef.current >= 3) {
+      clickCountRef.current = 0;
       setAdminOpen(true);
+      return;
     }
+    clickTimerRef.current = setTimeout(() => {
+      clickCountRef.current = 0;
+      navigate("/");
+    }, 400);
   };
 
   const submitAdminPassword = async (e: React.FormEvent) => {
