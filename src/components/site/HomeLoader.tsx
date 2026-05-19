@@ -1,6 +1,6 @@
 import logo from "@/assets/anirise-logo.jpg";
 
-export const HomeLoader = () => {
+export const HomeLoader = ({ onDone }: { onDone?: () => void }) => {
   return (
     <div className="fixed inset-0 z-[100] bg-background grid place-items-center">
       <div className="flex flex-col items-center gap-5">
@@ -18,7 +18,10 @@ export const HomeLoader = () => {
 
         {/* Center-out fill line */}
         <div className="relative h-[3px] w-48 bg-muted rounded-full overflow-hidden">
-          <div className="absolute top-0 left-1/2 h-full w-0 bg-gradient-accent rounded-full -translate-x-1/2 animate-[loader-fill_0.3s_ease-out_forwards]" />
+          <div
+            className="absolute top-0 left-1/2 h-full w-0 bg-gradient-accent rounded-full -translate-x-1/2 animate-[loader-fill_0.45s_ease-out_forwards]"
+            onAnimationEnd={onDone}
+          />
         </div>
       </div>
 
