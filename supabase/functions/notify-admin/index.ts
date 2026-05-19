@@ -7,6 +7,16 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
+    // Internal-only: must be called from another edge function with the shared token.
+    const INTERNAL_TOKEN = Deno.env.get('NOTIFY_INTERNAL_TOKEN');
+    const provided = req.headers.get('x-internal-token');
+    if (!INTERNAL_TOKEN || provided !== INTERNAL_TOKEN) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
     if (!LOVABLE_API_KEY || !RESEND_API_KEY) {

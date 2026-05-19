@@ -16,7 +16,7 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 export const Navbar = () => {
-  const { contact, pageLocation, customPages } = useAdmin();
+  const { contact, pageLocation, customPages, login } = useAdmin();
 
   const sectionKeys = ["hero", "services", "portfolio", "blog", "testimonials", "contact"];
   const links = sectionKeys.map((k) => {
@@ -49,9 +49,10 @@ export const Navbar = () => {
     }
   };
 
-  const submitAdminPassword = (e: React.FormEvent) => {
+  const submitAdminPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminPw === "1122") {
+    const ok = await login(adminPw);
+    if (ok) {
       setAdminOpen(false);
       setAdminPw("");
       navigate("/admin");

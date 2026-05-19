@@ -707,7 +707,7 @@ const defaultHomeMembership: Record<SectionKey, boolean> = {
 
 type AdminCtx = {
   isAuthed: boolean;
-  login: (pw: string) => boolean;
+  login: (pw: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   posts: BlogPost[];
@@ -863,17 +863,69 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
 
+  // Admin session token (HMAC token from admin-login edge function)
+  const adminTokenRef = useRef<string | null>(null);
+
+  // Call admin-action edge function with the current token.
+  // Returns { ok: boolean, data?: any, error?: string }.
+  const adminCall = async (op: string, payload: any = {}): Promise<{ ok: boolean; data?: any; error?: string }> => {
+    const token = adminTokenRef.current;
+    if (!token) return { ok: false, error: "Not authenticated" };
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-action", {
+        body: { token, op, payload },
+      });
+      if (error) return { ok: false, error: error.message };
+      if (data?.error) return { ok: false, error: data.error };
+      return { ok: true, data: data?.data };
+    } catch (e: any) {
+      return { ok: false, error: e?.message || "Network error" };
+    }
+  };
+
+  // Load admin-only data (full leads list, all reviews, visit analytics).
+  const loadAdminData = async () => {
+    const [leadsR, reviewsR, visitsR] = await Promise.all([
+      adminCall("leads_list"),
+      adminCall("reviews_list"),
+      adminCall("visits_list", { sinceDays: 30 }),
+    ]);
+    if (leadsR.ok && Array.isArray(leadsR.data)) setLeads(leadsR.data.map(fromDbLead));
+    if (reviewsR.ok && Array.isArray(reviewsR.data)) {
+      setReviews(reviewsR.data.map((r: any) => ({
+        id: r.id, name: r.name, role: r.role ?? "", quote: r.quote,
+        rating: r.rating ?? 5, approved: !!r.approved,
+        createdAt: new Date(r.created_at).getTime(),
+      })));
+    }
+    if (visitsR.ok && Array.isArray(visitsR.data)) {
+      const rows = visitsR.data;
+      const uniqueIds = new Set<string>();
+      rows.forEach((v: any, i: number) => uniqueIds.add(v.visitor_id || `legacy-${i}`));
+      setVisits(uniqueIds.size);
+      const buckets: Record<string, Set<string>> = {};
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+        buckets[d] = new Set();
+      }
+      rows.forEach((v: any, i: number) => {
+        const d = new Date(v.created_at).toISOString().slice(0, 10);
+        if (d in buckets) buckets[d].add(v.visitor_id || `legacy-${i}`);
+      });
+      setVisitSeries(Object.entries(buckets).map(([day, set]) => ({ day: day.slice(5), visits: set.size })));
+    }
+  };
+
   // ---------------------------------------------------------------
   // Initial load
   // ---------------------------------------------------------------
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [settingsRes, postsRes, leadsRes, visitsRes, reviewsRes] = await Promise.all([
+      // Public-readable tables only. leads + all-reviews + visits load after admin login.
+      const [settingsRes, postsRes, reviewsRes] = await Promise.all([
         supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
         supabase.from("blog_posts").select("*").order("date", { ascending: false }),
-        supabase.from("leads").select("*").order("created_at", { ascending: false }),
-        supabase.from("page_visits").select("created_at, visitor_id").gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString()),
         supabase.from("reviews").select("*").order("created_at", { ascending: false }),
       ]);
       if (!alive) return;
@@ -916,33 +968,28 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         }
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
-      if (leadsRes.data) setLeads(leadsRes.data.map(fromDbLead));
       if (reviewsRes.data) setReviews(reviewsRes.data.map((r: any) => ({
         id: r.id, name: r.name, role: r.role ?? "", quote: r.quote,
         rating: r.rating ?? 5, approved: !!r.approved,
         createdAt: new Date(r.created_at).getTime(),
       })));
-      if (visitsRes.data) {
-        // Unique visitors (30d): distinct visitor_id, falling back to row id for legacy rows.
-        const uniqueIds = new Set<string>();
-        visitsRes.data.forEach((v: any, i: number) => uniqueIds.add(v.visitor_id || `legacy-${i}`));
-        setVisits(uniqueIds.size);
-
-        // Daily unique visitors for last 14 days
-        const buckets: Record<string, Set<string>> = {};
-        for (let i = 13; i >= 0; i--) {
-          const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-          buckets[d] = new Set();
-        }
-        visitsRes.data.forEach((v: any, i: number) => {
-          const d = new Date(v.created_at).toISOString().slice(0, 10);
-          if (d in buckets) buckets[d].add(v.visitor_id || `legacy-${i}`);
-        });
-        setVisitSeries(Object.entries(buckets).map(([day, set]) => ({ day: day.slice(5), visits: set.size })));
-      }
 
       setLoading(false);
-      // Allow the persist effect to fire on subsequent edits
+
+      // Restore admin session from localStorage; ping to validate.
+      const saved = typeof window !== "undefined" ? localStorage.getItem("anirise_admin_token") : null;
+      if (saved) {
+        adminTokenRef.current = saved;
+        const ok = await adminCall("ping");
+        if (ok.ok) {
+          setIsAuthed(true);
+          await loadAdminData();
+        } else {
+          adminTokenRef.current = null;
+          try { localStorage.removeItem("anirise_admin_token"); } catch {}
+        }
+      }
+
       setTimeout(() => { hydrated.current = true; }, 0);
     })();
     return () => { alive = false; };
@@ -954,35 +1001,35 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!hydrated.current) return;
+    if (!isAuthed) return; // Only admins can persist site_settings now (RLS enforces this server-side too).
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      supabase.from("site_settings").update({
-        content: content as any,
-        contact: contact as any,
-        portfolio: portfolio as any,
-        seo: seo as any,
-        appearance: appearance as any,
-        custom_pages: customPages as any,
-        home_sections: homeSections as any,
-        section_groups: sectionGroups as any,
-        page_location: pageLocation as any,
-        home_membership: homeMembership as any,
-        home_blocks: homeBlocks as any,
-        home_faqs: homeFaqs as any,
-        service_faqs: serviceFaqs as any,
-        stats: stats as any,
-        trust_logos: trustLogos as any,
-        case_studies: caseStudies as any,
-        final_cta: finalCta as any,
-        service_previews: servicePreviews as any,
-        service_content: serviceContent as any,
-        process_flow: processFlow as any,
-        updated_at: new Date().toISOString(),
-      }).eq("id", 1).then(({ error }) => {
-        if (error) console.error("[site_settings] save failed", error);
+      adminCall("update_site_settings", {
+        content,
+        contact,
+        portfolio,
+        seo,
+        appearance,
+        custom_pages: customPages,
+        home_sections: homeSections,
+        section_groups: sectionGroups,
+        page_location: pageLocation,
+        home_membership: homeMembership,
+        home_blocks: homeBlocks,
+        home_faqs: homeFaqs,
+        service_faqs: serviceFaqs,
+        stats,
+        trust_logos: trustLogos,
+        case_studies: caseStudies,
+        final_cta: finalCta,
+        service_previews: servicePreviews,
+        service_content: serviceContent,
+        process_flow: processFlow,
+      }).then((r) => {
+        if (!r.ok) console.error("[site_settings] save failed", r.error);
       });
     }, 500);
-  }, [content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews, serviceContent, processFlow]);
+  }, [isAuthed, content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews, serviceContent, processFlow]);
 
   // ---------------------------------------------------------------
   // Live document.head effects (unchanged)
@@ -1065,65 +1112,72 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   }, [appearance]);
 
   // ---------------------------------------------------------------
-  // Auth (simple gate, unchanged)
+  // Auth — password verified server-side by admin-login edge function.
   // ---------------------------------------------------------------
-  const login = (pw: string) => { if (pw === "1122") { setIsAuthed(true); return true; } return false; };
-  const logout = () => setIsAuthed(false);
+  const login = async (pw: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-login", { body: { password: pw } });
+      if (error || !data?.token) return false;
+      adminTokenRef.current = data.token;
+      try { localStorage.setItem("anirise_admin_token", data.token); } catch {}
+      setIsAuthed(true);
+      await loadAdminData();
+      return true;
+    } catch (e) {
+      console.error("login failed", e);
+      return false;
+    }
+  };
+  const logout = () => {
+    adminTokenRef.current = null;
+    try { localStorage.removeItem("anirise_admin_token"); } catch {}
+    setIsAuthed(false);
+  };
 
   // ---------------------------------------------------------------
-  // Blog (DB-backed)
+  // Blog (admin-action backed)
   // ---------------------------------------------------------------
   const addPost = async (p: Omit<BlogPost, "id">) => {
-    const { data, error } = await supabase.from("blog_posts").insert(toDbPost(p)).select().single();
-    if (error || !data) return console.error(error);
-    setPosts((prev) => [fromDbPost(data), ...prev]);
+    const r = await adminCall("blog_create", toDbPost(p));
+    if (!r.ok || !r.data) return console.error("blog_create failed", r.error);
+    setPosts((prev) => [fromDbPost(r.data), ...prev]);
   };
   const updatePost = async (id: string, p: Partial<BlogPost>) => {
-    const { data, error } = await supabase.from("blog_posts").update(toDbPost(p)).eq("id", id).select().single();
-    if (error || !data) return console.error(error);
-    setPosts((prev) => prev.map((x) => (x.id === id ? fromDbPost(data) : x)));
+    const r = await adminCall("blog_update", { id, patch: toDbPost(p) });
+    if (!r.ok || !r.data) return console.error("blog_update failed", r.error);
+    setPosts((prev) => prev.map((x) => (x.id === id ? fromDbPost(r.data) : x)));
   };
   const deletePost = async (id: string) => {
-    const { error } = await supabase.from("blog_posts").delete().eq("id", id);
-    if (error) return console.error(error);
+    const r = await adminCall("blog_delete", { id });
+    if (!r.ok) return console.error("blog_delete failed", r.error);
     setPosts((prev) => prev.filter((x) => x.id !== id));
   };
 
   // ---------------------------------------------------------------
-  // Leads (DB-backed)
+  // Leads — public submit goes through submit-lead; admin ops via admin-action
   // ---------------------------------------------------------------
   const addLead = async (l: Omit<Lead, "id" | "createdAt">) => {
-    const { data, error } = await supabase.from("leads").insert(l).select().single();
-    if (error || !data) { console.error(error); return; }
-    setLeads((prev) => [fromDbLead(data), ...prev]);
-    const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
-    supabase.functions.invoke("notify-admin", {
-      body: {
-        subject: `New Lead: ${l.name}`,
-        html: `<h2>New Strategy Call Request</h2>
-<p><b>Name:</b> ${esc(l.name)}</p>
-<p><b>Email:</b> ${esc(l.email)}</p>
-<p><b>Phone:</b> ${esc(l.phone)}</p>
-<p><b>Service:</b> ${esc(l.service || "-")}</p>
-<p><b>Message:</b><br/>${esc(l.message || "-").replace(/\n/g, "<br/>")}</p>`,
-      },
-    }).catch((e) => console.error("notify-admin failed", e));
+    try {
+      const { data, error } = await supabase.functions.invoke("submit-lead", { body: l });
+      if (error || data?.error) console.error("submit-lead failed", error || data?.error);
+    } catch (e) {
+      console.error("submit-lead failed", e);
+    }
   };
   const deleteLead = async (id: string) => {
-    const { error } = await supabase.from("leads").delete().eq("id", id);
-    if (error) return console.error(error);
+    const r = await adminCall("lead_delete", { id });
+    if (!r.ok) return console.error("lead_delete failed", r.error);
     setLeads((prev) => prev.filter((x) => x.id !== id));
   };
   const clearLeads = async () => {
-    const { error } = await supabase.from("leads").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    if (error) return console.error(error);
+    const r = await adminCall("leads_clear");
+    if (!r.ok) return console.error("leads_clear failed", r.error);
     setLeads([]);
   };
   const pruneOldLeads = async (): Promise<number> => {
-    const cutoff = new Date(Date.now() - 90 * 86400000).toISOString();
-    const { data, error } = await supabase.from("leads").delete().lt("created_at", cutoff).select("id");
-    if (error) { console.error(error); return 0; }
-    const removed = data?.length ?? 0;
+    const r = await adminCall("leads_purge_old");
+    if (!r.ok) return 0;
+    const removed = r.data?.removed ?? 0;
     if (removed) {
       const cutoffMs = Date.now() - 90 * 86400000;
       setLeads((prev) => prev.filter((l) => l.createdAt >= cutoffMs));
@@ -1131,38 +1185,23 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     return removed;
   };
 
-  // Reviews (DB-backed)
+  // Reviews — public submit via submit-review; admin moderation via admin-action
   const addReview = async (r: Omit<Review, "id" | "createdAt" | "approved">) => {
-    const { data, error } = await supabase.from("reviews").insert({
-      name: r.name, role: r.role, quote: r.quote, rating: r.rating, approved: false,
-    }).select().single();
-    if (error || !data) { console.error(error); return; }
-    setReviews((prev) => [{
-      id: data.id, name: data.name, role: data.role ?? "", quote: data.quote,
-      rating: data.rating ?? 5, approved: !!data.approved,
-      createdAt: new Date(data.created_at).getTime(),
-    }, ...prev]);
-    const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
-    supabase.functions.invoke("notify-admin", {
-      body: {
-        subject: `New Review (${r.rating}★) from ${r.name}`,
-        html: `<h2>New Review Submitted</h2>
-<p><b>Name:</b> ${esc(r.name)}</p>
-<p><b>Role:</b> ${esc(r.role || "-")}</p>
-<p><b>Rating:</b> ${r.rating} / 5</p>
-<p><b>Review:</b><br/>${esc(r.quote).replace(/\n/g, "<br/>")}</p>
-<p style="color:#666;font-size:13px">Pending approval in admin panel.</p>`,
-      },
-    }).catch((e) => console.error("notify-admin failed", e));
+    try {
+      const { data, error } = await supabase.functions.invoke("submit-review", { body: r });
+      if (error || data?.error) console.error("submit-review failed", error || data?.error);
+    } catch (e) {
+      console.error("submit-review failed", e);
+    }
   };
   const approveReview = async (id: string, approved: boolean) => {
-    const { error } = await supabase.from("reviews").update({ approved }).eq("id", id);
-    if (error) return console.error(error);
+    const r = await adminCall("review_update", { id, patch: { approved } });
+    if (!r.ok) return console.error("review_update failed", r.error);
     setReviews((prev) => prev.map((x) => (x.id === id ? { ...x, approved } : x)));
   };
   const deleteReview = async (id: string) => {
-    const { error } = await supabase.from("reviews").delete().eq("id", id);
-    if (error) return console.error(error);
+    const r = await adminCall("review_delete", { id });
+    if (!r.ok) return console.error("review_delete failed", r.error);
     setReviews((prev) => prev.filter((x) => x.id !== id));
   };
 
