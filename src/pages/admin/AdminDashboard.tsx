@@ -679,11 +679,11 @@ const AdminDashboard = () => {
         </div>
       </>);
 
-      if (blockKey === "servicesPreview") return wrap("Auto-scrolling services cards on home. Add an image + alt text for each service card.", <>
-        <p className="text-sm text-muted-foreground">Section title/intro is edited on the <button className="text-accent underline" onClick={() => setActivePage("services")}>Services page</button>.</p>
+      if (blockKey === "servicesPreview") return wrap("Auto-scrolling services cards on home. Edit each card's image, title and description.", <>
+        <p className="text-sm text-muted-foreground">Section title/intro is edited on the <button className="text-accent underline" onClick={() => setActivePage("services")}>Services page</button>. Leave title/description empty to use the defaults.</p>
         <div className="space-y-3">
           {SITE_SERVICES.map((s) => {
-            const sp = servicePreviews[s.slug] || { image: "", imageAlt: "" };
+            const sp = servicePreviews[s.slug] || { image: "", imageAlt: "", title: "", desc: "" };
             return (
               <div key={s.slug} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
                 <div className="flex items-center justify-between">
@@ -691,7 +691,9 @@ const AdminDashboard = () => {
                   <span className="text-xs text-muted-foreground">/{s.slug}</span>
                 </div>
                 <ImageUpload value={sp.image} onChange={(url) => updateServicePreview(s.slug, { image: url })} />
-                <Input value={sp.imageAlt} onChange={(e) => updateServicePreview(s.slug, { imageAlt: e.target.value })} placeholder="Image alt text (for SEO)" />
+                <Input value={sp.imageAlt || ""} onChange={(e) => updateServicePreview(s.slug, { imageAlt: e.target.value })} placeholder="Image alt text (for SEO)" />
+                <Input value={sp.title || ""} onChange={(e) => updateServicePreview(s.slug, { title: e.target.value })} placeholder={`Card title (default: ${s.label})`} />
+                <Textarea rows={3} value={sp.desc || ""} onChange={(e) => updateServicePreview(s.slug, { desc: e.target.value })} placeholder="Card description (leave empty for default)" />
               </div>
             );
           })}
