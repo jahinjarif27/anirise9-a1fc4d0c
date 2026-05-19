@@ -863,6 +863,59 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
 
+  // Admin session token (HMAC token from admin-login edge function)
+  const adminTokenRef = useRef<string | null>(null);
+
+  // Call admin-action edge function with the current token.
+  // Returns { ok: boolean, data?: any, error?: string }.
+  const adminCall = async (op: string, payload: any = {}): Promise<{ ok: boolean; data?: any; error?: string }> => {
+    const token = adminTokenRef.current;
+    if (!token) return { ok: false, error: "Not authenticated" };
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-action", {
+        body: { token, op, payload },
+      });
+      if (error) return { ok: false, error: error.message };
+      if (data?.error) return { ok: false, error: data.error };
+      return { ok: true, data: data?.data };
+    } catch (e: any) {
+      return { ok: false, error: e?.message || "Network error" };
+    }
+  };
+
+  // Load admin-only data (full leads list, all reviews, visit analytics).
+  const loadAdminData = async () => {
+    const [leadsR, reviewsR, visitsR] = await Promise.all([
+      adminCall("leads_list"),
+      adminCall("reviews_list"),
+      adminCall("visits_list", { sinceDays: 30 }),
+    ]);
+    if (leadsR.ok && Array.isArray(leadsR.data)) setLeads(leadsR.data.map(fromDbLead));
+    if (reviewsR.ok && Array.isArray(reviewsR.data)) {
+      setReviews(reviewsR.data.map((r: any) => ({
+        id: r.id, name: r.name, role: r.role ?? "", quote: r.quote,
+        rating: r.rating ?? 5, approved: !!r.approved,
+        createdAt: new Date(r.created_at).getTime(),
+      })));
+    }
+    if (visitsR.ok && Array.isArray(visitsR.data)) {
+      const rows = visitsR.data;
+      const uniqueIds = new Set<string>();
+      rows.forEach((v: any, i: number) => uniqueIds.add(v.visitor_id || `legacy-${i}`));
+      setVisits(uniqueIds.size);
+      const buckets: Record<string, Set<string>> = {};
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+        buckets[d] = new Set();
+      }
+      rows.forEach((v: any, i: number) => {
+        const d = new Date(v.created_at).toISOString().slice(0, 10);
+        if (d in buckets) buckets[d].add(v.visitor_id || `legacy-${i}`);
+      });
+      setVisitSeries(Object.entries(buckets).map(([day, set]) => ({ day: day.slice(5), visits: set.size })));
+    }
+  };
+
   // ---------------------------------------------------------------
   // Initial load
   // ---------------------------------------------------------------
