@@ -1249,7 +1249,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const deleteCaseStudy = (id: string) => setCaseStudies((prev) => prev.filter((x) => x.id !== id));
   const updateFinalCta = (c: Partial<FinalCta>) => setFinalCta((prev) => ({ ...prev, ...c }));
   const updateServicePreview = (slug: string, sp: Partial<ServicePreview>) =>
-    setServicePreviews((prev) => ({ ...prev, [slug]: { image: "", imageAlt: "", ...(prev[slug] || {}), ...sp } }));
+    setServicePreviews((prev) => ({ ...prev, [slug]: { image: "", imageAlt: "", title: "", desc: "", ...(prev[slug] || {}), ...sp } }));
   const updateServiceContent = (slug: string, patch: Partial<ServiceContent>) =>
     setServiceContent((prev) => {
       const base = prev[slug] ?? defaultServiceContent[slug] ?? defaultServiceContent["website-seo"];
