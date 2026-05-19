@@ -61,10 +61,10 @@ export const ServicesPreview = () => {
                 )}
               </div>
               <h3 className="text-xl font-extrabold text-foreground mb-2 text-center">
-                {s.title}
+                {sp?.title?.trim() || s.title}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed text-center italic line-clamp-3">
-                {s.desc}
+                {sp?.desc?.trim() || s.desc}
               </p>
             </Link>
             );

@@ -16,16 +16,12 @@ import { ProcessSteps } from "@/components/site/home/ProcessSteps";
 import { HomeLoader } from "@/components/site/HomeLoader";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const Index = () => {
   const { pageLocation, homeSections, customPages, homeBlocks, seo, loading } = useAdmin();
-  const [minDelay, setMinDelay] = useState(true);
-  useEffect(() => {
-    const t = setTimeout(() => setMinDelay(false), 300);
-    return () => clearTimeout(t);
-  }, []);
-  const showLoader = loading || minDelay;
+  const [animDone, setAnimDone] = useState(false);
+  const showLoader = loading || !animDone;
   const onHome = (k: string) => (pageLocation[k] ?? "home") === "home";
   const pageSeo = seo.pageSeo?.home;
   useSEO({
@@ -45,7 +41,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {showLoader && <HomeLoader />}
+      {showLoader && <HomeLoader onDone={() => setAnimDone(true)} />}
       <Navbar />
       <main>
         {onHome("hero") && <Hero />}
