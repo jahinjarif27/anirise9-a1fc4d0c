@@ -41,7 +41,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {showLoader && <HomeLoader />}
+      {showLoader && <HomeLoader onDone={() => setAnimDone(true)} />}
       <Navbar />
       <main>
         {onHome("hero") && <Hero />}
