@@ -8,10 +8,14 @@ import { toast } from "sonner";
 export const AdminLogin = () => {
   const { login } = useAdmin();
   const [pw, setPw] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!login(pw)) {
+    setBusy(true);
+    const ok = await login(pw);
+    setBusy(false);
+    if (!ok) {
       toast.error("Wrong password");
       setPw("");
     } else {
