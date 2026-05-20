@@ -1215,8 +1215,8 @@ const AdminDashboard = () => {
             <SectionHeader
               icon={ImgIcon}
               title={it.title || "Untitled project"}
-              subtitle={`Project detail page — /portfolio/${it.id}`}
-              action={<Button asChild variant="outline" size="sm"><Link to={`/portfolio/${it.id}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>}
+              subtitle={`Project detail page — /portfolio/${(it.slug?.trim() || it.id)}`}
+              action={<Button asChild variant="outline" size="sm"><Link to={`/portfolio/${it.slug?.trim() || it.id}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>}
             />
 
             <div className="grid sm:grid-cols-2 gap-3">
