@@ -105,6 +105,11 @@ const PAGE_URL_PREVIEW: Record<string, string> = {
   testimonials: "/testimonials", contact: "/contact", "strategy-call": "/strategy-call",
 };
 
+const SCHEMA_TYPE_OPTIONS = [
+  "Article", "BlogPosting", "BreadcrumbList", "Service", "Product",
+  "FAQPage", "WebPage", "WebSite", "Organization", "LocalBusiness", "Person", "Event",
+];
+
 const SeoBlock = ({
   pageKey, seo, updatePageSeo,
 }: {
@@ -112,44 +117,222 @@ const SeoBlock = ({
   seo: any; updatePageSeo: (key: string, patch: any) => void;
 }) => {
   if (!INDEXABLE_PAGE_KEYS.has(pageKey)) return null;
-  const s = seo.pageSeo[pageKey] || { metaTitle: "", metaDescription: "", metaKeywords: "" };
+  const s = seo.pageSeo[pageKey] || {};
   const titleLen = s.metaTitle?.length || 0;
   const descLen = s.metaDescription?.length || 0;
-  const onSave = () => {
-    // SEO is persisted reactively via the AdminContext debounce; this triggers
-    // a no-op write that flushes any pending edits and confirms to the user.
-    updatePageSeo(pageKey, {});
-    toast.success(`SEO saved for ${PAGE_URL_PREVIEW[pageKey] || pageKey} — live on next page load`);
+  const status: "published" | "draft" = s.status === "draft" ? "draft" : "published";
+  const canonicalAuto = s.canonicalAuto !== false; // default true
+  const defaultSlug = pageKey === "home" ? "" : pageKey;
+  const effectiveSlug = (s.slug?.trim() || defaultSlug).replace(/^\/+/, "");
+  const previewPath = effectiveSlug ? `/${effectiveSlug}` : "/";
+  const robots: "index" | "noindex" = s.robots === "noindex" ? "noindex" : "index";
+  const schemas: any[] = Array.isArray(s.schemas) ? s.schemas : [];
+
+  const update = (patch: any) => updatePageSeo(pageKey, patch);
+
+  const addSchema = () => {
+    const id = `ps_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+    update({ schemas: [...schemas, { id, type: "Article", enabled: true, name: "New schema", json: "{}" }] });
   };
+  const updateSchema = (id: string, patch: any) => {
+    update({ schemas: schemas.map((x) => (x.id === id ? { ...x, ...patch } : x)) });
+  };
+  const removeSchema = (id: string) => {
+    update({ schemas: schemas.filter((x) => x.id !== id) });
+  };
+
+  const onSave = () => {
+    update({});
+    toast.success(`SEO saved for ${previewPath} — live on next page load`);
+  };
+
   return (
-    <Card className="p-5 sm:p-6 space-y-3">
+    <Card className="p-5 sm:p-6 space-y-4">
       <div className="flex items-center gap-2 flex-wrap">
         <Search className="h-4 w-4" />
-        <h4 className="font-bold">Page SEO</h4>
-        <span className="text-[11px] text-muted-foreground">{PAGE_URL_PREVIEW[pageKey]}</span>
+        <h4 className="font-bold">Page SEO &amp; settings</h4>
+        <span className="text-[11px] text-muted-foreground font-mono">{previewPath}</span>
+        {status === "draft" && (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">DRAFT</span>
+        )}
+        {robots === "noindex" && (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-700 dark:text-rose-300">NOINDEX</span>
+        )}
         <Button size="sm" variant="hero" className="ml-auto" onClick={onSave}>
           <Save className="h-4 w-4" /> Save SEO
         </Button>
       </div>
-      <p className="text-[11px] text-muted-foreground -mt-1">
-        These tags ship in the <code>&lt;head&gt;</code> of <code>{PAGE_URL_PREVIEW[pageKey]}</code> so Google can rank this page correctly.
-      </p>
+
+      {/* Slug + status */}
+      <div className="grid sm:grid-cols-[1fr_auto] gap-3 items-end">
+        <div>
+          <label className="text-xs font-medium mb-1 block">
+            URL slug{" "}
+            <span className="text-muted-foreground font-normal">
+              (default: <code className="font-mono">{defaultSlug ? `/${defaultSlug}` : "/"}</code>)
+            </span>
+          </label>
+          {pageKey === "home" ? (
+            <Input value="/" disabled />
+          ) : (
+            <Input
+              value={s.slug || ""}
+              placeholder={defaultSlug}
+              onChange={(e) => update({ slug: e.target.value.trim().toLowerCase().replace(/[^a-z0-9\-_/]/g, "").replace(/^\/+/, "") })}
+            />
+          )}
+          <p className="text-[10px] text-muted-foreground mt-1">
+            Original path <code className="font-mono">/{defaultSlug || ""}</code> always works too — both render this page.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-secondary">
+          <Switch
+            checked={status === "published"}
+            onCheckedChange={(v) => update({ status: v ? "published" : "draft" })}
+          />
+          <span className="text-sm font-medium">{status === "published" ? "Published" : "Draft"}</span>
+        </div>
+      </div>
+
       <div>
         <label className="text-xs font-medium mb-1 block">
           Meta title <span className={titleLen > 60 ? "text-destructive" : "text-muted-foreground"}>({titleLen}/60)</span>
         </label>
-        <Input value={s.metaTitle} onChange={(e) => updatePageSeo(pageKey, { metaTitle: e.target.value })} placeholder="e.g. Portfolio — AniRise Client Work & Results" />
+        <Input value={s.metaTitle || ""} onChange={(e) => update({ metaTitle: e.target.value })} placeholder="e.g. Portfolio — AniRise Client Work & Results" />
       </div>
       <div>
         <label className="text-xs font-medium mb-1 block">
           Meta description <span className={descLen > 160 ? "text-destructive" : "text-muted-foreground"}>({descLen}/160)</span>
         </label>
-        <Textarea rows={3} value={s.metaDescription} onChange={(e) => updatePageSeo(pageKey, { metaDescription: e.target.value })} placeholder="Short summary shown by Google under the title." />
+        <Textarea rows={3} value={s.metaDescription || ""} onChange={(e) => update({ metaDescription: e.target.value })} placeholder="Short summary shown by Google under the title." />
       </div>
       <div>
         <label className="text-xs font-medium mb-1 block">Meta keywords <span className="text-muted-foreground">(optional)</span></label>
-        <Input value={s.metaKeywords} onChange={(e) => updatePageSeo(pageKey, { metaKeywords: e.target.value })} placeholder="comma, separated, keywords" />
+        <Input value={s.metaKeywords || ""} onChange={(e) => update({ metaKeywords: e.target.value })} placeholder="comma, separated, keywords" />
       </div>
+
+      {/* Canonical */}
+      <div className="rounded-xl border border-border/60 p-3 space-y-2 bg-secondary/30">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-semibold">Canonical URL</span>
+          <div className="ml-auto flex items-center gap-2">
+            <Switch checked={canonicalAuto} onCheckedChange={(v) => update({ canonicalAuto: v })} />
+            <span className="text-xs">Auto</span>
+          </div>
+        </div>
+        {canonicalAuto ? (
+          <p className="text-[11px] text-muted-foreground font-mono break-all">
+            https://anirise.com.bd{previewPath}
+          </p>
+        ) : (
+          <Input
+            value={s.canonicalUrl || ""}
+            onChange={(e) => update({ canonicalUrl: e.target.value })}
+            placeholder="https://example.com/your-canonical-url"
+          />
+        )}
+      </div>
+
+      {/* Open Graph + Robots */}
+      <div className="rounded-xl border border-border/60 p-3 space-y-3 bg-secondary/30">
+        <p className="text-xs font-semibold">Social sharing (Open Graph)</p>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label className="text-[11px] font-medium mb-1 block">OG Title</label>
+            <Input value={s.ogTitle || ""} onChange={(e) => update({ ogTitle: e.target.value })} placeholder="Defaults to meta title" />
+          </div>
+          <div>
+            <label className="text-[11px] font-medium mb-1 block">OG Image URL</label>
+            <Input value={s.ogImage || ""} onChange={(e) => update({ ogImage: e.target.value })} placeholder="/og-image.jpg or https://..." />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="text-[11px] font-medium mb-1 block">OG Description</label>
+            <Textarea rows={2} value={s.ogDescription || ""} onChange={(e) => update({ ogDescription: e.target.value })} placeholder="Defaults to meta description" />
+          </div>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3 pt-2 border-t border-border/40">
+          <div>
+            <label className="text-[11px] font-medium mb-1 block">Robots</label>
+            <select
+              value={robots}
+              onChange={(e) => update({ robots: e.target.value })}
+              className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm"
+            >
+              <option value="index">Index (visible to search engines)</option>
+              <option value="noindex">No-index (hide from search engines)</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-[11px] font-medium mb-1 block">Sitemap change frequency</label>
+            <select
+              value={s.changefreq || "monthly"}
+              onChange={(e) => update({ changefreq: e.target.value })}
+              className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm"
+            >
+              {["always","hourly","daily","weekly","monthly","yearly","never"].map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-[11px] font-medium mb-1 block">Sitemap priority (0.0 – 1.0)</label>
+            <Input value={s.priority || "0.8"} onChange={(e) => update({ priority: e.target.value })} placeholder="0.8" />
+          </div>
+        </div>
+      </div>
+
+      {/* Page-level JSON-LD schemas */}
+      <div className="rounded-xl border border-border/60 p-3 space-y-3 bg-secondary/30">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-semibold">Structured data (JSON-LD)</span>
+          <Button size="sm" variant="outline" className="ml-auto h-7 text-xs" onClick={addSchema}>
+            <Plus className="h-3.5 w-3.5" /> Add schema
+          </Button>
+        </div>
+        {schemas.length === 0 && (
+          <p className="text-[11px] text-muted-foreground">No page-level schemas. The page will use the sitewide Organization schema as fallback.</p>
+        )}
+        {schemas.map((sc: any) => (
+          <div key={sc.id} className="rounded-lg border border-border/60 bg-background p-3 space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Input
+                className="h-8 text-xs flex-1 min-w-[140px]"
+                value={sc.name || ""}
+                onChange={(e) => updateSchema(sc.id, { name: e.target.value })}
+                placeholder="Schema name (internal only)"
+              />
+              <select
+                value={sc.type}
+                onChange={(e) => updateSchema(sc.id, { type: e.target.value })}
+                className="h-8 px-2 rounded-md border border-input bg-background text-xs"
+              >
+                {SCHEMA_TYPE_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+              <div className="flex items-center gap-1.5">
+                <Switch checked={sc.enabled !== false} onCheckedChange={(v) => updateSchema(sc.id, { enabled: v })} />
+                <span className="text-[10px]">{sc.enabled !== false ? "On" : "Off"}</span>
+              </div>
+              <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => removeSchema(sc.id)}>
+                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+              </Button>
+            </div>
+            <Textarea
+              rows={4}
+              className="font-mono text-[11px]"
+              value={sc.json || ""}
+              onChange={(e) => updateSchema(sc.id, { json: e.target.value })}
+              placeholder='{"headline": "My article", "author": {"@type": "Person", "name": "Jane"}}'
+            />
+            <p className="text-[10px] text-muted-foreground">
+              JSON body only — <code>@context</code> and <code>@type</code> are added automatically.
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-[11px] text-muted-foreground border-t border-border/40 pt-3">
+        These tags ship in the <code>&lt;head&gt;</code> of <code className="font-mono">{previewPath}</code>. Draft status hides the page from public navigation and serves a 404 to visitors.
+      </p>
     </Card>
   );
 };
