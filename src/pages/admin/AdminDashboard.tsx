@@ -1080,6 +1080,15 @@ const AdminDashboard = () => {
             <p className="text-sm text-muted-foreground">Edit every text, stat, process step, deliverable, chart bar and CTA shown on this service page. FAQ is at the bottom.</p>
           </Card>
 
+          <SeoBlock
+            pageKey={`svc:${slug}`}
+            seo={seo}
+            updatePageSeo={updatePageSeo}
+            defaultPath={`/services/${slug}`}
+            disableSlug
+          />
+
+
           <ServiceContentEditor
             slug={slug}
             content={serviceContent[slug] ?? { enabled: true, heroEyebrow: svc.label, heroHeadlineBefore: svc.label, heroHeadlineAccent: "", heroBlurb: "", heroPrimaryLabel: "", heroPrimaryUrl: "/#contact", heroSecondaryLabel: "", heroSecondaryUrl: "#process", stats: [], whyEyebrow: "", whyTitle: "", whyCards: [], processEyebrow: "", processTitle: "", processSteps: [], deliverablesEyebrow: "", deliverablesTitle: "", deliverablesBlurb: "", deliverables: [], chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] }, ctaHeadline: "", ctaBlurb: "", ctaLabel: "", ctaUrl: "/#contact" }}
