@@ -35,6 +35,7 @@ const ProjectDetail = () => {
   });
 
   if (loading) return null;
+  if (shouldRedirect) return <Navigate to={`/portfolio/${p!.slug}`} replace />;
   if (!p) {
     return (
       <div className="min-h-screen bg-background">
