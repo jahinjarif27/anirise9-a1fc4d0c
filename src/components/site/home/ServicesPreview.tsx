@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { services } from "@/data/services";
+import { useServices } from "@/lib/useServices";
 import { useAdmin } from "@/context/AdminContext";
 
 export const ServicesPreview = () => {
   const { content, servicePreviews } = useAdmin();
+  const services = useServices();
   // Duplicate list so marquee loops seamlessly
   const loop = [...services, ...services];
 

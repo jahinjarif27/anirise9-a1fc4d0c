@@ -6,7 +6,7 @@ import { ServiceLayout } from "@/pages/services/ServiceLayout";
 import { ServiceFAQ } from "@/components/site/ServiceFAQ";
 import { useAdmin } from "@/context/AdminContext";
 import { defaultServiceContent, ServiceContent } from "@/data/serviceContentDefaults";
-import { services } from "@/data/services";
+import { useServices } from "@/lib/useServices";
 import {
   ResponsiveContainer,
   BarChart,
@@ -40,6 +40,7 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
 
 export const ServicePageTemplate = ({ slug }: { slug: string }) => {
   const { serviceContent } = useAdmin();
+  const services = useServices();
   const service = services.find((s) => s.slug === slug);
   const base = defaultServiceContent[slug] ?? {
     ...defaultServiceContent["website-seo"],

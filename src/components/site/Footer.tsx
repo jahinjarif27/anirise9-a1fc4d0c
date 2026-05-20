@@ -2,7 +2,7 @@ import logo from "@/assets/anirise-logo.jpg";
 import { Facebook, Mail, Phone, Instagram, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
-import { services } from "@/data/services";
+import { useServices } from "@/lib/useServices";
 
 const PAGE_KEYS = [
   { key: "home", label: "Home", defaultSlug: "" },
@@ -14,6 +14,7 @@ const PAGE_KEYS = [
 
 export const Footer = () => {
   const { contact, seo } = useAdmin();
+  const services = useServices();
   const pages = PAGE_KEYS
     .filter((p) => seo.pageSeo?.[p.key]?.status !== "draft")
     .map((p) => {

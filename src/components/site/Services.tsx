@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { services, Service } from "@/data/services";
 import { useAdmin } from "@/context/AdminContext";
+import { useServices, type RuntimeService } from "@/lib/useServices";
+
+type Service = RuntimeService;
 
 const ServiceCard = ({ service }: { service: Service }) => (
   <Link
@@ -21,6 +23,7 @@ const ServiceCard = ({ service }: { service: Service }) => (
 
 export const Services = () => {
   const { content } = useAdmin();
+  const services = useServices();
 
   return (
     <section id="services" className="bg-background py-20 lg:py-24">

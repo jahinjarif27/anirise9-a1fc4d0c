@@ -12,13 +12,8 @@ import {
 import { Send } from "lucide-react";
 import { toast } from "sonner";
 import { useAdmin } from "@/context/AdminContext";
-import { services } from "@/data/services";
+import { useServices } from "@/lib/useServices";
 
-const SERVICE_OPTIONS = [
-  ...services.map((s) => s.title),
-  "Custom Web Development",
-  "Other",
-];
 const TIMELINE_OPTIONS = [
   "As Soon As Possible",
   "Within 1 Month",
@@ -34,6 +29,8 @@ const BUDGET_OPTIONS = [
 
 export const StrategyCall = () => {
   const { addLead } = useAdmin();
+  const dynServices = useServices();
+  const SERVICE_OPTIONS = [...dynServices.map((s) => s.title), "Custom Web Development", "Other"];
   const [form, setForm] = useState({
     name: "",
     phone: "",
