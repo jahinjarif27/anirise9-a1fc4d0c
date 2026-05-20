@@ -1433,6 +1433,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         finalCta, updateFinalCta,
         servicePreviews, updateServicePreview,
         serviceContent, updateServiceContent,
+        addService, updateService, deleteService,
         processFlow, updateProcessFlow, addProcessFlowStep, updateProcessFlowStep, deleteProcessFlowStep,
       }}
     >
