@@ -181,6 +181,8 @@ const SeoBlock = ({
           </label>
           {pageKey === "home" ? (
             <Input value="/" disabled />
+          ) : disableSlug ? (
+            <Input value={`/${defaultSlug}`} disabled />
           ) : (
             <Input
               value={s.slug || ""}
