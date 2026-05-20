@@ -38,10 +38,13 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
   };
 };
 
-export const ServicePageTemplate = ({ slug }: { slug: string }) => {
+export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) => {
   const { serviceContent } = useAdmin();
   const services = useServices();
-  const service = services.find((s) => s.slug === slug);
+  // Accept either identity slug OR public URL slug.
+  const match = services.find((s) => s.slug === incomingSlug || s.publicSlug === incomingSlug);
+  const slug = match?.slug ?? incomingSlug;
+  const service = match;
   const base = defaultServiceContent[slug] ?? {
     ...defaultServiceContent["website-seo"],
     heroEyebrow: service?.title ?? "Service",
@@ -53,8 +56,9 @@ export const ServicePageTemplate = ({ slug }: { slug: string }) => {
   };
   const c = merge(base, serviceContent?.[slug]);
 
+  const publicSlug = service?.publicSlug ?? slug;
   return (
-    <ServiceLayout title={service?.title ?? c.heroEyebrow ?? "Service"} description={c.heroBlurb} path={`/services/${slug}`}>
+    <ServiceLayout title={service?.title ?? c.heroEyebrow ?? "Service"} description={c.heroBlurb} path={`/services/${publicSlug}`}>
       {/* Hero */}
       <section className="bg-gradient-hero py-20 lg:py-28 relative overflow-hidden">
         <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-accent/10 blur-3xl" aria-hidden />

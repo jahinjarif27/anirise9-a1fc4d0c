@@ -149,7 +149,7 @@ export const Navbar = () => {
                   <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
                     <div className="min-w-[260px] bg-background border border-border rounded-2xl shadow-elegant p-2">
                       {services.map((s) => (
-                        <a key={s.slug} href={`/services/${s.slug}`} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors">
+                        <a key={s.slug} href={`/services/${s.publicSlug}`} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors">
                           <span className="h-9 w-9 rounded-lg bg-accent/10 text-accent grid place-items-center shrink-0">
                             <s.icon className="h-4 w-4" />
                           </span>
@@ -224,7 +224,7 @@ export const Navbar = () => {
                                 {services.map((s) => (
                                   <li key={s.slug}>
                                     <a
-                                      href={`/services/${s.slug}`}
+                                      href={`/services/${s.publicSlug}`}
                                       onClick={() => setOpen(false)}
                                       className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-medium text-foreground/80 hover:text-accent hover:bg-secondary/50"
                                     >

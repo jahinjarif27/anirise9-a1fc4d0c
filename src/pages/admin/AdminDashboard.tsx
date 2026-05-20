@@ -26,7 +26,7 @@ import { ServiceContentEditor } from "@/components/admin/ServiceContentEditor";
 import { Switch } from "@/components/ui/switch";
 import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
-import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES } from "@/context/AdminContext";
+import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES, SERVICE_ICON_CHOICES } from "@/context/AdminContext";
 
 const visitData = Array.from({ length: 14 }, (_, i) => ({
   day: `D${i + 1}`,
@@ -111,14 +111,20 @@ const SCHEMA_TYPE_OPTIONS = [
 ];
 
 const SeoBlock = ({
-  pageKey, seo, updatePageSeo, defaultPath, disableSlug = false,
+  pageKey, seo, updatePageSeo, defaultPath, disableSlug = false, slugPrefix,
+  externalSlug, onExternalSlugChange,
 }: {
   pageKey: string;
   seo: any; updatePageSeo: (key: string, patch: any) => void;
   /** Override default URL for non-built-in pages (e.g. /services/website-seo). */
   defaultPath?: string;
-  /** Hide slug-edit input (e.g. service/project pages where slug = identity). */
+  /** Hide slug-edit input entirely (read-only display). */
   disableSlug?: boolean;
+  /** When set, show this fixed prefix and only let admin edit the trailing slug. e.g. "/services/" */
+  slugPrefix?: string;
+  /** When set, the slug input reads/writes this external value instead of pageSeo[key].slug. */
+  externalSlug?: string;
+  onExternalSlugChange?: (next: string) => void;
 }) => {
   // Allow extended keys (svc:*, proj:*) by checking defaultPath presence.
   if (!INDEXABLE_PAGE_KEYS.has(pageKey) && !defaultPath) return null;
@@ -130,7 +136,13 @@ const SeoBlock = ({
   const defaultSlug = defaultPath
     ? defaultPath.replace(/^\/+/, "")
     : (pageKey === "home" ? "" : pageKey);
-  const effectiveSlug = (s.slug?.trim() || defaultSlug).replace(/^\/+/, "");
+  // For slugPrefix mode, the "tail" is everything after the prefix.
+  const prefixClean = slugPrefix ? slugPrefix.replace(/^\/+/, "").replace(/\/+$/, "") + "/" : "";
+  const defaultTail = slugPrefix ? defaultSlug.slice(prefixClean.length) : defaultSlug;
+  const effectiveTail = slugPrefix
+    ? ((externalSlug ?? s.slug ?? "").trim() || defaultTail)
+    : ((s.slug?.trim() || defaultSlug)).replace(/^\/+/, "");
+  const effectiveSlug = slugPrefix ? `${prefixClean}${effectiveTail}` : effectiveTail;
   const previewPath = effectiveSlug ? `/${effectiveSlug}` : "/";
   const robots: "index" | "noindex" = s.robots === "noindex" ? "noindex" : "index";
   const schemas: any[] = Array.isArray(s.schemas) ? s.schemas : [];
@@ -152,6 +164,9 @@ const SeoBlock = ({
     update({});
     toast.success(`SEO saved for ${previewPath} — live on next page load`);
   };
+
+  const sanitizeTail = (v: string) =>
+    v.trim().toLowerCase().replace(/[^a-z0-9\-_]/g, "").replace(/^\/+/, "");
 
   return (
     <Card className="p-5 sm:p-6 space-y-4">
@@ -181,6 +196,20 @@ const SeoBlock = ({
           </label>
           {pageKey === "home" ? (
             <Input value="/" disabled />
+          ) : slugPrefix ? (
+            <div className="flex items-stretch rounded-md border border-input bg-background overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+              <span className="px-3 py-2 text-sm font-mono text-muted-foreground bg-secondary/60 select-none border-r border-input">/{prefixClean}</span>
+              <input
+                value={externalSlug ?? s.slug ?? ""}
+                placeholder={defaultTail}
+                onChange={(e) => {
+                  const next = sanitizeTail(e.target.value);
+                  if (onExternalSlugChange) onExternalSlugChange(next);
+                  else update({ slug: next });
+                }}
+                className="flex-1 px-3 py-2 text-sm bg-transparent outline-none"
+              />
+            </div>
           ) : disableSlug ? (
             <Input value={`/${defaultSlug}`} disabled />
           ) : (
@@ -202,6 +231,7 @@ const SeoBlock = ({
           <span className="text-sm font-medium">{status === "published" ? "Published" : "Draft"}</span>
         </div>
       </div>
+
 
       <div>
         <label className="text-xs font-medium mb-1 block">
@@ -373,8 +403,14 @@ const AdminDashboard = () => {
     finalCta, updateFinalCta,
     servicePreviews, updateServicePreview,
     serviceContent, updateServiceContent,
+    addService, updateService, deleteService,
     processFlow, updateProcessFlow, addProcessFlowStep, updateProcessFlowStep, deleteProcessFlowStep,
   } = useAdmin();
+  // Dynamic services list (admin-managed). Falls back to legacy static labels when DB list is empty.
+  const adminServicesList = (content.servicesList || []);
+  const siteServices: { slug: string; label: string }[] = adminServicesList.length
+    ? [...adminServicesList].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((s) => ({ slug: s.slug, label: s.title }))
+    : SITE_SERVICES;
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
     slug: "", title: "", excerpt: "", category: "SEO",
@@ -874,7 +910,7 @@ const AdminDashboard = () => {
       if (blockKey === "servicesPreview") return wrap("Auto-scrolling services cards on home. Edit each card's image, title and description.", <>
         <p className="text-sm text-muted-foreground">Section title/intro is edited on the <button className="text-accent underline" onClick={() => setActivePage("services")}>Services page</button>. Leave title/description empty to use the defaults.</p>
         <div className="space-y-3">
-          {SITE_SERVICES.map((s) => {
+          {siteServices.map((s) => {
             const sp = servicePreviews[s.slug] || { image: "", imageAlt: "", title: "", desc: "" };
             return (
               <div key={s.slug} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
@@ -1063,8 +1099,11 @@ const AdminDashboard = () => {
     // Service page editors
     if (activePage.startsWith("svc:")) {
       const slug = activePage.slice(4);
-      const svc = SITE_SERVICES.find((s) => s.slug === slug);
+      const svc = siteServices.find((s) => s.slug === slug);
       if (!svc) return <p className="text-sm text-muted-foreground">Service not found.</p>;
+      const adminSvc = adminServicesList.find((s) => s.slug === slug);
+      const urlSlugVal = adminSvc?.urlSlug ?? "";
+      const publicTail = (urlSlugVal.trim() || slug);
       const faqs = serviceFaqs[slug] || [];
       return (
         <div className="space-y-4">
@@ -1072,11 +1111,45 @@ const AdminDashboard = () => {
             <SectionHeader
               icon={Layers}
               title={svc.label}
-              subtitle={`Service page — /services/${slug}`}
+              subtitle={`Service page — /services/${publicTail}`}
               action={
-                <Button asChild variant="outline" size="sm"><Link to={`/services/${slug}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
+                <Button asChild variant="outline" size="sm"><Link to={`/services/${publicTail}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
               }
             />
+            {adminSvc ? (
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Card title">
+                  <Input value={adminSvc.title} onChange={(e) => updateService(adminSvc.id, { title: e.target.value })} />
+                </Field>
+                <Field label="Icon (lucide)">
+                  <Select value={adminSvc.iconName || "Sparkles"} onValueChange={(v) => updateService(adminSvc.id, { iconName: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent className="max-h-[260px]">
+                      {SERVICE_ICON_CHOICES.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <div className="sm:col-span-2">
+                  <Field label="Short description (shown on Services overview card)">
+                    <Textarea rows={2} value={adminSvc.desc} onChange={(e) => updateService(adminSvc.id, { desc: e.target.value })} />
+                  </Field>
+                </div>
+                <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-border/60">
+                  <div className="flex items-center gap-2">
+                    <Switch checked={adminSvc.published !== false} onCheckedChange={(v) => updateService(adminSvc.id, { published: v })} />
+                    <span className="text-sm font-medium">{adminSvc.published !== false ? "Published" : "Draft"}</span>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => {
+                    if (!confirm(`Delete service "${adminSvc.title}"? Its page and content stay in the DB but become unreachable.`)) return;
+                    deleteService(adminSvc.id);
+                    setActivePage("services");
+                    toast.success("Service deleted");
+                  }}><Trash2 className="h-4 w-4 text-destructive" /> Delete service</Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">Legacy service — edit title/desc/icon by adding it to the admin Services list (use “+ Add service”).</p>
+            )}
             <p className="text-sm text-muted-foreground">Edit every text, stat, process step, deliverable, chart bar and CTA shown on this service page. FAQ is at the bottom.</p>
           </Card>
 
@@ -1085,7 +1158,10 @@ const AdminDashboard = () => {
             seo={seo}
             updatePageSeo={updatePageSeo}
             defaultPath={`/services/${slug}`}
-            disableSlug
+            slugPrefix={adminSvc ? "/services/" : undefined}
+            disableSlug={!adminSvc}
+            externalSlug={adminSvc ? urlSlugVal : undefined}
+            onExternalSlugChange={adminSvc ? (next) => updateService(adminSvc.id, { urlSlug: next }) : undefined}
           />
 
 
@@ -1094,6 +1170,7 @@ const AdminDashboard = () => {
             content={serviceContent[slug] ?? { enabled: true, heroEyebrow: svc.label, heroHeadlineBefore: svc.label, heroHeadlineAccent: "", heroBlurb: "", heroPrimaryLabel: "", heroPrimaryUrl: "/#contact", heroSecondaryLabel: "", heroSecondaryUrl: "#process", stats: [], whyEyebrow: "", whyTitle: "", whyCards: [], processEyebrow: "", processTitle: "", processSteps: [], deliverablesEyebrow: "", deliverablesTitle: "", deliverablesBlurb: "", deliverables: [], chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] }, ctaHeadline: "", ctaBlurb: "", ctaLabel: "", ctaUrl: "/#contact" }}
             onChange={(patch) => updateServiceContent(slug, patch)}
           />
+
 
           <Card className="p-5 sm:p-6 space-y-4">
             <SectionHeader
@@ -1138,8 +1215,8 @@ const AdminDashboard = () => {
             <SectionHeader
               icon={ImgIcon}
               title={it.title || "Untitled project"}
-              subtitle={`Project detail page — /portfolio/${it.id}`}
-              action={<Button asChild variant="outline" size="sm"><Link to={`/portfolio/${it.id}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>}
+              subtitle={`Project detail page — /portfolio/${(it.slug?.trim() || it.id)}`}
+              action={<Button asChild variant="outline" size="sm"><Link to={`/portfolio/${it.slug?.trim() || it.id}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>}
             />
 
             <div className="grid sm:grid-cols-2 gap-3">
@@ -1299,7 +1376,9 @@ const AdminDashboard = () => {
             seo={seo}
             updatePageSeo={updatePageSeo}
             defaultPath={`/portfolio/${it.id}`}
-            disableSlug
+            slugPrefix="/portfolio/"
+            externalSlug={it.slug || ""}
+            onExternalSlugChange={(next) => updatePortfolioItem(it.id, { slug: next })}
           />
 
         </div>
@@ -1724,7 +1803,7 @@ const AdminDashboard = () => {
                           <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
                           <Layers className="h-3.5 w-3.5 text-accent" />
                           <span className="flex-1 truncate">Services</span>
-                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{1 + SITE_SERVICES.length}</Badge>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{1 + siteServices.length}</Badge>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
                           <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
@@ -1735,7 +1814,7 @@ const AdminDashboard = () => {
                                 <span className="truncate">Services overview</span>
                               </button>
                             </li>
-                            {SITE_SERVICES.map((s) => {
+                            {siteServices.map((s) => {
                               const key = `svc:${s.slug}`;
                               const count = (serviceFaqs[s.slug] || []).length;
                               return (
@@ -1749,6 +1828,16 @@ const AdminDashboard = () => {
                                 </li>
                               );
                             })}
+                            <li>
+                              <button onClick={() => {
+                                const item = addService({ title: "New service", desc: "Short description", iconName: "Sparkles" });
+                                setTimeout(() => setActivePage(`svc:${item.slug}`), 0);
+                                toast.success("Service added");
+                              }}
+                                className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 transition-colors">
+                                <Plus className="h-3 w-3" /> Add service
+                              </button>
+                            </li>
                           </ul>
                         </CollapsibleContent>
                       </Collapsible>

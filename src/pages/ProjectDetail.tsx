@@ -23,12 +23,13 @@ import {
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { portfolio, loading } = useAdmin();
-  const p = portfolio.find((x) => x.id === id);
+  const p = portfolio.find((x) => x.id === id || (x.slug && x.slug === id));
+  const publicTail = p?.slug?.trim() || p?.id || id || "";
 
   useSEO({
     title: p ? `${p.title} — Project | AniRise` : "Project | AniRise",
     description: p?.description || "AniRise project case.",
-    path: `/portfolio/${id}`,
+    path: `/portfolio/${publicTail}`,
   });
 
   if (loading) return null;

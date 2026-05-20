@@ -59,7 +59,7 @@ export const Footer = () => {
           <ul className="space-y-2 text-sm text-primary-foreground/70">
             {services.map((s) => (
               <li key={s.slug}>
-                <Link to={`/services/${s.slug}`} className="hover:text-accent transition-smooth">
+                <Link to={`/services/${s.publicSlug}`} className="hover:text-accent transition-smooth">
                   {s.title}
                 </Link>
               </li>

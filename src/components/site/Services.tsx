@@ -7,7 +7,7 @@ type Service = RuntimeService;
 
 const ServiceCard = ({ service }: { service: Service }) => (
   <Link
-    to={`/services/${service.slug}`}
+    to={`/services/${service.publicSlug}`}
     className="group block bg-card rounded-2xl p-6 shadow-card hover:shadow-elegant transition-smooth border border-border/40"
   >
     <div className="h-12 w-12 rounded-xl bg-accent/10 text-accent grid place-items-center mb-5 group-hover:bg-gradient-accent group-hover:text-accent-foreground transition-smooth">
