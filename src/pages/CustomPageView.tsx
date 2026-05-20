@@ -19,10 +19,7 @@ function CustomPageContent({ page }: { page: NonNullable<ReturnType<typeof useAd
     title: ps?.metaTitle || `${page.title} — AniRise`,
     description: ps?.metaDescription || page.intro || (page.body ? page.body.slice(0, 158) : undefined),
     path: `/${page.slug}`,
-    image: ps?.ogImage || page.image || undefined,
     canonical: ps?.canonicalAuto === false ? ps?.canonicalUrl : undefined,
-    ogTitle: ps?.ogTitle,
-    ogDescription: ps?.ogDescription,
     robots: ps?.robots === "noindex" ? "noindex, nofollow" : undefined,
     schemas: ps?.schemas?.filter((s: any) => s.enabled),
   });

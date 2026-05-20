@@ -17,8 +17,6 @@ const BlogPostPage = () => {
     title: override?.metaTitle || (post ? `${post.title} — AniRise` : "Article — AniRise"),
     description: override?.metaDescription || post?.excerpt?.slice(0, 158) || "Article from the AniRise blog.",
     path: `/blog/${slug ?? ""}`,
-    image: post?.cover,
-    type: "article",
     jsonLd: post
       ? {
           "@context": "https://schema.org",

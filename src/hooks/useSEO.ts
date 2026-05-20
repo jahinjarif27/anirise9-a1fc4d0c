@@ -15,12 +15,8 @@ type SEOOptions = {
   description?: string;
   /** Page path (e.g. "/services"). Used to build canonical when no override. */
   path?: string;
-  image?: string;
-  type?: "website" | "article";
-  /** Full canonical URL override (e.g. "https://example.com/blog/post-1"). Takes precedence over path. */
+  /** Full canonical URL override. Takes precedence over path. */
   canonical?: string;
-  ogTitle?: string;
-  ogDescription?: string;
   /** Robots directive. Use "noindex, nofollow" to keep page out of search. */
   robots?: string;
   /** Per-page structured-data blocks. Replaces all previous page-level JSON-LD on mount. */
@@ -49,20 +45,26 @@ function upsertLink(rel: string, href: string) {
   el.setAttribute("href", href);
 }
 
+/**
+ * Remove any Open Graph / Twitter card meta tags that may have been injected
+ * earlier (legacy code or third-party scripts). OG sharing previews are
+ * intentionally disabled site-wide.
+ */
+function stripOgTags() {
+  document.head
+    .querySelectorAll('meta[property^="og:"], meta[name^="twitter:"]')
+    .forEach((n) => n.remove());
+}
+
 export function useSEO({
   title,
   description,
   path,
-  image,
-  type = "website",
   canonical,
-  ogTitle,
-  ogDescription,
   robots,
   schemas,
   jsonLd,
 }: SEOOptions) {
-  // Stable dep keys
   const schemaKey = JSON.stringify(schemas ?? []);
   const jsonLdKey = JSON.stringify(jsonLd ?? null);
 
@@ -71,41 +73,24 @@ export function useSEO({
 
     const pathname = path ?? (typeof window !== "undefined" ? window.location.pathname : "/");
     const canonicalUrl = canonical && canonical.trim() ? canonical.trim() : SITE_URL + pathname;
-    const img = image
-      ? image.startsWith("http")
-        ? image
-        : SITE_URL + (image.startsWith("/") ? image : "/" + image)
-      : `${SITE_URL}/favicon.jpg`;
-
-    const finalOgTitle = ogTitle?.trim() || title;
-    const finalOgDesc = ogDescription?.trim() || description;
 
     if (description) {
       upsertMeta('meta[name="description"]', "name", "description", description);
-      upsertMeta('meta[name="twitter:description"]', "name", "twitter:description", finalOgDesc || description);
     }
-    if (finalOgDesc) {
-      upsertMeta('meta[property="og:description"]', "property", "og:description", finalOgDesc);
-    }
-    upsertMeta('meta[property="og:title"]', "property", "og:title", finalOgTitle);
-    upsertMeta('meta[name="twitter:title"]', "name", "twitter:title", finalOgTitle);
-    upsertMeta('meta[property="og:url"]', "property", "og:url", canonicalUrl);
-    upsertMeta('meta[property="og:type"]', "property", "og:type", type);
-    upsertMeta('meta[property="og:image"]', "property", "og:image", img);
-    upsertMeta('meta[name="twitter:image"]', "name", "twitter:image", img);
     upsertLink("canonical", canonicalUrl);
 
-    // Robots — only override if explicitly provided (so noindex doesn't leak across pages)
+    // Robots — only override if explicitly provided
     if (robots && robots.trim()) {
       upsertMeta('meta[name="robots"]', "name", "robots", robots.trim());
     } else {
-      // Reset to default index,follow so a previous page's noindex doesn't stick
       upsertMeta('meta[name="robots"]', "name", "robots", "index, follow");
     }
 
+    // Always strip any OG/Twitter tags every render
+    stripOgTags();
+
     // Per-page JSON-LD — replace any previous page-level blocks on every render
-    const existing = document.head.querySelectorAll('script[data-page-jsonld="true"]');
-    existing.forEach((n) => n.remove());
+    document.head.querySelectorAll('script[data-page-jsonld="true"]').forEach((n) => n.remove());
 
     const allSchemas: SchemaInput[] = [];
     if (Array.isArray(schemas)) allSchemas.push(...schemas.filter((s) => s.enabled !== false));
@@ -124,7 +109,7 @@ export function useSEO({
       try {
         body = s.json && s.json.trim() ? JSON.parse(s.json) : {};
       } catch {
-        return; // skip invalid JSON
+        return;
       }
       const payload = { "@context": "https://schema.org", "@type": s.type, ...(body as object) };
       const tag = document.createElement("script");
@@ -133,5 +118,5 @@ export function useSEO({
       tag.text = JSON.stringify(payload);
       document.head.appendChild(tag);
     });
-  }, [title, description, path, image, type, canonical, ogTitle, ogDescription, robots, schemaKey, jsonLdKey]);
+  }, [title, description, path, canonical, robots, schemaKey, jsonLdKey]);
 }

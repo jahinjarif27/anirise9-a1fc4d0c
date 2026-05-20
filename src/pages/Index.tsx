@@ -41,10 +41,7 @@ const Index = () => {
       ps?.metaDescription ||
       "AniRise is a digital agency helping brands rise online with SEO, ecommerce SEO, web development, and digital marketing. Visibility, growth, success.",
     path: "/",
-    image: ps?.ogImage || undefined,
     canonical: ps?.canonicalAuto === false ? ps?.canonicalUrl : undefined,
-    ogTitle: ps?.ogTitle,
-    ogDescription: ps?.ogDescription,
     robots: ps?.robots === "noindex" ? "noindex, nofollow" : undefined,
     schemas: userSchemas.length > 0 ? userSchemas : undefined,
     jsonLd: fallbackJsonLd,

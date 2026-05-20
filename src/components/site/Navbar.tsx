@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { Menu, Phone, Search, TrendingUp, Facebook, Instagram } from "lucide-react";
+import { Menu, Phone, Search, TrendingUp, Facebook, Instagram, ChevronDown } from "lucide-react";
 import logo from "@/assets/anirise-logo.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAdmin } from "@/context/AdminContext";
+import { services } from "@/data/services";
 
 const SECTION_LABELS: Record<string, string> = {
   hero: "Home", services: "Services", portfolio: "Projects",
@@ -126,16 +128,37 @@ export const Navbar = () => {
             <span className="font-display text-xl font-bold text-foreground">AniRise</span>
           </a>
           <ul className="hidden lg:flex items-center gap-8 mx-auto">
-            {allLinks.map((l) => (
-              <li key={l.href}>
-                <a
-                  href={l.href}
-                  className="text-sm font-medium text-foreground/80 hover:text-accent transition-smooth"
-                >
-                  {l.label}
-                </a>
-              </li>
-            ))}
+            {allLinks.map((l) => {
+              const isServices = l.label === "Services";
+              if (!isServices) {
+                return (
+                  <li key={l.href}>
+                    <a href={l.href} className="text-sm font-medium text-foreground/80 hover:text-accent transition-smooth">
+                      {l.label}
+                    </a>
+                  </li>
+                );
+              }
+              return (
+                <li key={l.href} className="relative group">
+                  <a href={l.href} className="inline-flex items-center gap-1 text-sm font-medium text-foreground/80 hover:text-accent transition-smooth">
+                    {l.label} <ChevronDown className="h-3.5 w-3.5" />
+                  </a>
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+                    <div className="min-w-[260px] bg-background border border-border rounded-2xl shadow-elegant p-2">
+                      {services.map((s) => (
+                        <a key={s.slug} href={`/services/${s.slug}`} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors">
+                          <span className="h-9 w-9 rounded-lg bg-accent/10 text-accent grid place-items-center shrink-0">
+                            <s.icon className="h-4 w-4" />
+                          </span>
+                          <span className="text-sm font-medium text-foreground">{s.title}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
           <div className="flex items-center gap-2">
             <button aria-label="Search" className="h-10 w-10 grid place-items-center rounded-full hover:bg-secondary text-foreground">

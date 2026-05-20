@@ -42,7 +42,28 @@ type SiteContent = {
   contactBlurb: string;
   contactImage: string;
   contactImageAlt: string;
+  /** Admin-managed services list (replaces hardcoded src/data/services.ts) */
+  servicesList?: AdminService[];
 };
+
+export type AdminService = {
+  id: string;
+  slug: string;
+  title: string;
+  desc: string;
+  /** Lucide icon name, e.g. "Search". Rendered via lucide-react Icons map. */
+  iconName: string;
+  published: boolean;
+  order: number;
+};
+
+/** Curated lucide-react icon names admin can pick from. */
+export const SERVICE_ICON_CHOICES = [
+  "Search", "ShoppingCart", "Code2", "Megaphone", "PenTool", "Smartphone",
+  "Globe", "Rocket", "TrendingUp", "BarChart3", "Mail", "Camera",
+  "Video", "Palette", "Settings", "Zap", "Award", "Target",
+  "Layout", "Layers", "Briefcase", "MessageSquare", "Star", "Sparkles",
+];
 
 type ContactInfo = {
   whatsapp: string;
@@ -72,6 +93,8 @@ export type ProjectCategory = typeof PROJECT_CATEGORIES[number];
 
 export type PortfolioItem = {
   id: string;
+  /** Vanity URL slug. When set, /portfolio/{slug} resolves; /portfolio/{id} still works. */
+  slug?: string;
   image: string;
   imageAlt: string;
   tag: string;
@@ -319,6 +342,14 @@ const defaultContent: SiteContent = {
   contactBlurb: "Tell us about your business. We'll reply within 24 hours with a clear, honest path forward.",
   contactImage: "",
   contactImageAlt: "",
+  servicesList: [
+    { id: "svc-website-seo",          slug: "website-seo",          title: "Website SEO",           desc: "Rank higher on Google. We optimize your site's structure, content, and authority to drive organic traffic that converts.", iconName: "Search",       published: true, order: 1 },
+    { id: "svc-ecommerce-seo",        slug: "ecommerce-seo",        title: "Ecommerce SEO",         desc: "Get your products in front of buyers. Product-page optimization, schema, and category strategy built to scale revenue.",       iconName: "ShoppingCart", published: true, order: 2 },
+    { id: "svc-website-development",  slug: "website-development",  title: "Website Development",   desc: "Fast, modern, mobile-first websites engineered for performance, conversions, and a seamless brand experience.",               iconName: "Code2",        published: true, order: 3 },
+    { id: "svc-social-media",         slug: "social-media-marketing", title: "Social Media Marketing", desc: "Grow your audience on Facebook & Instagram with content and ad campaigns that build community and drive sales.",               iconName: "Megaphone",    published: true, order: 4 },
+    { id: "svc-graphics-design",      slug: "graphics-design",      title: "Graphics Design",       desc: "Eye-catching visuals, brand identity, and marketing creatives that make your brand instantly recognizable.",                       iconName: "PenTool",      published: true, order: 5 },
+    { id: "svc-digital-marketing",    slug: "digital-marketing",    title: "Digital Marketing",     desc: "Full-funnel campaigns across search, social, and email — measured, optimized, and engineered for ROI.",                            iconName: "Smartphone",   published: true, order: 6 },
+  ],
 };
 
 const defaultContact: ContactInfo = {
@@ -1069,12 +1100,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     };
     setMeta('meta[name="description"]', "name", "description", seo.metaDescription);
     setMeta('meta[name="keywords"]', "name", "keywords", seo.metaKeywords);
-    setMeta('meta[property="og:title"]', "property", "og:title", seo.metaTitle);
-    setMeta('meta[property="og:description"]', "property", "og:description", seo.metaDescription);
-    setMeta('meta[property="og:image"]', "property", "og:image", seo.ogImage);
-    setMeta('meta[name="twitter:title"]', "name", "twitter:title", seo.metaTitle);
-    setMeta('meta[name="twitter:description"]', "name", "twitter:description", seo.metaDescription);
-    setMeta('meta[name="twitter:image"]', "name", "twitter:image", seo.ogImage);
+    // Open Graph / Twitter intentionally disabled site-wide.
+    // Strip anything other code may have injected.
+    document.head
+      .querySelectorAll('meta[property^="og:"], meta[name^="twitter:"]')
+      .forEach((n) => n.remove());
     let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonical) {
       canonical = document.createElement("link");
