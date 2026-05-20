@@ -43,9 +43,15 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
 export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) => {
   const { serviceContent } = useAdmin();
   const services = useServices();
-  // Accept either identity slug OR public URL slug.
+  // Find by identity slug OR public URL slug.
   const match = services.find((s) => s.slug === incomingSlug || s.publicSlug === incomingSlug);
-  const slug = match?.slug ?? incomingSlug;
+  // If admin set a custom urlSlug, only the new public slug should resolve.
+  // Old identity slug → redirect to the new public URL (prevents duplicate-content SEO issue).
+  if (match && match.publicSlug !== incomingSlug) {
+    return <Navigate to={`/services/${match.publicSlug}`} replace />;
+  }
+  if (!match) return <NotFound />;
+  const slug = match.slug;
   const service = match;
   const base = defaultServiceContent[slug] ?? {
     ...defaultServiceContent["website-seo"],
