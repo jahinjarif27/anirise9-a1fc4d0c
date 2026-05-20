@@ -1828,6 +1828,16 @@ const AdminDashboard = () => {
                                 </li>
                               );
                             })}
+                            <li>
+                              <button onClick={() => {
+                                const item = addService({ title: "New service", desc: "Short description", iconName: "Sparkles" });
+                                setTimeout(() => setActivePage(`svc:${item.slug}`), 0);
+                                toast.success("Service added");
+                              }}
+                                className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 transition-colors">
+                                <Plus className="h-3 w-3" /> Add service
+                              </button>
+                            </li>
                           </ul>
                         </CollapsibleContent>
                       </Collapsible>
