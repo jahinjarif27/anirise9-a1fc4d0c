@@ -25,6 +25,8 @@ const ProjectDetail = () => {
   const { portfolio, loading } = useAdmin();
   const p = portfolio.find((x) => x.id === id || (x.slug && x.slug === id));
   const publicTail = p?.slug?.trim() || p?.id || id || "";
+  // If a custom slug exists, only that slug should resolve; redirect from raw id.
+  const shouldRedirect = !!p && !!p.slug?.trim() && id !== p.slug;
 
   useSEO({
     title: p ? `${p.title} — Project | AniRise` : "Project | AniRise",
