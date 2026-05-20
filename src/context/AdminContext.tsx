@@ -847,6 +847,9 @@ type AdminCtx = {
   updateServicePreview: (slug: string, sp: Partial<ServicePreview>) => void;
   serviceContent: Record<string, ServiceContent>;
   updateServiceContent: (slug: string, patch: Partial<ServiceContent>) => void;
+  addService: (s?: Partial<AdminService>) => AdminService;
+  updateService: (id: string, patch: Partial<AdminService>) => void;
+  deleteService: (id: string) => void;
   processFlow: ProcessFlow;
   updateProcessFlow: (patch: Partial<ProcessFlow>) => void;
   addProcessFlowStep: () => void;
