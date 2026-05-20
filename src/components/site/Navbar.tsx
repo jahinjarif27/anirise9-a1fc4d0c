@@ -16,19 +16,33 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 export const Navbar = () => {
-  const { contact, pageLocation, customPages, login } = useAdmin();
+  const { contact, customPages, login, seo } = useAdmin();
 
-  const sectionKeys = ["hero", "services", "portfolio", "blog", "testimonials", "contact"];
-  const links = sectionKeys.map((k) => {
-    const label = SECTION_LABELS[k];
-    if (k === "hero") return { label, href: "/" };
-    if (k === "blog") return { label, href: "/blog" };
-    return { label, href: `/${k}` };
-  });
+  // Built-in section nav — use admin-set slug + filter draft pages.
+  type NavKey = "hero" | "services" | "portfolio" | "blog" | "testimonials" | "contact";
+  const NAV_TO_SEO_KEY: Record<NavKey, string> = {
+    hero: "home", services: "services", portfolio: "portfolio",
+    blog: "blog", testimonials: "testimonials", contact: "contact",
+  };
+  const sectionKeys: NavKey[] = ["hero", "services", "portfolio", "blog", "testimonials", "contact"];
+  const links = sectionKeys
+    .filter((k) => {
+      const seoKey = NAV_TO_SEO_KEY[k];
+      return seo.pageSeo?.[seoKey]?.status !== "draft";
+    })
+    .map((k) => {
+      const label = SECTION_LABELS[k];
+      if (k === "hero") return { label, href: "/" };
+      const seoKey = NAV_TO_SEO_KEY[k];
+      const customSlug = seo.pageSeo?.[seoKey]?.slug?.trim();
+      const slug = customSlug && customSlug.length > 0 ? customSlug.replace(/^\/+/, "") : k;
+      return { label, href: `/${slug}` };
+    });
   const customLinks = customPages
     .filter((p) => p.published && Array.isArray(p.navLocation) && p.navLocation.length > 0)
     .map((p) => ({ label: p.title || p.slug, href: `/${p.slug}` }));
   const allLinks = [...links, ...customLinks];
+
   
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
