@@ -23,20 +23,31 @@ const Index = () => {
   const [animDone, setAnimDone] = useState(false);
   const showLoader = loading || !animDone;
   const onHome = (k: string) => (pageLocation[k] ?? "home") === "home";
-  const pageSeo = seo.pageSeo?.home;
+  const ps = seo.pageSeo?.home;
+  const userSchemas = ps?.schemas?.filter((s) => s.enabled) ?? [];
+  // Fallback Organization JSON-LD when admin hasn't configured page-level schemas
+  const fallbackJsonLd = userSchemas.length === 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "AniRise",
+        url: "https://anirise.com.bd/",
+        logo: "https://anirise.com.bd/favicon.jpg",
+      }
+    : undefined;
   useSEO({
-    title: pageSeo?.metaTitle || "AniRise — Visibility · Growth · Success | SEO & Web Agency",
+    title: ps?.metaTitle || "AniRise — Visibility · Growth · Success | SEO & Web Agency",
     description:
-      pageSeo?.metaDescription ||
+      ps?.metaDescription ||
       "AniRise is a digital agency helping brands rise online with SEO, ecommerce SEO, web development, and digital marketing. Visibility, growth, success.",
     path: "/",
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      name: "AniRise",
-      url: "https://anirise.com.bd/",
-      logo: "https://anirise.com.bd/favicon.jpg",
-    },
+    image: ps?.ogImage || undefined,
+    canonical: ps?.canonicalAuto === false ? ps?.canonicalUrl : undefined,
+    ogTitle: ps?.ogTitle,
+    ogDescription: ps?.ogDescription,
+    robots: ps?.robots === "noindex" ? "noindex, nofollow" : undefined,
+    schemas: userSchemas.length > 0 ? userSchemas : undefined,
+    jsonLd: fallbackJsonLd,
   });
 
   return (

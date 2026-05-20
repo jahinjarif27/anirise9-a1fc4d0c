@@ -5,6 +5,9 @@ import BlogPage from "./Blog.tsx";
 import BlogPostPage from "./BlogPost.tsx";
 import { CustomPageView } from "./CustomPageView";
 import { SectionPage } from "./SectionPage";
+import { useAdmin } from "@/context/AdminContext";
+import { useParams } from "react-router-dom";
+import { resolvePathToBuiltIn, type BuiltInPageKey } from "@/lib/pageConfig";
 
 const NotFound = lazy(() => import("./NotFound.tsx"));
 const AdminDashboard = lazy(() => import("./admin/AdminDashboard.tsx"));
@@ -16,12 +19,11 @@ const StrategyCallPage = lazy(() => import("./StrategyCallPage.tsx"));
 const CaseStudyDetail = lazy(() => import("./CaseStudyDetail.tsx"));
 const ProjectDetail = lazy(() => import("./ProjectDetail.tsx"));
 
-import { Hero } from "@/components/site/Hero";
 import { Services } from "@/components/site/Services";
 import { Portfolio } from "@/components/site/Portfolio";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Contact } from "@/components/site/Contact";
-import { Blog as BlogSection } from "@/components/site/Blog";
+import { About } from "@/components/site/About";
 
 const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title: string }> = {
   services: { Component: Services, title: "Services" },
@@ -29,8 +31,28 @@ const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title
   projects: { Component: Portfolio, title: "Projects" },
   testimonials: { Component: Testimonials, title: "Testimonials" },
   contact: { Component: Contact, title: "Contact" },
+  about: { Component: About, title: "About" },
 };
 
+/**
+ * Catch-all single-segment route. Order of resolution:
+ *   1. Admin-set custom slug for a built-in page → render that page
+ *   2. Default slug for a built-in page → render that page
+ *   3. Custom page (CustomPageView)
+ */
+const DynamicSlugResolver = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const { seo } = useAdmin();
+  const matched = resolvePathToBuiltIn(slug || "", seo.pageSeo);
+  if (matched && matched !== "home" && matched !== "blog" && matched !== "strategy-call") {
+    const entry = SECTION_COMPONENTS[matched as BuiltInPageKey];
+    if (entry) {
+      return <SectionPage Section={entry.Component} title={entry.title} sectionKey={matched} />;
+    }
+  }
+  // Fall through to custom page (handles /:slug for admin-created pages)
+  return <CustomPageView />;
+};
 
 export const AppRoutes = () => {
   return (
@@ -55,7 +77,7 @@ export const AppRoutes = () => {
         ))}
         <Route path="/p/:slug" element={<CustomPageView />} />
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/:slug" element={<CustomPageView />} />
+        <Route path="/:slug" element={<DynamicSlugResolver />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

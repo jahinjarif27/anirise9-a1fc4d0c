@@ -116,10 +116,32 @@ export type SchemaItem = {
   name: string;
 };
 
+export type PageStatus = "published" | "draft";
+export type PageRobots = "index" | "noindex";
+
 export type PageSeo = {
   metaTitle: string;
   metaDescription: string;
   metaKeywords: string;
+  // Phase 1 extensions — all optional, backward compatible with existing rows.
+  /** Public URL slug override. Empty / undefined = use default. */
+  slug?: string;
+  /** Draft pages 404 on public site, are hidden from nav/footer, excluded from sitemap. */
+  status?: PageStatus;
+  /** Full canonical URL override. When empty, hook builds from path. */
+  canonicalUrl?: string;
+  canonicalAuto?: boolean;
+  ogTitle?: string;
+  ogDescription?: string;
+  /** OG image URL (absolute or root-relative). */
+  ogImage?: string;
+  /** Robots meta value — "index" / "noindex". */
+  robots?: PageRobots;
+  /** Per-page JSON-LD schema blocks. */
+  schemas?: SchemaItem[];
+  /** Sitemap hints */
+  changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
+  priority?: string;
 };
 
 export type CustomPageSection = { id: string; title: string; body: string };
