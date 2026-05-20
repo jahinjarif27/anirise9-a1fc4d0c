@@ -1293,6 +1293,15 @@ const AdminDashboard = () => {
               </Button>
             </div>
           </Card>
+
+          <SeoBlock
+            pageKey={`proj:${it.id}`}
+            seo={seo}
+            updatePageSeo={updatePageSeo}
+            defaultPath={`/portfolio/${it.id}`}
+            disableSlug
+          />
+
         </div>
       );
     }
