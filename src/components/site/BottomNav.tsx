@@ -128,7 +128,7 @@ export const BottomNav = () => {
                               {services.map((s) => (
                                 <li key={s.slug}>
                                   <button
-                                    onClick={() => go(`/services/${s.slug}`)}
+                                    onClick={() => go(`/services/${s.publicSlug}`)}
                                     className="w-full text-left flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-medium text-foreground/80 hover:text-accent hover:bg-secondary/50"
                                   >
                                     <span className="h-8 w-8 rounded-lg bg-accent/10 text-accent grid place-items-center shrink-0">
