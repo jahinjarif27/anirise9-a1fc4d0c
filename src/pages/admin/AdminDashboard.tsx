@@ -373,8 +373,14 @@ const AdminDashboard = () => {
     finalCta, updateFinalCta,
     servicePreviews, updateServicePreview,
     serviceContent, updateServiceContent,
+    addService, updateService, deleteService,
     processFlow, updateProcessFlow, addProcessFlowStep, updateProcessFlowStep, deleteProcessFlowStep,
   } = useAdmin();
+  // Dynamic services list (admin-managed). Falls back to legacy static labels when DB list is empty.
+  const adminServicesList = (content.servicesList || []);
+  const siteServices: { slug: string; label: string }[] = adminServicesList.length
+    ? [...adminServicesList].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((s) => ({ slug: s.slug, label: s.title }))
+    : SITE_SERVICES;
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<BlogPost, "id">>({
     slug: "", title: "", excerpt: "", category: "SEO",
