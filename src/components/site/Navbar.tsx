@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAdmin } from "@/context/AdminContext";
-import { services } from "@/data/services";
+import { useServices } from "@/lib/useServices";
 
 const SECTION_LABELS: Record<string, string> = {
   hero: "Home", services: "Services", portfolio: "Projects",
@@ -19,6 +19,8 @@ const SECTION_LABELS: Record<string, string> = {
 
 export const Navbar = () => {
   const { contact, customPages, login, seo } = useAdmin();
+  const services = useServices();
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
   // Built-in section nav — use admin-set slug + filter draft pages.
   type NavKey = "hero" | "services" | "portfolio" | "blog" | "testimonials" | "contact";
