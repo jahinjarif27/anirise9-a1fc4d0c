@@ -1353,6 +1353,31 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       return { ...prev, [slug]: { ...base, ...patch } };
     });
 
+  const addService = (s: Partial<AdminService> = {}): AdminService => {
+    const list = content.servicesList || [];
+    const baseSlug = (s.slug || `service-${Date.now().toString(36)}`).toLowerCase().replace(/[^a-z0-9\-_]/g, "-");
+    // Ensure identity slug is unique
+    let slug = baseSlug, n = 2;
+    while (list.some((x) => x.slug === slug)) { slug = `${baseSlug}-${n++}`; }
+    const order = list.length ? Math.max(...list.map((x) => x.order || 0)) + 1 : 1;
+    const item: AdminService = {
+      id: `svc_${newId()}`,
+      slug,
+      title: s.title || "New service",
+      desc: s.desc || "",
+      iconName: s.iconName || "Sparkles",
+      published: s.published ?? true,
+      order,
+      ...(s.urlSlug ? { urlSlug: s.urlSlug } : {}),
+    };
+    setContent((p) => ({ ...p, servicesList: [...(p.servicesList || []), item] }));
+    return item;
+  };
+  const updateService = (id: string, patch: Partial<AdminService>) =>
+    setContent((p) => ({ ...p, servicesList: (p.servicesList || []).map((x) => (x.id === id ? { ...x, ...patch } : x)) }));
+  const deleteService = (id: string) =>
+    setContent((p) => ({ ...p, servicesList: (p.servicesList || []).filter((x) => x.id !== id) }));
+
   const updateProcessFlow = (patch: Partial<ProcessFlow>) => setProcessFlow((prev) => ({ ...prev, ...patch }));
   const addProcessFlowStep = () =>
     setProcessFlow((prev) => ({ ...prev, steps: [...prev.steps, { id: newId(), icon: "Sparkles", title: "New step", chip: "Tag" }] }));
