@@ -1101,6 +1101,9 @@ const AdminDashboard = () => {
       const slug = activePage.slice(4);
       const svc = siteServices.find((s) => s.slug === slug);
       if (!svc) return <p className="text-sm text-muted-foreground">Service not found.</p>;
+      const adminSvc = adminServicesList.find((s) => s.slug === slug);
+      const urlSlugVal = adminSvc?.urlSlug ?? "";
+      const publicTail = (urlSlugVal.trim() || slug);
       const faqs = serviceFaqs[slug] || [];
       return (
         <div className="space-y-4">
@@ -1108,11 +1111,45 @@ const AdminDashboard = () => {
             <SectionHeader
               icon={Layers}
               title={svc.label}
-              subtitle={`Service page — /services/${slug}`}
+              subtitle={`Service page — /services/${publicTail}`}
               action={
-                <Button asChild variant="outline" size="sm"><Link to={`/services/${slug}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
+                <Button asChild variant="outline" size="sm"><Link to={`/services/${publicTail}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
               }
             />
+            {adminSvc ? (
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Card title">
+                  <Input value={adminSvc.title} onChange={(e) => updateService(adminSvc.id, { title: e.target.value })} />
+                </Field>
+                <Field label="Icon (lucide)">
+                  <Select value={adminSvc.iconName || "Sparkles"} onValueChange={(v) => updateService(adminSvc.id, { iconName: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent className="max-h-[260px]">
+                      {SERVICE_ICON_CHOICES.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <div className="sm:col-span-2">
+                  <Field label="Short description (shown on Services overview card)">
+                    <Textarea rows={2} value={adminSvc.desc} onChange={(e) => updateService(adminSvc.id, { desc: e.target.value })} />
+                  </Field>
+                </div>
+                <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-border/60">
+                  <div className="flex items-center gap-2">
+                    <Switch checked={adminSvc.published !== false} onCheckedChange={(v) => updateService(adminSvc.id, { published: v })} />
+                    <span className="text-sm font-medium">{adminSvc.published !== false ? "Published" : "Draft"}</span>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => {
+                    if (!confirm(`Delete service "${adminSvc.title}"? Its page and content stay in the DB but become unreachable.`)) return;
+                    deleteService(adminSvc.id);
+                    setActivePage("services");
+                    toast.success("Service deleted");
+                  }}><Trash2 className="h-4 w-4 text-destructive" /> Delete service</Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">Legacy service — edit title/desc/icon by adding it to the admin Services list (use “+ Add service”).</p>
+            )}
             <p className="text-sm text-muted-foreground">Edit every text, stat, process step, deliverable, chart bar and CTA shown on this service page. FAQ is at the bottom.</p>
           </Card>
 
@@ -1121,7 +1158,10 @@ const AdminDashboard = () => {
             seo={seo}
             updatePageSeo={updatePageSeo}
             defaultPath={`/services/${slug}`}
-            disableSlug
+            slugPrefix={adminSvc ? "/services/" : undefined}
+            disableSlug={!adminSvc}
+            externalSlug={adminSvc ? urlSlugVal : undefined}
+            onExternalSlugChange={adminSvc ? (next) => updateService(adminSvc.id, { urlSlug: next }) : undefined}
           />
 
 
@@ -1130,6 +1170,7 @@ const AdminDashboard = () => {
             content={serviceContent[slug] ?? { enabled: true, heroEyebrow: svc.label, heroHeadlineBefore: svc.label, heroHeadlineAccent: "", heroBlurb: "", heroPrimaryLabel: "", heroPrimaryUrl: "/#contact", heroSecondaryLabel: "", heroSecondaryUrl: "#process", stats: [], whyEyebrow: "", whyTitle: "", whyCards: [], processEyebrow: "", processTitle: "", processSteps: [], deliverablesEyebrow: "", deliverablesTitle: "", deliverablesBlurb: "", deliverables: [], chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] }, ctaHeadline: "", ctaBlurb: "", ctaLabel: "", ctaUrl: "/#contact" }}
             onChange={(patch) => updateServiceContent(slug, patch)}
           />
+
 
           <Card className="p-5 sm:p-6 space-y-4">
             <SectionHeader
