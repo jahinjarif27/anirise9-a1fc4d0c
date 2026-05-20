@@ -54,7 +54,7 @@ export const Portfolio = () => {
             {filtered.map((it) => (
               <Link
                 key={it.id}
-                to={`/portfolio/${it.id}`}
+                to={`/portfolio/${it.slug?.trim() || it.id}`}
                 aria-label={`View project: ${it.title}`}
                 className="group relative overflow-hidden rounded-2xl shadow-card hover:shadow-elegant transition-smooth block cursor-pointer ring-1 ring-border/40 hover:ring-accent/60 hover:-translate-y-1"
               >
