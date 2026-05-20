@@ -1376,7 +1376,9 @@ const AdminDashboard = () => {
             seo={seo}
             updatePageSeo={updatePageSeo}
             defaultPath={`/portfolio/${it.id}`}
-            disableSlug
+            slugPrefix="/portfolio/"
+            externalSlug={it.slug || ""}
+            onExternalSlugChange={(next) => updatePortfolioItem(it.id, { slug: next })}
           />
 
         </div>
