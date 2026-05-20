@@ -111,18 +111,25 @@ const SCHEMA_TYPE_OPTIONS = [
 ];
 
 const SeoBlock = ({
-  pageKey, seo, updatePageSeo,
+  pageKey, seo, updatePageSeo, defaultPath, disableSlug = false,
 }: {
   pageKey: string;
   seo: any; updatePageSeo: (key: string, patch: any) => void;
+  /** Override default URL for non-built-in pages (e.g. /services/website-seo). */
+  defaultPath?: string;
+  /** Hide slug-edit input (e.g. service/project pages where slug = identity). */
+  disableSlug?: boolean;
 }) => {
-  if (!INDEXABLE_PAGE_KEYS.has(pageKey)) return null;
+  // Allow extended keys (svc:*, proj:*) by checking defaultPath presence.
+  if (!INDEXABLE_PAGE_KEYS.has(pageKey) && !defaultPath) return null;
   const s = seo.pageSeo[pageKey] || {};
   const titleLen = s.metaTitle?.length || 0;
   const descLen = s.metaDescription?.length || 0;
   const status: "published" | "draft" = s.status === "draft" ? "draft" : "published";
   const canonicalAuto = s.canonicalAuto !== false; // default true
-  const defaultSlug = pageKey === "home" ? "" : pageKey;
+  const defaultSlug = defaultPath
+    ? defaultPath.replace(/^\/+/, "")
+    : (pageKey === "home" ? "" : pageKey);
   const effectiveSlug = (s.slug?.trim() || defaultSlug).replace(/^\/+/, "");
   const previewPath = effectiveSlug ? `/${effectiveSlug}` : "/";
   const robots: "index" | "noindex" = s.robots === "noindex" ? "noindex" : "index";
@@ -174,6 +181,8 @@ const SeoBlock = ({
           </label>
           {pageKey === "home" ? (
             <Input value="/" disabled />
+          ) : disableSlug ? (
+            <Input value={`/${defaultSlug}`} disabled />
           ) : (
             <Input
               value={s.slug || ""}
@@ -1071,6 +1080,15 @@ const AdminDashboard = () => {
             <p className="text-sm text-muted-foreground">Edit every text, stat, process step, deliverable, chart bar and CTA shown on this service page. FAQ is at the bottom.</p>
           </Card>
 
+          <SeoBlock
+            pageKey={`svc:${slug}`}
+            seo={seo}
+            updatePageSeo={updatePageSeo}
+            defaultPath={`/services/${slug}`}
+            disableSlug
+          />
+
+
           <ServiceContentEditor
             slug={slug}
             content={serviceContent[slug] ?? { enabled: true, heroEyebrow: svc.label, heroHeadlineBefore: svc.label, heroHeadlineAccent: "", heroBlurb: "", heroPrimaryLabel: "", heroPrimaryUrl: "/#contact", heroSecondaryLabel: "", heroSecondaryUrl: "#process", stats: [], whyEyebrow: "", whyTitle: "", whyCards: [], processEyebrow: "", processTitle: "", processSteps: [], deliverablesEyebrow: "", deliverablesTitle: "", deliverablesBlurb: "", deliverables: [], chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] }, ctaHeadline: "", ctaBlurb: "", ctaLabel: "", ctaUrl: "/#contact" }}
@@ -1275,6 +1293,15 @@ const AdminDashboard = () => {
               </Button>
             </div>
           </Card>
+
+          <SeoBlock
+            pageKey={`proj:${it.id}`}
+            seo={seo}
+            updatePageSeo={updatePageSeo}
+            defaultPath={`/portfolio/${it.id}`}
+            disableSlug
+          />
+
         </div>
       );
     }

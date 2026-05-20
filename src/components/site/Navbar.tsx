@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAdmin } from "@/context/AdminContext";
-import { services } from "@/data/services";
+import { useServices } from "@/lib/useServices";
 
 const SECTION_LABELS: Record<string, string> = {
   hero: "Home", services: "Services", portfolio: "Projects",
@@ -19,6 +19,8 @@ const SECTION_LABELS: Record<string, string> = {
 
 export const Navbar = () => {
   const { contact, customPages, login, seo } = useAdmin();
+  const services = useServices();
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
   // Built-in section nav — use admin-set slug + filter draft pages.
   type NavKey = "hero" | "services" | "portfolio" | "blog" | "testimonials" | "contact";
@@ -182,19 +184,63 @@ export const Navbar = () => {
                     <img src={logo} alt="AniRise" className="h-10 w-10 rounded-full ring-2 ring-primary/20" />
                     <span className="font-display text-xl font-bold">AniRise</span>
                   </div>
-                  <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-1 py-5">
-                    {allLinks.map((l) => (
-                      <li key={l.href}>
-                        <a
-                          href={l.href}
-                          onClick={() => setOpen(false)}
-                          className="flex items-center justify-between py-3 text-base font-medium text-foreground/90 hover:text-accent border-b border-border/40 group"
-                        >
-                          <span>{l.label}</span>
-                          <span className="opacity-0 group-hover:opacity-100 transition-smooth text-accent">→</span>
-                        </a>
-                      </li>
-                    ))}
+                  <ul className="grid gap-x-6 gap-y-1 py-5">
+                    {allLinks.map((l) => {
+                      const isServices = l.label === "Services";
+                      if (!isServices) {
+                        return (
+                          <li key={l.href}>
+                            <a
+                              href={l.href}
+                              onClick={() => setOpen(false)}
+                              className="flex items-center justify-between py-3 text-base font-medium text-foreground/90 hover:text-accent border-b border-border/40 group"
+                            >
+                              <span>{l.label}</span>
+                              <span className="opacity-0 group-hover:opacity-100 transition-smooth text-accent">→</span>
+                            </a>
+                          </li>
+                        );
+                      }
+                      return (
+                        <li key={l.href}>
+                          <Collapsible open={mobileServicesOpen} onOpenChange={setMobileServicesOpen}>
+                            <div className="flex items-center justify-between border-b border-border/40">
+                              <a
+                                href={l.href}
+                                onClick={() => setOpen(false)}
+                                className="flex-1 py-3 text-base font-medium text-foreground/90 hover:text-accent"
+                              >
+                                {l.label}
+                              </a>
+                              <CollapsibleTrigger
+                                aria-label="Toggle services"
+                                className="p-2 text-foreground/70 hover:text-accent"
+                              >
+                                <ChevronDown className={`h-4 w-4 transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`} />
+                              </CollapsibleTrigger>
+                            </div>
+                            <CollapsibleContent>
+                              <ul className="pl-3 ml-1 border-l border-border/40 py-1 space-y-0.5">
+                                {services.map((s) => (
+                                  <li key={s.slug}>
+                                    <a
+                                      href={`/services/${s.slug}`}
+                                      onClick={() => setOpen(false)}
+                                      className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-medium text-foreground/80 hover:text-accent hover:bg-secondary/50"
+                                    >
+                                      <span className="h-8 w-8 rounded-lg bg-accent/10 text-accent grid place-items-center shrink-0">
+                                        <s.icon className="h-4 w-4" />
+                                      </span>
+                                      <span className="flex-1">{s.title}</span>
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            </CollapsibleContent>
+                          </Collapsible>
+                        </li>
+                      );
+                    })}
                   </ul>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-3">
                     <Button asChild size="lg" className="sm:flex-1 rounded-full bg-gradient-accent text-accent-foreground hover:opacity-90 min-h-14 h-14 text-base font-bold">
