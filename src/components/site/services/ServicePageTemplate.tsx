@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { lazy } from "react";
 import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { ServiceFAQ } from "@/components/site/ServiceFAQ";
 import { useAdmin } from "@/context/AdminContext";
 import { defaultServiceContent, ServiceContent } from "@/data/serviceContentDefaults";
 import { useServices } from "@/lib/useServices";
+const NotFound = lazy(() => import("@/pages/NotFound"));
 import {
   ResponsiveContainer,
   BarChart,
