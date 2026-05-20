@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { lazy } from "react";
 import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { ServiceFAQ } from "@/components/site/ServiceFAQ";
 import { useAdmin } from "@/context/AdminContext";
 import { defaultServiceContent, ServiceContent } from "@/data/serviceContentDefaults";
 import { useServices } from "@/lib/useServices";
+const NotFound = lazy(() => import("@/pages/NotFound"));
 import {
   ResponsiveContainer,
   BarChart,
@@ -41,9 +43,15 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
 export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) => {
   const { serviceContent } = useAdmin();
   const services = useServices();
-  // Accept either identity slug OR public URL slug.
+  // Find by identity slug OR public URL slug.
   const match = services.find((s) => s.slug === incomingSlug || s.publicSlug === incomingSlug);
-  const slug = match?.slug ?? incomingSlug;
+  // If admin set a custom urlSlug, only the new public slug should resolve.
+  // Old identity slug → redirect to the new public URL (prevents duplicate-content SEO issue).
+  if (match && match.publicSlug !== incomingSlug) {
+    return <Navigate to={`/services/${match.publicSlug}`} replace />;
+  }
+  if (!match) return <NotFound />;
+  const slug = match.slug;
   const service = match;
   const base = defaultServiceContent[slug] ?? {
     ...defaultServiceContent["website-seo"],

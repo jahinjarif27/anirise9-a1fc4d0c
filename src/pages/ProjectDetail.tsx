@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Building2, UserCircle2, Calendar, CheckCircle2 } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
@@ -25,6 +25,8 @@ const ProjectDetail = () => {
   const { portfolio, loading } = useAdmin();
   const p = portfolio.find((x) => x.id === id || (x.slug && x.slug === id));
   const publicTail = p?.slug?.trim() || p?.id || id || "";
+  // If a custom slug exists, only that slug should resolve; redirect from raw id.
+  const shouldRedirect = !!p && !!p.slug?.trim() && id !== p.slug;
 
   useSEO({
     title: p ? `${p.title} — Project | AniRise` : "Project | AniRise",
@@ -33,6 +35,7 @@ const ProjectDetail = () => {
   });
 
   if (loading) return null;
+  if (shouldRedirect) return <Navigate to={`/portfolio/${p!.slug}`} replace />;
   if (!p) {
     return (
       <div className="min-h-screen bg-background">
