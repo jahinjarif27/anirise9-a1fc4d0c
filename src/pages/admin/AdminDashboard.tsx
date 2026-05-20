@@ -111,14 +111,20 @@ const SCHEMA_TYPE_OPTIONS = [
 ];
 
 const SeoBlock = ({
-  pageKey, seo, updatePageSeo, defaultPath, disableSlug = false,
+  pageKey, seo, updatePageSeo, defaultPath, disableSlug = false, slugPrefix,
+  externalSlug, onExternalSlugChange,
 }: {
   pageKey: string;
   seo: any; updatePageSeo: (key: string, patch: any) => void;
   /** Override default URL for non-built-in pages (e.g. /services/website-seo). */
   defaultPath?: string;
-  /** Hide slug-edit input (e.g. service/project pages where slug = identity). */
+  /** Hide slug-edit input entirely (read-only display). */
   disableSlug?: boolean;
+  /** When set, show this fixed prefix and only let admin edit the trailing slug. e.g. "/services/" */
+  slugPrefix?: string;
+  /** When set, the slug input reads/writes this external value instead of pageSeo[key].slug. */
+  externalSlug?: string;
+  onExternalSlugChange?: (next: string) => void;
 }) => {
   // Allow extended keys (svc:*, proj:*) by checking defaultPath presence.
   if (!INDEXABLE_PAGE_KEYS.has(pageKey) && !defaultPath) return null;
@@ -130,7 +136,13 @@ const SeoBlock = ({
   const defaultSlug = defaultPath
     ? defaultPath.replace(/^\/+/, "")
     : (pageKey === "home" ? "" : pageKey);
-  const effectiveSlug = (s.slug?.trim() || defaultSlug).replace(/^\/+/, "");
+  // For slugPrefix mode, the "tail" is everything after the prefix.
+  const prefixClean = slugPrefix ? slugPrefix.replace(/^\/+/, "").replace(/\/+$/, "") + "/" : "";
+  const defaultTail = slugPrefix ? defaultSlug.slice(prefixClean.length) : defaultSlug;
+  const effectiveTail = slugPrefix
+    ? ((externalSlug ?? s.slug ?? "").trim() || defaultTail)
+    : ((s.slug?.trim() || defaultSlug)).replace(/^\/+/, "");
+  const effectiveSlug = slugPrefix ? `${prefixClean}${effectiveTail}` : effectiveTail;
   const previewPath = effectiveSlug ? `/${effectiveSlug}` : "/";
   const robots: "index" | "noindex" = s.robots === "noindex" ? "noindex" : "index";
   const schemas: any[] = Array.isArray(s.schemas) ? s.schemas : [];
@@ -152,6 +164,9 @@ const SeoBlock = ({
     update({});
     toast.success(`SEO saved for ${previewPath} — live on next page load`);
   };
+
+  const sanitizeTail = (v: string) =>
+    v.trim().toLowerCase().replace(/[^a-z0-9\-_]/g, "").replace(/^\/+/, "");
 
   return (
     <Card className="p-5 sm:p-6 space-y-4">
@@ -181,6 +196,20 @@ const SeoBlock = ({
           </label>
           {pageKey === "home" ? (
             <Input value="/" disabled />
+          ) : slugPrefix ? (
+            <div className="flex items-stretch rounded-md border border-input bg-background overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+              <span className="px-3 py-2 text-sm font-mono text-muted-foreground bg-secondary/60 select-none border-r border-input">/{prefixClean}</span>
+              <input
+                value={externalSlug ?? s.slug ?? ""}
+                placeholder={defaultTail}
+                onChange={(e) => {
+                  const next = sanitizeTail(e.target.value);
+                  if (onExternalSlugChange) onExternalSlugChange(next);
+                  else update({ slug: next });
+                }}
+                className="flex-1 px-3 py-2 text-sm bg-transparent outline-none"
+              />
+            </div>
           ) : disableSlug ? (
             <Input value={`/${defaultSlug}`} disabled />
           ) : (
@@ -202,6 +231,7 @@ const SeoBlock = ({
           <span className="text-sm font-medium">{status === "published" ? "Published" : "Draft"}</span>
         </div>
       </div>
+
 
       <div>
         <label className="text-xs font-medium mb-1 block">
