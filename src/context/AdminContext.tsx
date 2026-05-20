@@ -42,7 +42,28 @@ type SiteContent = {
   contactBlurb: string;
   contactImage: string;
   contactImageAlt: string;
+  /** Admin-managed services list (replaces hardcoded src/data/services.ts) */
+  servicesList?: AdminService[];
 };
+
+export type AdminService = {
+  id: string;
+  slug: string;
+  title: string;
+  desc: string;
+  /** Lucide icon name, e.g. "Search". Rendered via lucide-react Icons map. */
+  iconName: string;
+  published: boolean;
+  order: number;
+};
+
+/** Curated lucide-react icon names admin can pick from. */
+export const SERVICE_ICON_CHOICES = [
+  "Search", "ShoppingCart", "Code2", "Megaphone", "PenTool", "Smartphone",
+  "Globe", "Rocket", "TrendingUp", "BarChart3", "Mail", "Camera",
+  "Video", "Palette", "Settings", "Zap", "Award", "Target",
+  "Layout", "Layers", "Briefcase", "MessageSquare", "Star", "Sparkles",
+];
 
 type ContactInfo = {
   whatsapp: string;
@@ -72,6 +93,8 @@ export type ProjectCategory = typeof PROJECT_CATEGORIES[number];
 
 export type PortfolioItem = {
   id: string;
+  /** Vanity URL slug. When set, /portfolio/{slug} resolves; /portfolio/{id} still works. */
+  slug?: string;
   image: string;
   imageAlt: string;
   tag: string;
