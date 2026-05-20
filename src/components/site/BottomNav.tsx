@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Home, LayoutGrid, Briefcase, Menu as MenuIcon, Phone, Facebook, Instagram } from "lucide-react";
+import { Home, LayoutGrid, Briefcase, Menu as MenuIcon, Phone, Facebook, Instagram, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/anirise-logo.jpg";
 import { useAdmin } from "@/context/AdminContext";
+import { useServices } from "@/lib/useServices";
 
 const SECTION_LABELS: Record<string, string> = {
   hero: "Home", services: "Services", portfolio: "Projects",
@@ -13,6 +15,8 @@ const SECTION_LABELS: Record<string, string> = {
 
 export const BottomNav = () => {
   const { contact, customPages } = useAdmin();
+  const services = useServices();
+  const [servicesOpen, setServicesOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -89,18 +93,57 @@ export const BottomNav = () => {
                   <img src={logo} alt="AniRise" className="h-10 w-10 rounded-full ring-2 ring-primary/20" />
                   <span className="font-display text-xl font-bold">AniRise</span>
                 </div>
-                <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-1 py-5">
-                  {allLinks.map((l) => (
-                    <li key={l.href}>
-                      <button
-                        onClick={() => go(l.href)}
-                        className="w-full flex items-center justify-between py-3 text-base font-medium text-foreground/90 hover:text-accent border-b border-border/40"
-                      >
-                        <span>{l.label}</span>
-                        <span className="text-accent">→</span>
-                      </button>
-                    </li>
-                  ))}
+                <ul className="grid gap-x-6 gap-y-1 py-5">
+                  {allLinks.map((l) => {
+                    const isServices = l.label === "Services";
+                    if (!isServices) {
+                      return (
+                        <li key={l.href}>
+                          <button
+                            onClick={() => go(l.href)}
+                            className="w-full flex items-center justify-between py-3 text-base font-medium text-foreground/90 hover:text-accent border-b border-border/40"
+                          >
+                            <span>{l.label}</span>
+                            <span className="text-accent">→</span>
+                          </button>
+                        </li>
+                      );
+                    }
+                    return (
+                      <li key={l.href}>
+                        <Collapsible open={servicesOpen} onOpenChange={setServicesOpen}>
+                          <div className="flex items-center justify-between border-b border-border/40">
+                            <button
+                              onClick={() => go(l.href)}
+                              className="flex-1 text-left py-3 text-base font-medium text-foreground/90 hover:text-accent"
+                            >
+                              {l.label}
+                            </button>
+                            <CollapsibleTrigger aria-label="Toggle services" className="p-2 text-foreground/70 hover:text-accent">
+                              <ChevronDown className={`h-4 w-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`} />
+                            </CollapsibleTrigger>
+                          </div>
+                          <CollapsibleContent>
+                            <ul className="pl-3 ml-1 border-l border-border/40 py-1 space-y-0.5">
+                              {services.map((s) => (
+                                <li key={s.slug}>
+                                  <button
+                                    onClick={() => go(`/services/${s.slug}`)}
+                                    className="w-full text-left flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-medium text-foreground/80 hover:text-accent hover:bg-secondary/50"
+                                  >
+                                    <span className="h-8 w-8 rounded-lg bg-accent/10 text-accent grid place-items-center shrink-0">
+                                      <s.icon className="h-4 w-4" />
+                                    </span>
+                                    <span className="flex-1">{s.title}</span>
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      </li>
+                    );
+                  })}
                 </ul>
                 <div className="flex flex-col sm:flex-row items-stretch gap-3 pt-3">
                   <Button asChild size="lg" className="sm:flex-1 rounded-full bg-gradient-accent text-accent-foreground hover:opacity-90 min-h-14 h-14 text-base font-bold">
