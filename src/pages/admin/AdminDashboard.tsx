@@ -880,7 +880,7 @@ const AdminDashboard = () => {
       if (blockKey === "servicesPreview") return wrap("Auto-scrolling services cards on home. Edit each card's image, title and description.", <>
         <p className="text-sm text-muted-foreground">Section title/intro is edited on the <button className="text-accent underline" onClick={() => setActivePage("services")}>Services page</button>. Leave title/description empty to use the defaults.</p>
         <div className="space-y-3">
-          {SITE_SERVICES.map((s) => {
+          {siteServices.map((s) => {
             const sp = servicePreviews[s.slug] || { image: "", imageAlt: "", title: "", desc: "" };
             return (
               <div key={s.slug} className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
@@ -1069,7 +1069,7 @@ const AdminDashboard = () => {
     // Service page editors
     if (activePage.startsWith("svc:")) {
       const slug = activePage.slice(4);
-      const svc = SITE_SERVICES.find((s) => s.slug === slug);
+      const svc = siteServices.find((s) => s.slug === slug);
       if (!svc) return <p className="text-sm text-muted-foreground">Service not found.</p>;
       const faqs = serviceFaqs[slug] || [];
       return (
@@ -1730,7 +1730,7 @@ const AdminDashboard = () => {
                           <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
                           <Layers className="h-3.5 w-3.5 text-accent" />
                           <span className="flex-1 truncate">Services</span>
-                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{1 + SITE_SERVICES.length}</Badge>
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold">{1 + siteServices.length}</Badge>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
                           <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
@@ -1741,7 +1741,7 @@ const AdminDashboard = () => {
                                 <span className="truncate">Services overview</span>
                               </button>
                             </li>
-                            {SITE_SERVICES.map((s) => {
+                            {siteServices.map((s) => {
                               const key = `svc:${s.slug}`;
                               const count = (serviceFaqs[s.slug] || []).length;
                               return (
