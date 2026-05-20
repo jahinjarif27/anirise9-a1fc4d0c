@@ -1,10 +1,13 @@
-import { ComponentType } from "react";
+import { ComponentType, lazy, Suspense } from "react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { Contact } from "@/components/site/Contact";
 import { useSEO } from "@/hooks/useSEO";
 import { useAdmin } from "@/context/AdminContext";
+import { getPagePath, isPageDraft } from "@/lib/pageConfig";
+
+const NotFound = lazy(() => import("./NotFound"));
 
 type Props = {
   Section: ComponentType;
@@ -22,11 +25,29 @@ const SECTION_DESCRIPTIONS: Record<string, string> = {
 
 export const SectionPage = ({ Section, title, sectionKey }: Props) => {
   const { seo } = useAdmin();
-  const override = sectionKey ? seo.pageSeo?.[sectionKey] : undefined;
+  const ps = sectionKey ? seo.pageSeo?.[sectionKey] : undefined;
+
+  // Draft page → 404 on public site
+  if (sectionKey && isPageDraft(sectionKey, seo.pageSeo)) {
+    return (
+      <Suspense fallback={null}>
+        <NotFound />
+      </Suspense>
+    );
+  }
+
+  const path = sectionKey ? getPagePath(sectionKey as any, seo.pageSeo) : undefined;
+
   useSEO({
-    title: override?.metaTitle || (title ? `${title} — AniRise` : "AniRise"),
-    description: override?.metaDescription || (sectionKey ? SECTION_DESCRIPTIONS[sectionKey] : undefined),
-    path: sectionKey ? `/${sectionKey}` : undefined,
+    title: ps?.metaTitle || (title ? `${title} — AniRise` : "AniRise"),
+    description: ps?.metaDescription || (sectionKey ? SECTION_DESCRIPTIONS[sectionKey] : undefined),
+    path,
+    image: ps?.ogImage || undefined,
+    canonical: ps?.canonicalAuto === false ? ps?.canonicalUrl : undefined,
+    ogTitle: ps?.ogTitle,
+    ogDescription: ps?.ogDescription,
+    robots: ps?.robots === "noindex" ? "noindex, nofollow" : undefined,
+    schemas: ps?.schemas?.filter((s) => s.enabled),
   });
 
   const isContactPage = sectionKey === "contact";

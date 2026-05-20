@@ -4,16 +4,23 @@ import { Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
 import { services } from "@/data/services";
 
-const pages = [
-  { label: "Home", href: "/" },
-  { label: "Projects", href: "/portfolio" },
-  { label: "Blog", href: "/blog" },
-  { label: "Contact", href: "/contact" },
-  { label: "Book A Strategy Call", href: "/strategy-call" },
+const PAGE_KEYS = [
+  { key: "home", label: "Home", defaultSlug: "" },
+  { key: "portfolio", label: "Projects", defaultSlug: "portfolio" },
+  { key: "blog", label: "Blog", defaultSlug: "blog" },
+  { key: "contact", label: "Contact", defaultSlug: "contact" },
+  { key: "strategy-call", label: "Book A Strategy Call", defaultSlug: "strategy-call" },
 ];
 
 export const Footer = () => {
-  const { contact } = useAdmin();
+  const { contact, seo } = useAdmin();
+  const pages = PAGE_KEYS
+    .filter((p) => seo.pageSeo?.[p.key]?.status !== "draft")
+    .map((p) => {
+      const custom = seo.pageSeo?.[p.key]?.slug?.trim();
+      const slug = custom && custom.length > 0 ? custom.replace(/^\/+/, "") : p.defaultSlug;
+      return { label: p.label, href: slug ? `/${slug}` : "/" };
+    });
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container py-14 grid md:grid-cols-2 lg:grid-cols-4 gap-10">

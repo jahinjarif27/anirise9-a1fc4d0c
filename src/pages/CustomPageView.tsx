@@ -14,12 +14,19 @@ import {
 } from "recharts";
 
 function CustomPageContent({ page }: { page: NonNullable<ReturnType<typeof useAdmin>["customPages"][number]> }) {
+  const ps = page.seo as any;
   useSEO({
-    title: page.seo?.metaTitle || `${page.title} — AniRise`,
-    description: page.seo?.metaDescription || page.intro || (page.body ? page.body.slice(0, 158) : undefined),
+    title: ps?.metaTitle || `${page.title} — AniRise`,
+    description: ps?.metaDescription || page.intro || (page.body ? page.body.slice(0, 158) : undefined),
     path: `/${page.slug}`,
-    image: page.image || undefined,
+    image: ps?.ogImage || page.image || undefined,
+    canonical: ps?.canonicalAuto === false ? ps?.canonicalUrl : undefined,
+    ogTitle: ps?.ogTitle,
+    ogDescription: ps?.ogDescription,
+    robots: ps?.robots === "noindex" ? "noindex, nofollow" : undefined,
+    schemas: ps?.schemas?.filter((s: any) => s.enabled),
   });
+
 
   return (
     <div className="min-h-screen bg-background">
