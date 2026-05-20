@@ -42,10 +42,7 @@ export const SectionPage = ({ Section, title, sectionKey }: Props) => {
     title: ps?.metaTitle || (title ? `${title} — AniRise` : "AniRise"),
     description: ps?.metaDescription || (sectionKey ? SECTION_DESCRIPTIONS[sectionKey] : undefined),
     path,
-    image: ps?.ogImage || undefined,
     canonical: ps?.canonicalAuto === false ? ps?.canonicalUrl : undefined,
-    ogTitle: ps?.ogTitle,
-    ogDescription: ps?.ogDescription,
     robots: ps?.robots === "noindex" ? "noindex, nofollow" : undefined,
     schemas: ps?.schemas?.filter((s) => s.enabled),
   });
