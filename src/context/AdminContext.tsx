@@ -48,7 +48,10 @@ type SiteContent = {
 
 export type AdminService = {
   id: string;
+  /** Internal identity slug — used as key for serviceContent, faqs, etc. NEVER changes after creation. */
   slug: string;
+  /** Optional public-URL trailing slug. When set, page lives at /services/{urlSlug}. Default = identity slug. */
+  urlSlug?: string;
   title: string;
   desc: string;
   /** Lucide icon name, e.g. "Search". Rendered via lucide-react Icons map. */
