@@ -11,13 +11,17 @@ const BlogPostPage = () => {
   const { slug } = useParams();
   const { posts, seo, loading } = useAdmin();
   const post = posts.find((p) => p.slug === slug);
-  const override = seo.pageSeo?.[`blog/${slug ?? ""}`];
+  const override = seo.pageSeo?.[`blog/${slug ?? ""}`] || {};
+  const userSchemas = Array.isArray(override.schemas) ? override.schemas.filter((s: any) => s.enabled) : [];
 
   useSEO({
-    title: override?.metaTitle || (post ? `${post.title} — AniRise` : "Article — AniRise"),
-    description: override?.metaDescription || post?.excerpt?.slice(0, 158) || "Article from the AniRise blog.",
+    title: override.metaTitle || (post ? `${post.title} — AniRise` : "Article — AniRise"),
+    description: override.metaDescription || post?.excerpt?.slice(0, 158) || "Article from the AniRise blog.",
     path: `/blog/${slug ?? ""}`,
-    jsonLd: post
+    canonical: override.canonicalAuto === false ? override.canonicalUrl : undefined,
+    robots: override.robots === "noindex" ? "noindex, nofollow" : undefined,
+    schemas: userSchemas.length > 0 ? userSchemas : undefined,
+    jsonLd: userSchemas.length === 0 && post
       ? {
           "@context": "https://schema.org",
           "@type": "BlogPosting",
@@ -37,7 +41,7 @@ const BlogPostPage = () => {
   });
 
   if (loading) return null;
-  if (!post) {
+  if (!post || override.status === "draft") {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
