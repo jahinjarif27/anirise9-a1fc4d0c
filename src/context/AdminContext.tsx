@@ -1536,7 +1536,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         content, updateContent,
         contact, updateContact,
         portfolio, addPortfolioItem, updatePortfolioItem, deletePortfolioItem,
-        seo, updateSeo, regenerateSitemap,
+        seo, updateSeo, regenerateSitemap, saveAllNow,
         addRedirect, updateRedirect, deleteRedirect,
         addSchema, updateSchema, deleteSchema,
         customPages, addCustomPage, updateCustomPage, deleteCustomPage,
