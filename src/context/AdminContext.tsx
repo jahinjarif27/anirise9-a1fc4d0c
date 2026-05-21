@@ -1458,11 +1458,15 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       entries.push({ path: `/services/${tail}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.8" });
     }
 
+    // Effective parent slugs (honor admin overrides)
+    const blogParent = (ps["blog"]?.slug?.trim() || "blog").replace(/^\/+/, "");
+    const portfolioParent = (ps["portfolio"]?.slug?.trim() || "portfolio").replace(/^\/+/, "");
+
     // Blog posts
     for (const p of posts) {
       const cfg: any = ps[`blog/${p.slug}`] || {};
       if (cfg.status === "draft" || cfg.robots === "noindex") continue;
-      entries.push({ path: `/blog/${p.slug}`, lastmod: p.date, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
+      entries.push({ path: `/${blogParent}/${p.slug}`, lastmod: p.date, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
     }
 
     // Portfolio items
@@ -1470,7 +1474,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       const cfg: any = ps[`proj:${it.id}`] || {};
       if (cfg.status === "draft" || cfg.robots === "noindex") continue;
       const tail = (it.slug && it.slug.trim()) || it.id;
-      entries.push({ path: `/portfolio/${tail}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
+      entries.push({ path: `/${portfolioParent}/${tail}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
     }
 
     // Case studies
