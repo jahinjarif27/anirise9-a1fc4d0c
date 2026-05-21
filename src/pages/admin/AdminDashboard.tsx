@@ -1424,6 +1424,12 @@ const AdminDashboard = () => {
             </div>
           </Card>
 
+          {/* Per-project paragraph note */}
+          <Card className="p-5 sm:p-6 space-y-3">
+            <SectionHeader icon={FileEdit} title="Page paragraph" subtitle="Optional heading + paragraph at the bottom of this project detail page." />
+            <SectionNoteEditor noteId={`proj:${it.id}`} label="Paragraph for this project page" />
+          </Card>
+
           <SeoBlock
             pageKey={`proj:${it.id}`}
             seo={seo}
@@ -1433,6 +1439,7 @@ const AdminDashboard = () => {
             externalSlug={it.slug || ""}
             onExternalSlugChange={(next) => updatePortfolioItem(it.id, { slug: next })}
           />
+
 
         </div>
       );
