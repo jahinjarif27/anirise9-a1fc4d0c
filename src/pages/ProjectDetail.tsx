@@ -24,20 +24,26 @@ import {
 
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { portfolio, loading } = useAdmin();
+  const location = useLocation();
+  const { portfolio, seo, loading } = useAdmin();
   const p = portfolio.find((x) => x.id === id || (x.slug && x.slug === id));
+  const portfolioSlug = getPageSlug("portfolio", seo.pageSeo); // effective parent slug
   const publicTail = p?.slug?.trim() || p?.id || id || "";
-  // If a custom slug exists, only that slug should resolve; redirect from raw id.
-  const shouldRedirect = !!p && !!p.slug?.trim() && id !== p.slug;
+  const expectedPath = `/${portfolioSlug}/${publicTail}`;
+  // If a custom slug exists for the item, only that slug should resolve; redirect from raw id.
+  const itemRedirect = !!p && !!p.slug?.trim() && id !== p.slug;
+  // If the parent section slug was overridden, redirect /portfolio/... → /<override>/...
+  const sectionRedirect = !!p && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
 
   useSEO({
     title: p ? `${p.title} — Project | AniRise` : "Project | AniRise",
     description: p?.description || "AniRise project case.",
-    path: `/portfolio/${publicTail}`,
+    path: expectedPath,
   });
 
   if (loading) return null;
-  if (shouldRedirect) return <Navigate to={`/portfolio/${p!.slug}`} replace />;
+  if (itemRedirect) return <Navigate to={`/${portfolioSlug}/${p!.slug}`} replace />;
+  if (sectionRedirect) return <Navigate to={expectedPath} replace />;
   if (!p) {
     return (
       <div className="min-h-screen bg-background">
