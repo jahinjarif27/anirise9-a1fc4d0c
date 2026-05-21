@@ -165,7 +165,8 @@ Deno.serve(async (req) => {
       headers: {
         ...cors,
         'Content-Type': 'application/xml; charset=utf-8',
-        'Cache-Control': 'public, max-age=300, s-maxage=300',
+        // Short cache so admin changes are reflected within ~30s. Bypass with ?t=timestamp.
+        'Cache-Control': 'public, max-age=30, s-maxage=30',
       },
     });
   } catch (e) {
