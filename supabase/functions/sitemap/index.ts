@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     const sb = createClient(SUPABASE_URL, KEY);
 
     const [settingsRes, postsRes] = await Promise.all([
-      sb.from('site_settings').select('seo, custom_pages, portfolio').eq('id', 1).maybeSingle(),
+      sb.from('site_settings').select('seo, custom_pages, portfolio, case_studies, content').eq('id', 1).maybeSingle(),
       sb.from('blog_posts').select('slug, date'),
     ]);
 
@@ -53,6 +53,8 @@ Deno.serve(async (req) => {
     const pageSeo: Record<string, any> = (s.seo?.pageSeo ?? {}) as any;
     const customPages: any[] = Array.isArray(s.custom_pages) ? s.custom_pages : [];
     const portfolio: any[] = Array.isArray(s.portfolio) ? s.portfolio : [];
+    const caseStudies: any[] = Array.isArray(s.case_studies) ? s.case_studies : [];
+    const svcList: any[] = Array.isArray(s.content?.servicesList) ? s.content.servicesList : [];
 
     const entries: Entry[] = [];
 
@@ -69,13 +71,31 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Effective parent slugs
+    const blogParent = (pageSeo.blog?.slug?.trim() || 'blog').replace(/^\/+/, '');
+    const portfolioParent = (pageSeo.portfolio?.slug?.trim() || 'portfolio').replace(/^\/+/, '');
+
+    // Services (admin-managed)
+    for (const sv of svcList) {
+      if (sv.published === false) continue;
+      const ps = pageSeo[`service:${sv.slug}`] || {};
+      if (ps.status === 'draft' || ps.robots === 'noindex') continue;
+      const tail = (sv.urlSlug?.trim() || sv.slug || '').replace(/^\/+/, '');
+      if (!tail) continue;
+      entries.push({
+        path: `/services/${tail}`,
+        changefreq: ps.changefreq || 'monthly',
+        priority: ps.priority || '0.9',
+      });
+    }
+
     // Blog posts
     if (Array.isArray(postsRes.data)) {
       for (const p of postsRes.data) {
         const ps = pageSeo[`blog/${p.slug}`] || {};
         if (ps.status === 'draft' || ps.robots === 'noindex') continue;
         entries.push({
-          path: `/blog/${p.slug}`,
+          path: `/${blogParent}/${p.slug}`,
           lastmod: p.date || undefined,
           changefreq: ps.changefreq || 'monthly',
           priority: ps.priority || '0.7',
@@ -91,7 +111,7 @@ Deno.serve(async (req) => {
       const slug = (p.slug || '').replace(/^\/+/, '');
       if (!slug) continue;
       entries.push({
-        path: `/${slug}`,
+        path: `/${p.parent ? p.parent + '/' : ''}${slug}`,
         changefreq: ps.changefreq || 'monthly',
         priority: ps.priority || '0.6',
       });
@@ -104,7 +124,19 @@ Deno.serve(async (req) => {
       const slugTail = (it.slug || it.id || '').replace(/^\/+/, '');
       if (!slugTail) continue;
       entries.push({
-        path: `/portfolio/${slugTail}`,
+        path: `/${portfolioParent}/${slugTail}`,
+        changefreq: ps.changefreq || 'monthly',
+        priority: ps.priority || '0.7',
+      });
+    }
+
+    // Case studies
+    for (const c of caseStudies) {
+      const ps = pageSeo[`case:${c.id}`] || {};
+      if (ps.status === 'draft' || ps.robots === 'noindex') continue;
+      if (!c?.id) continue;
+      entries.push({
+        path: `/case-studies/${c.id}`,
         changefreq: ps.changefreq || 'monthly',
         priority: ps.priority || '0.7',
       });
