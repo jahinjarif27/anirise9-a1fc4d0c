@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
+import { SectionNote } from "@/components/site/SectionNote";
 
 export const CaseStudies = () => {
   const { caseStudies } = useAdmin();
