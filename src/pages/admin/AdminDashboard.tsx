@@ -23,10 +23,12 @@ import logo from "@/assets/anirise-logo.jpg";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { ServiceContentEditor } from "@/components/admin/ServiceContentEditor";
+import { TextBlocksEditor } from "@/components/admin/TextBlocksEditor";
+import { SortableList } from "@/components/admin/SortableList";
 import { Switch } from "@/components/ui/switch";
 import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
-import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES, SERVICE_ICON_CHOICES } from "@/context/AdminContext";
+import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES, SERVICE_ICON_CHOICES, DEFAULT_HOME_ORDER } from "@/context/AdminContext";
 
 const visitData = Array.from({ length: 14 }, (_, i) => ({
   day: `D${i + 1}`,
@@ -669,12 +671,20 @@ const AdminDashboard = () => {
             <div>
               <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Page description / body</label>
               <Textarea
-                rows={8}
-                placeholder="Write the page content here. Plain text or Markdown — headings (##), lists, links etc. are supported."
+                rows={6}
+                placeholder="Quick plain-text or Markdown body. Use the paragraphs editor below for multi-paragraph layouts with per-paragraph alignment."
                 value={cp.body}
                 onChange={(e) => updateCustomPage(cp.id, { body: e.target.value })}
               />
-              <p className="text-[11px] text-muted-foreground mt-1.5">This shows as the main content on the page. Leave empty to show only the title and image.</p>
+              <p className="text-[11px] text-muted-foreground mt-1.5">If you add paragraphs below, those will be rendered instead of this field.</p>
+            </div>
+            <div className="rounded-xl border border-border bg-secondary/30 p-3">
+              <TextBlocksEditor
+                value={cp.textBlocks}
+                onChange={(next) => updateCustomPage(cp.id, { textBlocks: next })}
+                label="Paragraphs (multi-paragraph + alignment)"
+                hint="When present, this replaces the description/body field above on the live page."
+              />
             </div>
             <div className="flex justify-between pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteCustomPage(cp.id); setActivePage("hero"); toast.success("Page deleted"); }}>
@@ -728,7 +738,13 @@ const AdminDashboard = () => {
                         <Input value={s.title} onChange={(e) => { const next = [...sections]; next[idx] = { ...s, title: e.target.value }; updateCustomPage(cp.id, { sections: next }); }} placeholder="Section title" className="font-semibold" />
                         <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updateCustomPage(cp.id, { sections: sections.filter((x) => x.id !== s.id) })}><Trash2 className="h-4 w-4" /></Button>
                       </div>
-                      <Textarea rows={4} value={s.body} onChange={(e) => { const next = [...sections]; next[idx] = { ...s, body: e.target.value }; updateCustomPage(cp.id, { sections: next }); }} placeholder="Section body. Plain text or Markdown." />
+                      <Textarea rows={3} value={s.body} onChange={(e) => { const next = [...sections]; next[idx] = { ...s, body: e.target.value }; updateCustomPage(cp.id, { sections: next }); }} placeholder="Section body (single block). Use paragraphs editor below for multi-paragraph + alignment." />
+                      <TextBlocksEditor
+                        value={s.textBlocks}
+                        onChange={(tb) => { const next = [...sections]; next[idx] = { ...s, textBlocks: tb }; updateCustomPage(cp.id, { sections: next }); }}
+                        label="Paragraphs"
+                        hint="Optional. When set, replaces the single body field above."
+                      />
                     </div>
                   ))}
                 </div>
@@ -1527,7 +1543,15 @@ const AdminDashboard = () => {
               }
             />
             <Field label="Section title"><Input value={sec.title} onChange={(e) => updateHomeSection(sec.id, { title: e.target.value })} /></Field>
-            <Field label="Section content"><Textarea rows={4} value={sec.body} onChange={(e) => updateHomeSection(sec.id, { body: e.target.value })} /></Field>
+            <Field label="Section content (single block)"><Textarea rows={4} value={sec.body} onChange={(e) => updateHomeSection(sec.id, { body: e.target.value })} placeholder="Use paragraphs editor below for multi-paragraph + alignment." /></Field>
+            <div className="rounded-xl border border-border bg-secondary/30 p-3">
+              <TextBlocksEditor
+                value={sec.textBlocks}
+                onChange={(tb) => updateHomeSection(sec.id, { textBlocks: tb })}
+                label="Paragraphs (multi-paragraph + alignment)"
+                hint="When present, replaces the section content field above."
+              />
+            </div>
             <ImageUpload label="Section image" value={sec.image} onChange={(v) => updateHomeSection(sec.id, { image: v })} aspect="aspect-[16/9]" altValue={sec.imageAlt} onAltChange={(v) => updateHomeSection(sec.id, { imageAlt: v })} />
             <div className="flex justify-end pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteHomeSection(sec.id); setActivePage("home"); toast.success("Section removed"); }}>
@@ -1577,6 +1601,51 @@ const AdminDashboard = () => {
             })}
           </div>
         </Card>
+
+        {/* Phase 4 — drag-and-drop home block order */}
+        {(() => {
+          const labels: Record<string, string> = {
+            hero: "Hero", trustStrip: "Trust strip", stats: "Stats band",
+            servicesPreview: "Services preview", about: "About",
+            caseStudies: "Case studies", processFlow: "Process flow",
+            whyChoose: "Why choose AniRise", strategyCall: "Strategy call",
+            homeFaq: "Home FAQ", blog: "Blog", finalCta: "Final CTA",
+          };
+          const saved = Array.isArray(content.homeOrder) ? content.homeOrder : [];
+          const ordered = [
+            ...saved.filter((id) => id in labels),
+            ...DEFAULT_HOME_ORDER.filter((id) => !saved.includes(id)),
+          ];
+          const items = ordered.map((id) => ({ id, label: labels[id] || id }));
+          return (
+            <Card className="p-5 sm:p-6 space-y-3">
+              <SectionHeader icon={Layers} title="Home page block order" subtitle="Drag to reorder the blocks shown on the home page." />
+              <SortableList
+                items={items}
+                onReorder={(next) => updateContent({ homeOrder: next.map((i) => i.id) })}
+                renderItem={(item) => (
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{item.id}</span>
+                  </div>
+                )}
+              />
+            </Card>
+          );
+        })()}
+
+        {/* Phase 5 — live sitemap */}
+        <Card className="p-5 sm:p-6 space-y-2">
+          <SectionHeader icon={Globe} title="Live sitemap" subtitle="Auto-updates from admin changes. Submit this URL to Google Search Console." />
+          <a
+            href={`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap`}
+            target="_blank" rel="noopener noreferrer"
+            className="text-sm font-mono text-accent hover:underline break-all"
+          >
+            https://{import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap
+          </a>
+        </Card>
+
         <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} />
         <SeoBlock pageKey="strategy-call" seo={seo} updatePageSeo={updatePageSeo} />
       </div>
@@ -2204,6 +2273,16 @@ const AdminDashboard = () => {
                 {editingId && <Button variant="outline" onClick={() => setEditingId(null)}><X className="h-4 w-4" /> Cancel</Button>}
               </div>
             </Card>
+
+            {editingId && draft.slug && (
+              <SeoBlock
+                pageKey={`blog/${draft.slug}`}
+                seo={seo}
+                updatePageSeo={updatePageSeo}
+                defaultPath={`/blog/${draft.slug}`}
+                slugPrefix="/blog/"
+              />
+            )}
 
             <Card className="p-0 overflow-hidden">
               <div className="p-5 border-b border-border"><h3 className="font-bold">All posts ({posts.length})</h3></div>

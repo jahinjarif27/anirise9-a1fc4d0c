@@ -7,6 +7,7 @@ import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 import NotFound from "./NotFound";
 import { MarkdownContent } from "@/components/site/MarkdownContent";
+import { TextBlocksView } from "@/components/site/TextBlocksView";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
@@ -61,14 +62,12 @@ function CustomPageContent({ page }: { page: NonNullable<ReturnType<typeof useAd
 
           {page.sections && page.sections.length > 0 && (
             <div className="space-y-10 mb-12">
-              {page.sections.filter((s) => s.title || s.body).map((s) => (
+              {page.sections.filter((s) => s.title || s.body || (s.textBlocks && s.textBlocks.length)).map((s) => (
                 <section key={s.id}>
                   {s.title && <h2 className="text-2xl font-bold text-foreground mb-3">{s.title}</h2>}
-                  {s.body && (
-                    <div className="text-base text-muted-foreground leading-relaxed">
-                      <MarkdownContent content={s.body} />
-                    </div>
-                  )}
+                  <div className="text-base text-muted-foreground leading-relaxed">
+                    <TextBlocksView blocks={s.textBlocks} fallbackBody={s.body} />
+                  </div>
                 </section>
               ))}
             </div>
@@ -160,9 +159,9 @@ function CustomPageContent({ page }: { page: NonNullable<ReturnType<typeof useAd
             </section>
           )}
 
-          {page.body && (
+          {((page.textBlocks && page.textBlocks.length > 0) || (page.body && page.body.trim().length > 0)) && (
             <div className="mb-8">
-              <MarkdownContent content={page.body} />
+              <TextBlocksView blocks={page.textBlocks} fallbackBody={page.body} />
             </div>
           )}
         </article>

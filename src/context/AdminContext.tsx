@@ -44,7 +44,30 @@ type SiteContent = {
   contactImageAlt: string;
   /** Admin-managed services list (replaces hardcoded src/data/services.ts) */
   servicesList?: AdminService[];
+  /** Phase 4 — drag-and-drop home page block order. Unknown ids fall back to default. */
+  homeOrder?: string[];
 };
+
+// Phase 3 — multi-paragraph blocks (re-exported for consumers)
+export type TextAlign = "left" | "center" | "right" | "justify";
+export type TextBlock = { id: string; text: string; align?: TextAlign };
+
+// Phase 4 — canonical default home block order. Built-in IDs only.
+export const DEFAULT_HOME_ORDER = [
+  "hero",
+  "trustStrip",
+  "stats",
+  "servicesPreview",
+  "about",
+  "caseStudies",
+  "processFlow",
+  "whyChoose",
+  "strategyCall",
+  "homeFaq",
+  "blog",
+  "finalCta",
+] as const;
+export type HomeBlockId = typeof DEFAULT_HOME_ORDER[number];
 
 export type AdminService = {
   id: string;
@@ -170,22 +193,22 @@ export type PageSeo = {
   priority?: string;
 };
 
-export type CustomPageSection = { id: string; title: string; body: string };
+export type CustomPageSection = { id: string; title: string; body: string; textBlocks?: TextBlock[] };
 
 export type CustomPage = {
   id: string;
   title: string;
   slug: string;
   parent: string;
-  /** Where the page link appears. Empty array = hidden (direct URL only). Multiple locations allowed. */
   navLocation: ("navbar" | "menu")[];
   image: string;
   imageAlt: string;
   body: string;
+  /** Phase 3 — multi-paragraph + alignment. When non-empty, replaces `body` on render. */
+  textBlocks?: TextBlock[];
   seo: PageSeo;
   published: boolean;
   groupKey?: string;
-  // rich page-builder fields (all optional)
   eyebrow?: string;
   intro?: string;
   sections?: CustomPageSection[];
@@ -202,6 +225,8 @@ export type HomeSection = {
   id: string;
   title: string;
   body: string;
+  /** Phase 3 — multi-paragraph + alignment alternative to `body`. */
+  textBlocks?: TextBlock[];
   image: string;
   imageAlt: string;
   enabled: boolean;
