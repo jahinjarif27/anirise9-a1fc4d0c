@@ -1904,12 +1904,20 @@ const AdminDashboard = () => {
                         <CollapsibleContent>
                           <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
                             <li>
+                              <button onClick={() => setActivePage("home-order")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "home-order" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <Layers className="h-3 w-3 opacity-60" />
+                                <span className="truncate">Section order (drag)</span>
+                              </button>
+                            </li>
+                            <li>
                               <button onClick={() => setActivePage("hero")}
                                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "hero" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
                                 <FileText className="h-3 w-3 opacity-60" />
                                 <span className="truncate">Hero</span>
                               </button>
                             </li>
+
                             {HOME_BLOCKS.map((b) => {
                               const key = `hb:${b.key}`;
                               const on = homeBlocks[b.key];
