@@ -1189,6 +1189,41 @@ const AdminDashboard = () => {
             onChange={(patch) => updateServiceContent(slug, patch)}
           />
 
+          {/* Section reorder (drag) for this service's internal sections */}
+          {(() => {
+            const sc = serviceContent[slug];
+            const saved = (sc?.sectionOrder || []).filter((id) =>
+              (SERVICE_SECTION_IDS as readonly string[]).includes(id),
+            ) as ServiceSectionId[];
+            const ordered: ServiceSectionId[] = [
+              ...saved,
+              ...SERVICE_SECTION_IDS.filter((id) => !saved.includes(id)),
+            ];
+            const items = ordered.map((id) => ({ id, label: SERVICE_SECTION_LABELS[id] }));
+            return (
+              <Card className="p-5 sm:p-6 space-y-3">
+                <SectionHeader icon={Layers} title="Service section order" subtitle="Drag to reorder internal sections on this service page." />
+                <SortableList
+                  items={items}
+                  onReorder={(next) => updateServiceContent(slug, { sectionOrder: next.map((i) => i.id) } as any)}
+                  renderItem={(item) => (
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-medium truncate">{item.label}</span>
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{item.id}</span>
+                    </div>
+                  )}
+                />
+              </Card>
+            );
+          })()}
+
+          {/* Per-service paragraph note */}
+          <Card className="p-5 sm:p-6 space-y-3">
+            <SectionHeader icon={FileEdit} title="Page paragraph" subtitle="Optional heading + paragraph at the bottom of this service page." />
+            <SectionNoteEditor noteId={`svc:${slug}`} label="Paragraph for this service page" />
+          </Card>
+
+
 
           <Card className="p-5 sm:p-6 space-y-4">
             <SectionHeader
