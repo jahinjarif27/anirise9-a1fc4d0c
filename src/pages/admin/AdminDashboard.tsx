@@ -1685,6 +1685,7 @@ const AdminDashboard = () => {
               )}
             </TabsTrigger>
             <TabsTrigger value="blog"><FileText className="h-4 w-4 mr-1" /> Blog</TabsTrigger>
+            <TabsTrigger value="notes"><FileEdit className="h-4 w-4 mr-1" /> Section Notes</TabsTrigger>
             <TabsTrigger value="reviews">
               <MessageSquare className="h-4 w-4 mr-1" /> Reviews
               {reviews.filter((r) => !r.approved).length > 0 && (
