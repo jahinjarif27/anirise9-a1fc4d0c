@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useServices } from "@/lib/useServices";
 import { useAdmin } from "@/context/AdminContext";
+import { SectionNote } from "@/components/site/SectionNote";
 
 export const ServicesPreview = () => {
   const { content, servicePreviews } = useAdmin();
