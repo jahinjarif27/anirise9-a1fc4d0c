@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 import { useServices, type RuntimeService } from "@/lib/useServices";
+import { SectionNote } from "@/components/site/SectionNote";
 
 type Service = RuntimeService;
 
