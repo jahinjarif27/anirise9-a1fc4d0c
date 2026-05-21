@@ -24,6 +24,7 @@ export const HomeFAQ = () => {
           ))}
         </Accordion>
       </div>
+      <SectionNote id="homeFaq" />
     </section>
   );
 };
