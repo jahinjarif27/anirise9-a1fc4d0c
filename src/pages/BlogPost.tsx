@@ -11,7 +11,7 @@ const BlogPostPage = () => {
   const { slug } = useParams();
   const { posts, seo, loading } = useAdmin();
   const post = posts.find((p) => p.slug === slug);
-  const override = seo.pageSeo?.[`blog/${slug ?? ""}`] || {};
+  const override: any = seo.pageSeo?.[`blog/${slug ?? ""}`] || {};
   const userSchemas = Array.isArray(override.schemas) ? override.schemas.filter((s: any) => s.enabled) : [];
 
   useSEO({
