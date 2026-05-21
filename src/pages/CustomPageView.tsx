@@ -62,14 +62,12 @@ function CustomPageContent({ page }: { page: NonNullable<ReturnType<typeof useAd
 
           {page.sections && page.sections.length > 0 && (
             <div className="space-y-10 mb-12">
-              {page.sections.filter((s) => s.title || s.body).map((s) => (
+              {page.sections.filter((s) => s.title || s.body || (s.textBlocks && s.textBlocks.length)).map((s) => (
                 <section key={s.id}>
                   {s.title && <h2 className="text-2xl font-bold text-foreground mb-3">{s.title}</h2>}
-                  {s.body && (
-                    <div className="text-base text-muted-foreground leading-relaxed">
-                      <MarkdownContent content={s.body} />
-                    </div>
-                  )}
+                  <div className="text-base text-muted-foreground leading-relaxed">
+                    <TextBlocksView blocks={s.textBlocks} fallbackBody={s.body} />
+                  </div>
                 </section>
               ))}
             </div>
