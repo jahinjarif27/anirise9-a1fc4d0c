@@ -28,7 +28,7 @@ import { SortableList } from "@/components/admin/SortableList";
 import { Switch } from "@/components/ui/switch";
 import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
-import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES, SERVICE_ICON_CHOICES } from "@/context/AdminContext";
+import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES, SERVICE_ICON_CHOICES, DEFAULT_HOME_ORDER } from "@/context/AdminContext";
 
 const visitData = Array.from({ length: 14 }, (_, i) => ({
   day: `D${i + 1}`,
