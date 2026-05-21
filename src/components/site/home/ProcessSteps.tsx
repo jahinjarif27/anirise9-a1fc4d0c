@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
 import { Sparkles } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
+import { SectionNote } from "@/components/site/SectionNote";
+
 
 const Ico = ({ name, className }: { name: string; className?: string }) => {
   const C = (Icons as any)[name];
