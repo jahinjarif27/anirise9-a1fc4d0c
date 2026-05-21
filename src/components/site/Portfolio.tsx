@@ -14,7 +14,11 @@ export const Portfolio = () => {
     return ["All", ...ordered];
   }, [portfolio]);
 
-  const filtered = active === "All" ? portfolio : portfolio.filter((p) => p.category === active);
+  const sorted = useMemo(
+    () => [...portfolio].sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999)),
+    [portfolio],
+  );
+  const filtered = active === "All" ? sorted : sorted.filter((p) => p.category === active);
 
   return (
     <section id="portfolio" className="py-24 bg-background">

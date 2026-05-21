@@ -132,6 +132,8 @@ export type PortfolioItem = {
   title: string;
   description?: string;
   body?: string;
+  /** Display order on the Projects page. Lower numbers render first. */
+  order?: number;
   // rich detail-page fields (all optional)
   eyebrow?: string;
   intro?: string;
