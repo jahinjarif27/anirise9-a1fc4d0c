@@ -159,9 +159,9 @@ function CustomPageContent({ page }: { page: NonNullable<ReturnType<typeof useAd
             </section>
           )}
 
-          {page.body && (
+          {((page.textBlocks && page.textBlocks.length > 0) || (page.body && page.body.trim().length > 0)) && (
             <div className="mb-8">
-              <MarkdownContent content={page.body} />
+              <TextBlocksView blocks={page.textBlocks} fallbackBody={page.body} />
             </div>
           )}
         </article>
