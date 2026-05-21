@@ -28,6 +28,7 @@ export const TrustStrip = () => {
         </div>
       </div>
       <style>{`@keyframes scroll { from { transform: translateX(0) } to { transform: translateX(-50%) } }`}</style>
+      <SectionNote id="trustStrip" />
     </section>
   );
 };
