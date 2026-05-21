@@ -219,6 +219,7 @@ export const StrategyCall = () => {
           </div>
         </form>
       </div>
+      <SectionNote id="strategyCall" />
     </section>
   );
 };
