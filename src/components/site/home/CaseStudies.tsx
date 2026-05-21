@@ -37,6 +37,7 @@ export const CaseStudies = () => {
           ))}
         </div>
       </div>
+      <SectionNote id="caseStudies" />
     </section>
   );
 };
