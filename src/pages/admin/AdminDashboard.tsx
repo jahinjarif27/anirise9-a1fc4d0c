@@ -2274,6 +2274,16 @@ const AdminDashboard = () => {
               </div>
             </Card>
 
+            {editingId && draft.slug && (
+              <SeoBlock
+                pageKey={`blog/${draft.slug}`}
+                seo={seo}
+                updatePageSeo={updatePageSeo}
+                defaultPath={`/blog/${draft.slug}`}
+                slugPrefix="/blog/"
+              />
+            )}
+
             <Card className="p-0 overflow-hidden">
               <div className="p-5 border-b border-border"><h3 className="font-bold">All posts ({posts.length})</h3></div>
               <ul className="divide-y divide-border">
