@@ -1,4 +1,5 @@
 import { CheckCircle2, Smile, Target, Rocket, Users, ShieldCheck } from "lucide-react";
+import { SectionNote } from "@/components/site/SectionNote";
 import {
   ResponsiveContainer,
   BarChart,
