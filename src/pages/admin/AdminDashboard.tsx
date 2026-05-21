@@ -1543,7 +1543,7 @@ const AdminDashboard = () => {
               />
             </Card>
           )}
-
+          {activePage === "contact" && (
             <Card className="p-5 sm:p-6 space-y-4">
               <SectionHeader icon={Phone} title="Contact details" subtitle="Visible across the site" />
               <div className="grid sm:grid-cols-2 gap-3">
