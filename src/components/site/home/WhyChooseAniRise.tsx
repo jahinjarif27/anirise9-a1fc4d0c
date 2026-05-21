@@ -133,6 +133,7 @@ export const WhyChooseAniRise = () => {
           </div>
         </div>
       </div>
+      <SectionNote id="whyChoose" />
     </section>
   );
 };
