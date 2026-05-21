@@ -193,22 +193,22 @@ export type PageSeo = {
   priority?: string;
 };
 
-export type CustomPageSection = { id: string; title: string; body: string };
+export type CustomPageSection = { id: string; title: string; body: string; textBlocks?: TextBlock[] };
 
 export type CustomPage = {
   id: string;
   title: string;
   slug: string;
   parent: string;
-  /** Where the page link appears. Empty array = hidden (direct URL only). Multiple locations allowed. */
   navLocation: ("navbar" | "menu")[];
   image: string;
   imageAlt: string;
   body: string;
+  /** Phase 3 — multi-paragraph + alignment. When non-empty, replaces `body` on render. */
+  textBlocks?: TextBlock[];
   seo: PageSeo;
   published: boolean;
   groupKey?: string;
-  // rich page-builder fields (all optional)
   eyebrow?: string;
   intro?: string;
   sections?: CustomPageSection[];
@@ -225,6 +225,8 @@ export type HomeSection = {
   id: string;
   title: string;
   body: string;
+  /** Phase 3 — multi-paragraph + alignment alternative to `body`. */
+  textBlocks?: TextBlock[];
   image: string;
   imageAlt: string;
   enabled: boolean;
