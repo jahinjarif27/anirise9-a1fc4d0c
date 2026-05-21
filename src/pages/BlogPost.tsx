@@ -1,16 +1,21 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate, useLocation } from "react-router-dom";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
+import { getPageSlug } from "@/lib/pageConfig";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 const BlogPostPage = () => {
   const { slug } = useParams();
+  const location = useLocation();
   const { posts, seo, loading } = useAdmin();
   const post = posts.find((p) => p.slug === slug);
+  const blogSlug = getPageSlug("blog", seo.pageSeo);
+  const expectedPath = `/${blogSlug}/${slug ?? ""}`;
+  const sectionRedirect = !!post && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
   const override: any = seo.pageSeo?.[`blog/${slug ?? ""}`] || {};
   const userSchemas = Array.isArray(override.schemas) ? override.schemas.filter((s: any) => s.enabled) : [];
 
