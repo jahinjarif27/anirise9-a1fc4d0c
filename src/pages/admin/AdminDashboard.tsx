@@ -446,10 +446,11 @@ const AdminDashboard = () => {
     setDraft({ slug: p.slug, title: p.title, excerpt: p.excerpt, category: p.category, author: p.author, date: p.date, readTime: p.readTime, cover: p.cover, coverAlt: p.coverAlt || "", ctaEnabled: !!p.ctaEnabled, ctaLabel: p.ctaLabel || "", ctaUrl: p.ctaUrl || "", body: p.body || "" });
   };
 
-  const saveDraft = () => {
+  const saveDraft = async () => {
     if (!draft.title || !draft.slug) { toast.error("Title and slug are required"); return; }
-    if (editingId) { updatePost(editingId, draft); toast.success("Post updated"); }
-    else { addPost(draft); toast.success("Post created"); }
+    const ok = editingId ? await updatePost(editingId, draft) : await addPost(draft);
+    if (!ok) { toast.error("Save failed — please log in again and retry"); return; }
+    toast.success(editingId ? "Post updated" : "Post created");
     setEditingId(null);
     setBlogMode("simple");
     setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "", ctaEnabled: false, ctaLabel: "", ctaUrl: "", body: "" });
