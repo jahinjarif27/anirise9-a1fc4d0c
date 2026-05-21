@@ -1427,21 +1427,87 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const deleteProcessFlowStep = (id: string) =>
     setProcessFlow((prev) => ({ ...prev, steps: prev.steps.filter((s) => s.id !== id) }));
 
-  const buildSitemap = (base: string, slugs: string[], customSlugs: string[]) => {
-    const staticPaths = ["/", "/services", "/portfolio", "/testimonials", "/contact", "/blog", "/services/website-seo", "/services/ecommerce-seo", "/services/graphics-design"];
-    const blogPaths = slugs.map((s) => `/blog/${s}`);
-    const customPaths = customSlugs.map((s) => `/${s}`);
-    const all = [...staticPaths, ...blogPaths, ...customPaths];
-    const urls = all.map((p) => `  <url><loc>${base.replace(/\/$/, "")}${p}</loc><priority>${p === "/" ? "1.0" : "0.8"}</priority></url>`).join("\n");
+  const buildSitemap = (base: string) => {
+    const origin = (base || "https://anirise.com.bd").replace(/\/$/, "");
+    const ps = seo.pageSeo || {};
+    type E = { path: string; changefreq?: string; priority?: string; lastmod?: string };
+    const entries: E[] = [];
+
+    const builtins: Array<{ key: string; defaultSlug: string; cf: string; pr: string }> = [
+      { key: "home",          defaultSlug: "",              cf: "weekly",  pr: "1.0" },
+      { key: "services",      defaultSlug: "services",      cf: "monthly", pr: "0.9" },
+      { key: "about",         defaultSlug: "about",         cf: "monthly", pr: "0.8" },
+      { key: "portfolio",     defaultSlug: "portfolio",     cf: "monthly", pr: "0.8" },
+      { key: "testimonials",  defaultSlug: "testimonials",  cf: "monthly", pr: "0.7" },
+      { key: "contact",       defaultSlug: "contact",       cf: "monthly", pr: "0.8" },
+      { key: "blog",          defaultSlug: "blog",          cf: "weekly",  pr: "0.9" },
+      { key: "strategy-call", defaultSlug: "strategy-call", cf: "monthly", pr: "0.8" },
+    ];
+    for (const b of builtins) {
+      const cfg: any = ps[b.key] || {};
+      if (cfg.status === "draft" || cfg.robots === "noindex") continue;
+      const slug = ((cfg.slug && String(cfg.slug).trim()) || b.defaultSlug).replace(/^\/+/, "");
+      entries.push({ path: slug ? `/${slug}` : "/", changefreq: cfg.changefreq || b.cf, priority: cfg.priority || b.pr });
+    }
+
+    // Services (admin-managed) — public detail pages
+    for (const s of (content.servicesList || []).filter((x) => x.published)) {
+      const cfg: any = ps[`service:${s.slug}`] || {};
+      if (cfg.status === "draft" || cfg.robots === "noindex") continue;
+      const tail = (s.urlSlug && s.urlSlug.trim()) || s.slug;
+      entries.push({ path: `/services/${tail}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.8" });
+    }
+
+    // Blog posts
+    for (const p of posts) {
+      const cfg: any = ps[`blog/${p.slug}`] || {};
+      if (cfg.status === "draft" || cfg.robots === "noindex") continue;
+      entries.push({ path: `/blog/${p.slug}`, lastmod: p.date, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
+    }
+
+    // Portfolio items
+    for (const it of portfolio) {
+      const cfg: any = ps[`proj:${it.id}`] || {};
+      if (cfg.status === "draft" || cfg.robots === "noindex") continue;
+      const tail = (it.slug && it.slug.trim()) || it.id;
+      entries.push({ path: `/portfolio/${tail}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
+    }
+
+    // Case studies
+    for (const c of caseStudies) {
+      const cfg: any = ps[`case:${c.id}`] || {};
+      if (cfg.status === "draft" || cfg.robots === "noindex") continue;
+      entries.push({ path: `/case-studies/${c.id}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
+    }
+
+    // Custom pages (with optional parent)
+    for (const cp of customPages) {
+      if (!cp.published || !cp.slug) continue;
+      const cfg: any = cp.seo || {};
+      if (cfg.status === "draft" || cfg.robots === "noindex") continue;
+      const path = `/${cp.parent ? cp.parent + "/" : ""}${cp.slug.replace(/^\/+/, "")}`;
+      entries.push({ path, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.6" });
+    }
+
+    const urls = entries.map((e) =>
+      [
+        `  <url>`,
+        `    <loc>${origin}${e.path}</loc>`,
+        e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
+        e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
+        e.priority ? `    <priority>${e.priority}</priority>` : null,
+        `  </url>`,
+      ].filter(Boolean).join("\n"),
+    ).join("\n");
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`;
   };
-  const regenerateSitemap = () => setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl, posts.map((p) => p.slug), customPages.filter((p) => p.published).map((p) => p.slug)) }));
+  const regenerateSitemap = () => setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl) }));
 
   useEffect(() => {
     if (!seo.autoSitemap) return;
-    setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl, posts.map((p) => p.slug), customPages.filter((p) => p.published).map((p) => p.slug)) }));
+    setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [posts, customPages, seo.autoSitemap, seo.canonicalUrl]);
+  }, [posts, customPages, portfolio, caseStudies, content.servicesList, seo.pageSeo, seo.autoSitemap, seo.canonicalUrl]);
 
   return (
     <Ctx.Provider

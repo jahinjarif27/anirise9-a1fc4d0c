@@ -49,7 +49,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://anirise.com.bd/services/website-seo</loc>
+    <loc>https://anirise.com.bd/services/n</loc>
     <lastmod>2026-05-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -61,16 +61,28 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://anirise.com.bd/services/website-development</loc>
+    <lastmod>2026-05-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://anirise.com.bd/services/social-media-marketing</loc>
+    <lastmod>2026-05-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://anirise.com.bd/services/graphics-design</loc>
     <lastmod>2026-05-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://anirise.com.bd/blog/seo-checklist-2026</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://anirise.com.bd/services/digital-marketing</loc>
+    <lastmod>2026-05-21</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://anirise.com.bd/blog/ecommerce-product-pages</loc>
@@ -81,6 +93,18 @@
   <url>
     <loc>https://anirise.com.bd/blog/facebook-ads-small-budget</loc>
     <lastmod>2026-04-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://anirise.com.bd/blog/seo-checklist-2026</loc>
+    <lastmod>2026-04-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://anirise.com.bd/blog/N</loc>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -98,6 +122,12 @@
   </url>
   <url>
     <loc>https://anirise.com.bd/portfolio/p3</loc>
+    <lastmod>2026-05-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://anirise.com.bd/portfolio/1779353821135</loc>
     <lastmod>2026-05-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
