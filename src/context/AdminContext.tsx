@@ -382,6 +382,13 @@ const defaultContent: SiteContent = {
     { id: "svc-graphics-design",      slug: "graphics-design",      title: "Graphics Design",       desc: "Eye-catching visuals, brand identity, and marketing creatives that make your brand instantly recognizable.",                       iconName: "PenTool",      published: true, order: 5 },
     { id: "svc-digital-marketing",    slug: "digital-marketing",    title: "Digital Marketing",     desc: "Full-funnel campaigns across search, social, and email — measured, optimized, and engineered for ROI.",                            iconName: "Smartphone",   published: true, order: 6 },
   ],
+  sectionNotes: {
+    servicesPreview: {
+      heading: "Built for measurable growth",
+      text: "Every service above is part of one connected growth engine — SEO, design, and marketing working together so your visibility, traffic, and revenue all rise in sync. Pick a single service or combine them into a full roadmap.",
+      align: "center",
+    },
+  },
 };
 
 const defaultContact: ContactInfo = {
