@@ -1601,6 +1601,51 @@ const AdminDashboard = () => {
             })}
           </div>
         </Card>
+
+        {/* Phase 4 — drag-and-drop home block order */}
+        {(() => {
+          const labels: Record<string, string> = {
+            hero: "Hero", trustStrip: "Trust strip", stats: "Stats band",
+            servicesPreview: "Services preview", about: "About",
+            caseStudies: "Case studies", processFlow: "Process flow",
+            whyChoose: "Why choose AniRise", strategyCall: "Strategy call",
+            homeFaq: "Home FAQ", blog: "Blog", finalCta: "Final CTA",
+          };
+          const saved = Array.isArray(content.homeOrder) ? content.homeOrder : [];
+          const ordered = [
+            ...saved.filter((id) => id in labels),
+            ...DEFAULT_HOME_ORDER.filter((id) => !saved.includes(id)),
+          ];
+          const items = ordered.map((id) => ({ id, label: labels[id] || id }));
+          return (
+            <Card className="p-5 sm:p-6 space-y-3">
+              <SectionHeader icon={Layers} title="Home page block order" subtitle="Drag to reorder the blocks shown on the home page." />
+              <SortableList
+                items={items}
+                onReorder={(next) => updateContent({ homeOrder: next.map((i) => i.id) })}
+                renderItem={(item) => (
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{item.id}</span>
+                  </div>
+                )}
+              />
+            </Card>
+          );
+        })()}
+
+        {/* Phase 5 — live sitemap */}
+        <Card className="p-5 sm:p-6 space-y-2">
+          <SectionHeader icon={Globe} title="Live sitemap" subtitle="Auto-updates from admin changes. Submit this URL to Google Search Console." />
+          <a
+            href={`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap`}
+            target="_blank" rel="noopener noreferrer"
+            className="text-sm font-mono text-accent hover:underline break-all"
+          >
+            https://{import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap
+          </a>
+        </Card>
+
         <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} />
         <SeoBlock pageKey="strategy-call" seo={seo} updatePageSeo={updatePageSeo} />
       </div>
