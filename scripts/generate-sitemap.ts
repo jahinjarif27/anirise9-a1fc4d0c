@@ -31,39 +31,52 @@ const STATIC_PAGE_KEYS: Array<{ key: string; defaultSlug: string; changefreq: Si
   { key: "strategy-call", defaultSlug: "strategy-call", changefreq: "monthly", priority: "0.8" },
 ];
 
-const serviceEntries: SitemapEntry[] = [
+const serviceFallback: SitemapEntry[] = [
   { path: "/services/website-seo", changefreq: "monthly", priority: "0.9", lastmod: today },
   { path: "/services/ecommerce-seo", changefreq: "monthly", priority: "0.9", lastmod: today },
   { path: "/services/graphics-design", changefreq: "monthly", priority: "0.9", lastmod: today },
 ];
 
-const blogEntries: SitemapEntry[] = initialPosts.map((p) => ({
+const blogFallback: SitemapEntry[] = initialPosts.map((p) => ({
   path: `/blog/${p.slug}`,
   changefreq: "monthly",
   priority: "0.7",
   lastmod: p.date || today,
 }));
 
-async function fetchDynamicEntries(): Promise<{ pageEntries: SitemapEntry[]; extras: SitemapEntry[] }> {
+async function fetchDynamicEntries(): Promise<{
+  pageEntries: SitemapEntry[];
+  extras: SitemapEntry[];
+  services: SitemapEntry[];
+  blog: SitemapEntry[];
+}> {
   const pageEntries: SitemapEntry[] = [];
   const extras: SitemapEntry[] = [];
+  let services: SitemapEntry[] = serviceFallback;
+  let blog: SitemapEntry[] = blogFallback;
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=portfolio,case_studies,custom_pages,seo,updated_at`,
-      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } },
-    );
-    if (!res.ok) {
-      // Fallback to defaults
+    const [settingsRes, postsRes] = await Promise.all([
+      fetch(
+        `${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=portfolio,case_studies,custom_pages,seo,content,updated_at`,
+        { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } },
+      ),
+      fetch(
+        `${SUPABASE_URL}/rest/v1/blog_posts?select=slug,date`,
+        { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } },
+      ),
+    ]);
+    if (!settingsRes.ok) {
       for (const p of STATIC_PAGE_KEYS) {
         pageEntries.push({ path: p.defaultSlug ? `/${p.defaultSlug}` : "/", changefreq: p.changefreq, priority: p.priority, lastmod: today });
       }
-      return { pageEntries, extras };
+      return { pageEntries, extras, services, blog };
     }
-    const rows = (await res.json()) as Array<{
-      portfolio?: Array<{ id: string }>;
+    const rows = (await settingsRes.json()) as Array<{
+      portfolio?: Array<{ id: string; slug?: string }>;
       case_studies?: Array<{ id: string }>;
-      custom_pages?: Array<{ slug: string; parent?: string; published?: boolean }>;
+      custom_pages?: Array<{ slug: string; parent?: string; published?: boolean; seo?: any }>;
       seo?: { pageSeo?: Record<string, any> };
+      content?: { servicesList?: Array<{ slug: string; urlSlug?: string; published?: boolean }> };
       updated_at?: string;
     }>;
     const row = rows[0] || {};
@@ -84,17 +97,90 @@ async function fetchDynamicEntries(): Promise<{ pageEntries: SitemapEntry[]; ext
       });
     }
 
-    (row.portfolio || []).forEach((p) => p?.id && extras.push({ path: `/portfolio/${p.id}`, changefreq: "monthly", priority: "0.7", lastmod: settingsDate }));
-    (row.case_studies || []).forEach((c) => c?.id && extras.push({ path: `/case-studies/${c.id}`, changefreq: "monthly", priority: "0.7", lastmod: settingsDate }));
-    (row.custom_pages || []).filter((p) => p.published && p.slug).forEach((p) =>
-      extras.push({ path: `/${p.parent ? p.parent + "/" : ""}${p.slug}`, changefreq: "monthly", priority: "0.6", lastmod: settingsDate }),
-    );
-    return { pageEntries, extras };
+    // Services — admin-managed list (with pageSeo overrides keyed `service:<slug>`)
+    const svcList = row.content?.servicesList || [];
+    if (svcList.length) {
+      services = svcList
+        .filter((s) => s.published !== false)
+        .map((s) => {
+          const cfg = pageSeo[`service:${s.slug}`] || {};
+          if (cfg.status === "draft" || cfg.robots === "noindex") return null;
+          const tail = (s.urlSlug && s.urlSlug.trim()) || s.slug;
+          return {
+            path: `/services/${tail}`,
+            changefreq: (cfg.changefreq as SitemapEntry["changefreq"]) || "monthly",
+            priority: cfg.priority || "0.9",
+            lastmod: settingsDate,
+          } as SitemapEntry;
+        })
+        .filter(Boolean) as SitemapEntry[];
+    }
+
+    // Blog posts from DB (with pageSeo overrides keyed `blog/<slug>`)
+    if (postsRes.ok) {
+      const dbPosts = (await postsRes.json()) as Array<{ slug: string; date?: string }>;
+      if (Array.isArray(dbPosts) && dbPosts.length) {
+        blog = dbPosts
+          .map((p) => {
+            const cfg = pageSeo[`blog/${p.slug}`] || {};
+            if (cfg.status === "draft" || cfg.robots === "noindex") return null;
+            return {
+              path: `/blog/${p.slug}`,
+              changefreq: (cfg.changefreq as SitemapEntry["changefreq"]) || "monthly",
+              priority: cfg.priority || "0.7",
+              lastmod: p.date || settingsDate,
+            } as SitemapEntry;
+          })
+          .filter(Boolean) as SitemapEntry[];
+      }
+    }
+
+    // Portfolio
+    (row.portfolio || []).forEach((p) => {
+      if (!p?.id) return;
+      const cfg = pageSeo[`proj:${p.id}`] || {};
+      if (cfg.status === "draft" || cfg.robots === "noindex") return;
+      const tail = (p.slug && p.slug.trim()) || p.id;
+      extras.push({
+        path: `/portfolio/${tail}`,
+        changefreq: (cfg.changefreq as SitemapEntry["changefreq"]) || "monthly",
+        priority: cfg.priority || "0.7",
+        lastmod: settingsDate,
+      });
+    });
+
+    // Case studies
+    (row.case_studies || []).forEach((c) => {
+      if (!c?.id) return;
+      const cfg = pageSeo[`case:${c.id}`] || {};
+      if (cfg.status === "draft" || cfg.robots === "noindex") return;
+      extras.push({
+        path: `/case-studies/${c.id}`,
+        changefreq: (cfg.changefreq as SitemapEntry["changefreq"]) || "monthly",
+        priority: cfg.priority || "0.7",
+        lastmod: settingsDate,
+      });
+    });
+
+    // Custom pages (with parent + per-page seo overrides)
+    (row.custom_pages || []).filter((p) => p.published && p.slug).forEach((p) => {
+      const cfg = p.seo || {};
+      if (cfg.status === "draft" || cfg.robots === "noindex") return;
+      const slug = String(p.slug).replace(/^\/+/, "");
+      extras.push({
+        path: `/${p.parent ? p.parent + "/" : ""}${slug}`,
+        changefreq: (cfg.changefreq as SitemapEntry["changefreq"]) || "monthly",
+        priority: cfg.priority || "0.6",
+        lastmod: settingsDate,
+      });
+    });
+
+    return { pageEntries, extras, services, blog };
   } catch {
     for (const p of STATIC_PAGE_KEYS) {
       pageEntries.push({ path: p.defaultSlug ? `/${p.defaultSlug}` : "/", changefreq: p.changefreq, priority: p.priority, lastmod: today });
     }
-    return { pageEntries, extras };
+    return { pageEntries, extras, services, blog };
   }
 }
 
@@ -121,8 +207,9 @@ function generateSitemap(entries: SitemapEntry[]) {
 }
 
 (async () => {
-  const { pageEntries, extras } = await fetchDynamicEntries();
-  const entries = [...pageEntries, ...serviceEntries, ...blogEntries, ...extras];
+  const { pageEntries, extras, services, blog } = await fetchDynamicEntries();
+  const entries = [...pageEntries, ...services, ...blog, ...extras];
   writeFileSync(resolve("public/sitemap.xml"), generateSitemap(entries));
   console.log(`sitemap.xml written (${entries.length} entries)`);
 })();
+
