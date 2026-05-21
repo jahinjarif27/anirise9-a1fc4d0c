@@ -669,12 +669,20 @@ const AdminDashboard = () => {
             <div>
               <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Page description / body</label>
               <Textarea
-                rows={8}
-                placeholder="Write the page content here. Plain text or Markdown — headings (##), lists, links etc. are supported."
+                rows={6}
+                placeholder="Quick plain-text or Markdown body. Use the paragraphs editor below for multi-paragraph layouts with per-paragraph alignment."
                 value={cp.body}
                 onChange={(e) => updateCustomPage(cp.id, { body: e.target.value })}
               />
-              <p className="text-[11px] text-muted-foreground mt-1.5">This shows as the main content on the page. Leave empty to show only the title and image.</p>
+              <p className="text-[11px] text-muted-foreground mt-1.5">If you add paragraphs below, those will be rendered instead of this field.</p>
+            </div>
+            <div className="rounded-xl border border-border bg-secondary/30 p-3">
+              <TextBlocksEditor
+                value={cp.textBlocks}
+                onChange={(next) => updateCustomPage(cp.id, { textBlocks: next })}
+                label="Paragraphs (multi-paragraph + alignment)"
+                hint="When present, this replaces the description/body field above on the live page."
+              />
             </div>
             <div className="flex justify-between pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteCustomPage(cp.id); setActivePage("hero"); toast.success("Page deleted"); }}>
