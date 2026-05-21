@@ -1505,7 +1505,45 @@ const AdminDashboard = () => {
               />
             </Card>
           )}
-          {activePage === "contact" && (
+          {activePage === "portfolio" && (
+            <Card className="p-5 sm:p-6 space-y-3">
+              <SectionHeader icon={Layers} title="Project order" subtitle="Drag to reorder project cards on /portfolio." />
+              <SortableList
+                items={[...portfolio]
+                  .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+                  .map((p) => ({ id: p.id, label: p.title || "Untitled", tag: p.tag }))}
+                onReorder={(next) => {
+                  next.forEach((item, idx) => updatePortfolioItem(item.id, { order: idx + 1 }));
+                }}
+                renderItem={(item) => (
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium truncate">{item.label}</span>
+                    {item.tag && <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{item.tag}</span>}
+                  </div>
+                )}
+              />
+            </Card>
+          )}
+          {activePage === "services" && (
+            <Card className="p-5 sm:p-6 space-y-3">
+              <SectionHeader icon={Layers} title="Service card order" subtitle="Drag to reorder service cards across /services, home preview, navbar dropdown." />
+              <SortableList
+                items={[...(content.servicesList || [])]
+                  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                  .map((s) => ({ id: s.id, label: s.title, slug: s.slug, published: s.published }))}
+                onReorder={(next) => {
+                  next.forEach((item, idx) => updateService(item.id, { order: idx + 1 }));
+                }}
+                renderItem={(item) => (
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium truncate">{item.label}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{item.slug}{!item.published && " · off"}</span>
+                  </div>
+                )}
+              />
+            </Card>
+          )}
+
             <Card className="p-5 sm:p-6 space-y-4">
               <SectionHeader icon={Phone} title="Contact details" subtitle="Visible across the site" />
               <div className="grid sm:grid-cols-2 gap-3">
