@@ -116,6 +116,10 @@ async function fetchDynamicEntries(): Promise<{
         .filter(Boolean) as SitemapEntry[];
     }
 
+    // Effective parent slugs (honor admin overrides)
+    const blogParent = (pageSeo.blog?.slug?.trim() || "blog").replace(/^\/+/, "");
+    const portfolioParent = (pageSeo.portfolio?.slug?.trim() || "portfolio").replace(/^\/+/, "");
+
     // Blog posts from DB (with pageSeo overrides keyed `blog/<slug>`)
     if (postsRes.ok) {
       const dbPosts = (await postsRes.json()) as Array<{ slug: string; date?: string }>;
@@ -125,7 +129,7 @@ async function fetchDynamicEntries(): Promise<{
             const cfg = pageSeo[`blog/${p.slug}`] || {};
             if (cfg.status === "draft" || cfg.robots === "noindex") return null;
             return {
-              path: `/blog/${p.slug}`,
+              path: `/${blogParent}/${p.slug}`,
               changefreq: (cfg.changefreq as SitemapEntry["changefreq"]) || "monthly",
               priority: cfg.priority || "0.7",
               lastmod: p.date || settingsDate,
@@ -142,7 +146,7 @@ async function fetchDynamicEntries(): Promise<{
       if (cfg.status === "draft" || cfg.robots === "noindex") return;
       const tail = (p.slug && p.slug.trim()) || p.id;
       extras.push({
-        path: `/portfolio/${tail}`,
+        path: `/${portfolioParent}/${tail}`,
         changefreq: (cfg.changefreq as SitemapEntry["changefreq"]) || "monthly",
         priority: cfg.priority || "0.7",
         lastmod: settingsDate,

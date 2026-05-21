@@ -1,23 +1,28 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate, useLocation } from "react-router-dom";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
+import { getPageSlug } from "@/lib/pageConfig";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 const BlogPostPage = () => {
   const { slug } = useParams();
+  const location = useLocation();
   const { posts, seo, loading } = useAdmin();
   const post = posts.find((p) => p.slug === slug);
+  const blogSlug = getPageSlug("blog", seo.pageSeo);
+  const expectedPath = `/${blogSlug}/${slug ?? ""}`;
+  const sectionRedirect = !!post && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
   const override: any = seo.pageSeo?.[`blog/${slug ?? ""}`] || {};
   const userSchemas = Array.isArray(override.schemas) ? override.schemas.filter((s: any) => s.enabled) : [];
 
   useSEO({
     title: override.metaTitle || (post ? `${post.title} — AniRise` : "Article — AniRise"),
     description: override.metaDescription || post?.excerpt?.slice(0, 158) || "Article from the AniRise blog.",
-    path: `/blog/${slug ?? ""}`,
+    path: expectedPath,
     canonical: override.canonicalAuto === false ? override.canonicalUrl : undefined,
     robots: override.robots === "noindex" ? "noindex, nofollow" : undefined,
     schemas: userSchemas.length > 0 ? userSchemas : undefined,
@@ -41,13 +46,14 @@ const BlogPostPage = () => {
   });
 
   if (loading) return null;
+  if (sectionRedirect) return <Navigate to={expectedPath} replace />;
   if (!post || override.status === "draft") {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="pt-32 pb-20 container text-center">
           <h1 className="text-3xl font-bold text-foreground">Post not found</h1>
-          <Link to="/blog" className="mt-4 inline-block text-accent">← Back to blog</Link>
+          <Link to={`/${blogSlug}`} className="mt-4 inline-block text-accent">← Back to blog</Link>
         </main>
         <Footer />
       </div>
@@ -59,7 +65,7 @@ const BlogPostPage = () => {
       <Navbar />
       <main className="pt-32 pb-20">
         <article className="container max-w-3xl">
-          <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent mb-6"><ArrowLeft className="h-4 w-4" /> Back to blog</Link>
+          <Link to={`/${blogSlug}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent mb-6"><ArrowLeft className="h-4 w-4" /> Back to blog</Link>
           <span className="inline-block text-[10px] font-bold tracking-widest uppercase text-accent bg-accent/10 px-2 py-1 rounded">{post.category}</span>
           <h1 className="mt-4 text-4xl sm:text-5xl font-extrabold text-foreground leading-tight">{post.title}</h1>
           <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">

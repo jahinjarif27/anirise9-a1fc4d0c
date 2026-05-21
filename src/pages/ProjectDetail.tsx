@@ -1,4 +1,4 @@
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link, Navigate, useLocation } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Building2, UserCircle2, Calendar, CheckCircle2 } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
@@ -6,6 +6,7 @@ import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { SectionNote } from "@/components/site/SectionNote";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
+import { getPageSlug } from "@/lib/pageConfig";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,27 +24,33 @@ import {
 
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { portfolio, loading } = useAdmin();
+  const location = useLocation();
+  const { portfolio, seo, loading } = useAdmin();
   const p = portfolio.find((x) => x.id === id || (x.slug && x.slug === id));
+  const portfolioSlug = getPageSlug("portfolio", seo.pageSeo); // effective parent slug
   const publicTail = p?.slug?.trim() || p?.id || id || "";
-  // If a custom slug exists, only that slug should resolve; redirect from raw id.
-  const shouldRedirect = !!p && !!p.slug?.trim() && id !== p.slug;
+  const expectedPath = `/${portfolioSlug}/${publicTail}`;
+  // If a custom slug exists for the item, only that slug should resolve; redirect from raw id.
+  const itemRedirect = !!p && !!p.slug?.trim() && id !== p.slug;
+  // If the parent section slug was overridden, redirect /portfolio/... → /<override>/...
+  const sectionRedirect = !!p && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
 
   useSEO({
     title: p ? `${p.title} — Project | AniRise` : "Project | AniRise",
     description: p?.description || "AniRise project case.",
-    path: `/portfolio/${publicTail}`,
+    path: expectedPath,
   });
 
   if (loading) return null;
-  if (shouldRedirect) return <Navigate to={`/portfolio/${p!.slug}`} replace />;
+  if (itemRedirect) return <Navigate to={`/${portfolioSlug}/${p!.slug}`} replace />;
+  if (sectionRedirect) return <Navigate to={expectedPath} replace />;
   if (!p) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="container py-32 text-center">
           <h1 className="text-3xl font-bold mb-4">Project not found</h1>
-          <Link to="/portfolio" className="text-accent underline">Back to projects</Link>
+          <Link to={`/${portfolioSlug}`} className="text-accent underline">Back to projects</Link>
         </main>
         <Footer />
       </div>
@@ -61,7 +68,7 @@ const ProjectDetail = () => {
       <Navbar />
       <main className="pt-28 pb-20">
         <div className="container max-w-5xl">
-          <Link to="/portfolio" className="inline-flex items-center gap-1 text-sm font-semibold text-accent mb-6 hover:gap-2 transition-all">
+          <Link to={`/${portfolioSlug}`} className="inline-flex items-center gap-1 text-sm font-semibold text-accent mb-6 hover:gap-2 transition-all">
             <ArrowLeft className="h-4 w-4" /> All projects
           </Link>
 
