@@ -54,6 +54,20 @@ const DynamicSlugResolver = () => {
   return <CustomPageView />;
 };
 
+/**
+ * Catch-all two-segment route for detail pages whose parent section has an
+ * admin-overridden slug. e.g. portfolio.slug = "project" → /project/p1 works.
+ */
+const DynamicDetailResolver = () => {
+  const { section } = useParams<{ section: string; id: string }>();
+  const { seo } = useAdmin();
+  const matched = resolvePathToBuiltIn(section || "", seo.pageSeo);
+  if (matched === "portfolio") return <ProjectDetail />;
+  if (matched === "blog") return <BlogPostPage />;
+  return <NotFound />;
+};
+
+
 export const AppRoutes = () => {
   return (
     <Suspense fallback={null}>
