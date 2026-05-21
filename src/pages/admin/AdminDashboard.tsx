@@ -25,10 +25,12 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 import { ServiceContentEditor } from "@/components/admin/ServiceContentEditor";
 import { TextBlocksEditor } from "@/components/admin/TextBlocksEditor";
 import { SortableList } from "@/components/admin/SortableList";
+import { SectionNoteEditor } from "@/components/admin/SectionNoteEditor";
 import { Switch } from "@/components/ui/switch";
 import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
 import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES, SERVICE_ICON_CHOICES, DEFAULT_HOME_ORDER } from "@/context/AdminContext";
+import { SERVICE_SECTION_IDS, SERVICE_SECTION_LABELS, type ServiceSectionId } from "@/data/serviceContentDefaults";
 
 const visitData = Array.from({ length: 14 }, (_, i) => ({
   day: `D${i + 1}`,
@@ -582,6 +584,54 @@ const AdminDashboard = () => {
   if (!isAuthed) return <AdminLogin />;
 
   const renderPageEditor = () => {
+    if (activePage === "home-order") {
+      const builtinLabels: Record<string, string> = {
+        hero: "Hero", trustStrip: "Trust strip", stats: "Stats band",
+        servicesPreview: "Services preview", about: "About",
+        caseStudies: "Case studies", processFlow: "Process flow",
+        whyChoose: "Why choose AniRise", strategyCall: "Strategy call",
+        homeFaq: "Home FAQ", blog: "Blog", finalCta: "Final CTA",
+      };
+      const customSecs = homeSections.filter((s) => (s.groupKey ?? "home") === "home");
+      const customPg = customPages.filter((p) => (p.groupKey ?? "") === "home");
+      const defaultIds = [
+        ...DEFAULT_HOME_ORDER,
+        ...customSecs.map((s) => `hs:${s.id}`),
+        ...customPg.map((p) => `cp:${p.id}`),
+      ];
+      const saved = Array.isArray(content.homeOrder) ? content.homeOrder : [];
+      const ordered = [
+        ...saved.filter((id) => defaultIds.includes(id)),
+        ...defaultIds.filter((id) => !saved.includes(id)),
+      ];
+      const labelFor = (id: string) => {
+        if (id.startsWith("hs:")) {
+          const s = customSecs.find((x) => x.id === id.slice(3));
+          return s ? `${s.title || "Untitled"} (custom)` : id;
+        }
+        if (id.startsWith("cp:")) {
+          const p = customPg.find((x) => x.id === id.slice(3));
+          return p ? `${p.title || p.slug} (page)` : id;
+        }
+        return builtinLabels[id] || id;
+      };
+      const items = ordered.map((id) => ({ id, label: labelFor(id) }));
+      return (
+        <Card className="p-5 sm:p-6 space-y-3">
+          <SectionHeader icon={Layers} title="Home page section order" subtitle="Drag to reorder every block on the home page — built-in, custom sections, and custom pages assigned to home." />
+          <SortableList
+            items={items}
+            onReorder={(next) => updateContent({ homeOrder: next.map((i) => i.id) })}
+            renderItem={(item) => (
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-medium truncate">{item.label}</span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{item.id}</span>
+              </div>
+            )}
+          />
+        </Card>
+      );
+    }
     if (activePage.startsWith("custom:")) {
       const id = activePage.slice(7);
       const cp = customPages.find((x) => x.id === id);
@@ -1187,6 +1237,41 @@ const AdminDashboard = () => {
             onChange={(patch) => updateServiceContent(slug, patch)}
           />
 
+          {/* Section reorder (drag) for this service's internal sections */}
+          {(() => {
+            const sc = serviceContent[slug];
+            const saved = (sc?.sectionOrder || []).filter((id) =>
+              (SERVICE_SECTION_IDS as readonly string[]).includes(id),
+            ) as ServiceSectionId[];
+            const ordered: ServiceSectionId[] = [
+              ...saved,
+              ...SERVICE_SECTION_IDS.filter((id) => !saved.includes(id)),
+            ];
+            const items = ordered.map((id) => ({ id, label: SERVICE_SECTION_LABELS[id] }));
+            return (
+              <Card className="p-5 sm:p-6 space-y-3">
+                <SectionHeader icon={Layers} title="Service section order" subtitle="Drag to reorder internal sections on this service page." />
+                <SortableList
+                  items={items}
+                  onReorder={(next) => updateServiceContent(slug, { sectionOrder: next.map((i) => i.id) } as any)}
+                  renderItem={(item) => (
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-medium truncate">{item.label}</span>
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{item.id}</span>
+                    </div>
+                  )}
+                />
+              </Card>
+            );
+          })()}
+
+          {/* Per-service paragraph note */}
+          <Card className="p-5 sm:p-6 space-y-3">
+            <SectionHeader icon={FileEdit} title="Page paragraph" subtitle="Optional heading + paragraph at the bottom of this service page." />
+            <SectionNoteEditor noteId={`svc:${slug}`} label="Paragraph for this service page" />
+          </Card>
+
+
 
           <Card className="p-5 sm:p-6 space-y-4">
             <SectionHeader
@@ -1387,6 +1472,12 @@ const AdminDashboard = () => {
             </div>
           </Card>
 
+          {/* Per-project paragraph note */}
+          <Card className="p-5 sm:p-6 space-y-3">
+            <SectionHeader icon={FileEdit} title="Page paragraph" subtitle="Optional heading + paragraph at the bottom of this project detail page." />
+            <SectionNoteEditor noteId={`proj:${it.id}`} label="Paragraph for this project page" />
+          </Card>
+
           <SeoBlock
             pageKey={`proj:${it.id}`}
             seo={seo}
@@ -1396,6 +1487,7 @@ const AdminDashboard = () => {
             externalSlug={it.slug || ""}
             onExternalSlugChange={(next) => updatePortfolioItem(it.id, { slug: next })}
           />
+
 
         </div>
       );
@@ -1860,12 +1952,20 @@ const AdminDashboard = () => {
                         <CollapsibleContent>
                           <ul className="ml-4 pl-3 border-l border-border/60 space-y-0.5 mt-1 mb-1">
                             <li>
+                              <button onClick={() => setActivePage("home-order")}
+                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "home-order" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
+                                <Layers className="h-3 w-3 opacity-60" />
+                                <span className="truncate">Section order (drag)</span>
+                              </button>
+                            </li>
+                            <li>
                               <button onClick={() => setActivePage("hero")}
                                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "hero" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
                                 <FileText className="h-3 w-3 opacity-60" />
                                 <span className="truncate">Hero</span>
                               </button>
                             </li>
+
                             {HOME_BLOCKS.map((b) => {
                               const key = `hb:${b.key}`;
                               const on = homeBlocks[b.key];
