@@ -73,6 +73,7 @@ export const ServicesPreview = () => {
           })}
         </div>
       </div>
+      <SectionNote id="servicesPreview" tone="onDark" />
     </section>
   );
 };
