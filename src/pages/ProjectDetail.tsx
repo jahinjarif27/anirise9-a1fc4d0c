@@ -3,6 +3,7 @@ import { ArrowLeft, ExternalLink, Building2, UserCircle2, Calendar, CheckCircle2
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
+import { SectionNote } from "@/components/site/SectionNote";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
