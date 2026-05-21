@@ -2755,8 +2755,44 @@ const AdminDashboard = () => {
                     <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
                     <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value })} />
                   </div>
-                  <div className="flex justify-end">
-                    <Button variant="hero" size="sm" onClick={() => { updateSeo({ sitemap: seo.sitemap }); toast.success("Sitemap saved"); }}>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        const url = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`;
+                        const tId = toast.loading("Fetching live sitemap…");
+                        try {
+                          const res = await fetch(url, { cache: "no-store" });
+                          const xml = await res.text();
+                          const count = (xml.match(/<url>/g) || []).length;
+                          toast.success(`Live sitemap OK — ${count} URLs`, { id: tId });
+                          console.log("[live sitemap]", xml);
+                        } catch (e: any) {
+                          toast.error(`Live sitemap fetch failed: ${e?.message || e}`, { id: tId });
+                        }
+                      }}
+                    >
+                      <RefreshCw className="h-4 w-4" /> Verify live sitemap
+                    </Button>
+                    <Button
+                      variant="hero"
+                      size="sm"
+                      onClick={async () => {
+                        updateSeo({ sitemap: seo.sitemap });
+                        const tId = toast.loading("Saving sitemap…");
+                        const r = await saveAllNow();
+                        if (!r.ok) {
+                          toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
+                          return;
+                        }
+                        // Warm/bust the edge cache so the next /sitemap.xml fetch is fresh.
+                        try {
+                          await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, { cache: "no-store" });
+                        } catch {}
+                        toast.success("Sitemap saved — live URL refreshed", { id: tId });
+                      }}
+                    >
                       <Save className="h-4 w-4" /> Save sitemap
                     </Button>
                   </div>
