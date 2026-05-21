@@ -44,7 +44,30 @@ type SiteContent = {
   contactImageAlt: string;
   /** Admin-managed services list (replaces hardcoded src/data/services.ts) */
   servicesList?: AdminService[];
+  /** Phase 4 — drag-and-drop home page block order. Unknown ids fall back to default. */
+  homeOrder?: string[];
 };
+
+// Phase 3 — multi-paragraph blocks (re-exported for consumers)
+export type TextAlign = "left" | "center" | "right" | "justify";
+export type TextBlock = { id: string; text: string; align?: TextAlign };
+
+// Phase 4 — canonical default home block order. Built-in IDs only.
+export const DEFAULT_HOME_ORDER = [
+  "hero",
+  "trustStrip",
+  "stats",
+  "servicesPreview",
+  "about",
+  "caseStudies",
+  "processFlow",
+  "whyChoose",
+  "strategyCall",
+  "homeFaq",
+  "blog",
+  "finalCta",
+] as const;
+export type HomeBlockId = typeof DEFAULT_HOME_ORDER[number];
 
 export type AdminService = {
   id: string;
