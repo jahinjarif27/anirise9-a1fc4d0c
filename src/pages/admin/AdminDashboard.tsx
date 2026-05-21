@@ -738,7 +738,13 @@ const AdminDashboard = () => {
                         <Input value={s.title} onChange={(e) => { const next = [...sections]; next[idx] = { ...s, title: e.target.value }; updateCustomPage(cp.id, { sections: next }); }} placeholder="Section title" className="font-semibold" />
                         <Button size="icon" variant="ghost" className="text-destructive" onClick={() => updateCustomPage(cp.id, { sections: sections.filter((x) => x.id !== s.id) })}><Trash2 className="h-4 w-4" /></Button>
                       </div>
-                      <Textarea rows={4} value={s.body} onChange={(e) => { const next = [...sections]; next[idx] = { ...s, body: e.target.value }; updateCustomPage(cp.id, { sections: next }); }} placeholder="Section body. Plain text or Markdown." />
+                      <Textarea rows={3} value={s.body} onChange={(e) => { const next = [...sections]; next[idx] = { ...s, body: e.target.value }; updateCustomPage(cp.id, { sections: next }); }} placeholder="Section body (single block). Use paragraphs editor below for multi-paragraph + alignment." />
+                      <TextBlocksEditor
+                        value={s.textBlocks}
+                        onChange={(tb) => { const next = [...sections]; next[idx] = { ...s, textBlocks: tb }; updateCustomPage(cp.id, { sections: next }); }}
+                        label="Paragraphs"
+                        hint="Optional. When set, replaces the single body field above."
+                      />
                     </div>
                   ))}
                 </div>
