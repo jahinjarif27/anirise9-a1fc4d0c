@@ -69,6 +69,7 @@ export const FinalCTA = () => {
           </Button>
         </div>
       </div>
+      <SectionNote id="finalCta" />
     </section>
   );
 };
