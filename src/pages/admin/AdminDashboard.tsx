@@ -23,6 +23,8 @@ import logo from "@/assets/anirise-logo.jpg";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { ServiceContentEditor } from "@/components/admin/ServiceContentEditor";
+import { TextBlocksEditor } from "@/components/admin/TextBlocksEditor";
+import { SortableList } from "@/components/admin/SortableList";
 import { Switch } from "@/components/ui/switch";
 import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
