@@ -1096,33 +1096,47 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   // Persist site_settings on any change (debounced)
   // ---------------------------------------------------------------
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Build the full payload sent to update_site_settings — used by both the
+  // debounced auto-save and the explicit saveAllNow() force-flush.
+  const buildSettingsPayload = () => ({
+    content,
+    contact,
+    portfolio,
+    seo,
+    appearance,
+    custom_pages: customPages,
+    home_sections: homeSections,
+    section_groups: sectionGroups,
+    page_location: pageLocation,
+    home_membership: homeMembership,
+    home_blocks: homeBlocks,
+    home_faqs: homeFaqs,
+    service_faqs: serviceFaqs,
+    stats,
+    trust_logos: trustLogos,
+    case_studies: caseStudies,
+    final_cta: finalCta,
+    service_previews: servicePreviews,
+    service_content: serviceContent,
+    process_flow: processFlow,
+  });
+
+  // Force-flush any pending debounced save and persist immediately.
+  // Returns { ok, error? } so the caller can show feedback.
+  const saveAllNow = async (): Promise<{ ok: boolean; error?: string }> => {
+    if (!isAuthed) return { ok: false, error: "Not authenticated" };
+    if (saveTimer.current) { clearTimeout(saveTimer.current); saveTimer.current = null; }
+    const r = await adminCall("update_site_settings", buildSettingsPayload());
+    return { ok: r.ok, error: r.error };
+  };
+
   useEffect(() => {
     if (!hydrated.current) return;
     if (!isAuthed) return; // Only admins can persist site_settings now (RLS enforces this server-side too).
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      adminCall("update_site_settings", {
-        content,
-        contact,
-        portfolio,
-        seo,
-        appearance,
-        custom_pages: customPages,
-        home_sections: homeSections,
-        section_groups: sectionGroups,
-        page_location: pageLocation,
-        home_membership: homeMembership,
-        home_blocks: homeBlocks,
-        home_faqs: homeFaqs,
-        service_faqs: serviceFaqs,
-        stats,
-        trust_logos: trustLogos,
-        case_studies: caseStudies,
-        final_cta: finalCta,
-        service_previews: servicePreviews,
-        service_content: serviceContent,
-        process_flow: processFlow,
-      }).then((r) => {
+      adminCall("update_site_settings", buildSettingsPayload()).then((r) => {
         if (!r.ok) console.error("[site_settings] save failed", r.error);
       });
     }, 500);
