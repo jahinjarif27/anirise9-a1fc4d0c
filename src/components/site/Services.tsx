@@ -43,6 +43,7 @@ export const Services = () => {
           <ServiceCard key={service.slug} service={service} />
         ))}
       </div>
+      <SectionNote id="servicesPage" />
     </section>
   );
 };
