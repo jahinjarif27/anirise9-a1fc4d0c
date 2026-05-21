@@ -1,11 +1,12 @@
 import { ComponentType, lazy, Suspense } from "react";
+import { useLocation } from "react-router-dom";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { Contact } from "@/components/site/Contact";
 import { useSEO } from "@/hooks/useSEO";
 import { useAdmin } from "@/context/AdminContext";
-import { getPagePath, isPageDraft } from "@/lib/pageConfig";
+import { getPagePath, isPageDraft, BUILTIN_DEFAULT_SLUGS, type BuiltInPageKey } from "@/lib/pageConfig";
 
 const NotFound = lazy(() => import("./NotFound"));
 
@@ -25,6 +26,7 @@ const SECTION_DESCRIPTIONS: Record<string, string> = {
 
 export const SectionPage = ({ Section, title, sectionKey }: Props) => {
   const { seo } = useAdmin();
+  const location = useLocation();
   const ps = sectionKey ? seo.pageSeo?.[sectionKey] : undefined;
 
   // Draft page → 404 on public site
@@ -34,6 +36,19 @@ export const SectionPage = ({ Section, title, sectionKey }: Props) => {
         <NotFound />
       </Suspense>
     );
+  }
+
+  // If admin overrode the slug, the default path must 404 (single source of truth).
+  if (sectionKey && (sectionKey in BUILTIN_DEFAULT_SLUGS)) {
+    const effective = getPagePath(sectionKey as BuiltInPageKey, seo.pageSeo);
+    const current = location.pathname.replace(/\/+$/, "") || "/";
+    if (current !== effective.replace(/\/+$/, "") && current !== effective) {
+      return (
+        <Suspense fallback={null}>
+          <NotFound />
+        </Suspense>
+      );
+    }
   }
 
   const path = sectionKey ? getPagePath(sectionKey as any, seo.pageSeo) : undefined;
@@ -46,6 +61,7 @@ export const SectionPage = ({ Section, title, sectionKey }: Props) => {
     robots: ps?.robots === "noindex" ? "noindex, nofollow" : undefined,
     schemas: ps?.schemas?.filter((s) => s.enabled),
   });
+
 
   const isContactPage = sectionKey === "contact";
 
