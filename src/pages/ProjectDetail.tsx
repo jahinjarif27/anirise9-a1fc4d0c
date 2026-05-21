@@ -223,6 +223,7 @@ const ProjectDetail = () => {
             <div className="prose prose-lg max-w-none whitespace-pre-line text-foreground/85">{p.body}</div>
           )}
         </div>
+        <SectionNote id={`proj:${p.id}`} />
       </main>
       <Footer />
       <WhatsAppButton />
