@@ -132,6 +132,8 @@ export type PortfolioItem = {
   title: string;
   description?: string;
   body?: string;
+  /** Display order on the Projects page. Lower numbers render first. */
+  order?: number;
   // rich detail-page fields (all optional)
   eyebrow?: string;
   intro?: string;
@@ -1304,7 +1306,10 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   // ---------------------------------------------------------------
   const updateContent = (c: Partial<SiteContent>) => setContent((prev) => ({ ...prev, ...c }));
   const updateContact = (c: Partial<ContactInfo>) => setContact((prev) => ({ ...prev, ...c }));
-  const addPortfolioItem = (p: Omit<PortfolioItem, "id">) => setPortfolio((prev) => [...prev, { ...p, id: Date.now().toString() }]);
+  const addPortfolioItem = (p: Omit<PortfolioItem, "id">) => setPortfolio((prev) => {
+    const maxOrder = prev.reduce((m, x) => Math.max(m, x.order ?? 0), 0);
+    return [...prev, { order: maxOrder + 1, ...p, id: Date.now().toString() }];
+  });
   const updatePortfolioItem = (id: string, p: Partial<PortfolioItem>) => setPortfolio((prev) => prev.map((x) => (x.id === id ? { ...x, ...p } : x)));
   const deletePortfolioItem = (id: string) => setPortfolio((prev) => prev.filter((x) => x.id !== id));
   const updateSeo = (s: Partial<SeoSettings>) => setSeo((prev) => ({ ...prev, ...s }));

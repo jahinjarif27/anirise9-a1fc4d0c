@@ -1505,6 +1505,44 @@ const AdminDashboard = () => {
               />
             </Card>
           )}
+          {activePage === "portfolio" && (
+            <Card className="p-5 sm:p-6 space-y-3">
+              <SectionHeader icon={Layers} title="Project order" subtitle="Drag to reorder project cards on /portfolio." />
+              <SortableList
+                items={[...portfolio]
+                  .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+                  .map((p) => ({ id: p.id, label: p.title || "Untitled", tag: p.tag }))}
+                onReorder={(next) => {
+                  next.forEach((item, idx) => updatePortfolioItem(item.id, { order: idx + 1 }));
+                }}
+                renderItem={(item) => (
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium truncate">{item.label}</span>
+                    {item.tag && <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{item.tag}</span>}
+                  </div>
+                )}
+              />
+            </Card>
+          )}
+          {activePage === "services" && (
+            <Card className="p-5 sm:p-6 space-y-3">
+              <SectionHeader icon={Layers} title="Service card order" subtitle="Drag to reorder service cards across /services, home preview, navbar dropdown." />
+              <SortableList
+                items={[...(content.servicesList || [])]
+                  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                  .map((s) => ({ id: s.id, label: s.title, slug: s.slug, published: s.published }))}
+                onReorder={(next) => {
+                  next.forEach((item, idx) => updateService(item.id, { order: idx + 1 }));
+                }}
+                renderItem={(item) => (
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium truncate">{item.label}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{item.slug}{!item.published && " · off"}</span>
+                  </div>
+                )}
+              />
+            </Card>
+          )}
           {activePage === "contact" && (
             <Card className="p-5 sm:p-6 space-y-4">
               <SectionHeader icon={Phone} title="Contact details" subtitle="Visible across the site" />
@@ -1602,30 +1640,48 @@ const AdminDashboard = () => {
           </div>
         </Card>
 
-        {/* Phase 4 — drag-and-drop home block order */}
+        {/* Phase 4 — drag-and-drop home block order (built-ins + custom sections + custom pages) */}
         {(() => {
-          const labels: Record<string, string> = {
+          const builtinLabels: Record<string, string> = {
             hero: "Hero", trustStrip: "Trust strip", stats: "Stats band",
             servicesPreview: "Services preview", about: "About",
             caseStudies: "Case studies", processFlow: "Process flow",
             whyChoose: "Why choose AniRise", strategyCall: "Strategy call",
             homeFaq: "Home FAQ", blog: "Blog", finalCta: "Final CTA",
           };
+          const customSecs = homeSections.filter((s) => (s.groupKey ?? "home") === "home");
+          const customPg = customPages.filter((p) => (p.groupKey ?? "") === "home");
+          const defaultIds = [
+            ...DEFAULT_HOME_ORDER,
+            ...customSecs.map((s) => `hs:${s.id}`),
+            ...customPg.map((p) => `cp:${p.id}`),
+          ];
           const saved = Array.isArray(content.homeOrder) ? content.homeOrder : [];
           const ordered = [
-            ...saved.filter((id) => id in labels),
-            ...DEFAULT_HOME_ORDER.filter((id) => !saved.includes(id)),
+            ...saved.filter((id) => defaultIds.includes(id)),
+            ...defaultIds.filter((id) => !saved.includes(id)),
           ];
-          const items = ordered.map((id) => ({ id, label: labels[id] || id }));
+          const labelFor = (id: string) => {
+            if (id.startsWith("hs:")) {
+              const s = customSecs.find((x) => x.id === id.slice(3));
+              return s ? `${s.title || "Untitled"} (custom)` : id;
+            }
+            if (id.startsWith("cp:")) {
+              const p = customPg.find((x) => x.id === id.slice(3));
+              return p ? `${p.title || p.slug} (page)` : id;
+            }
+            return builtinLabels[id] || id;
+          };
+          const items = ordered.map((id) => ({ id, label: labelFor(id) }));
           return (
             <Card className="p-5 sm:p-6 space-y-3">
-              <SectionHeader icon={Layers} title="Home page block order" subtitle="Drag to reorder the blocks shown on the home page." />
+              <SectionHeader icon={Layers} title="Home page section order" subtitle="Drag to reorder every block on the home page — built-in, custom sections, and custom pages assigned to home." />
               <SortableList
                 items={items}
                 onReorder={(next) => updateContent({ homeOrder: next.map((i) => i.id) })}
                 renderItem={(item) => (
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-sm font-medium truncate">{item.label}</span>
                     <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{item.id}</span>
                   </div>
                 )}
@@ -1633,6 +1689,7 @@ const AdminDashboard = () => {
             </Card>
           );
         })()}
+
 
         {/* Phase 5 — live sitemap */}
         <Card className="p-5 sm:p-6 space-y-2">

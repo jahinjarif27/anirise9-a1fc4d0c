@@ -48,16 +48,57 @@ const Index = () => {
     jsonLd: fallbackJsonLd,
   });
 
-  // Phase 4 — render built-in blocks in admin-defined order.
-  // Append any new default blocks that are missing from saved order (forward compat).
+  // Phase 4+ — unified ordering across built-in blocks, custom home sections, and custom pages on home.
+  const homeCustomSections = homeSections.filter(
+    (s) => s.enabled && (s.groupKey ?? "home") === "home",
+  );
+  const homeCustomPages = customPages.filter(
+    (p) => p.published && (p.groupKey ?? "") === "home",
+  );
+
+  const defaultUnified: string[] = [
+    ...DEFAULT_HOME_ORDER,
+    ...homeCustomSections.map((s) => `hs:${s.id}`),
+    ...homeCustomPages.map((p) => `cp:${p.id}`),
+  ];
   const savedOrder = Array.isArray(content.homeOrder) ? content.homeOrder : [];
-  const orderedBuiltins: HomeBlockId[] = [
-    ...savedOrder.filter((id): id is HomeBlockId => (DEFAULT_HOME_ORDER as readonly string[]).includes(id)),
-    ...DEFAULT_HOME_ORDER.filter((id) => !savedOrder.includes(id)),
+  const orderedIds = [
+    ...savedOrder.filter((id) => defaultUnified.includes(id)),
+    ...defaultUnified.filter((id) => !savedOrder.includes(id)),
   ];
 
-  const renderBuiltin = (id: HomeBlockId) => {
-    switch (id) {
+  const renderBlock = (id: string) => {
+    if (id.startsWith("hs:")) {
+      const s = homeCustomSections.find((x) => x.id === id.slice(3));
+      if (!s) return null;
+      return (
+        <section key={id} className="py-16 md:py-24">
+          <div className="container">
+            {s.title && <h2 className="text-3xl md:text-4xl font-extrabold mb-4">{s.title}</h2>}
+            {s.image && <img src={s.image} alt={s.imageAlt} className="rounded-2xl w-full mb-6" />}
+            <div className="max-w-3xl text-foreground/80">
+              <TextBlocksView blocks={s.textBlocks} fallbackBody={s.body} />
+            </div>
+          </div>
+        </section>
+      );
+    }
+    if (id.startsWith("cp:")) {
+      const p = homeCustomPages.find((x) => x.id === id.slice(3));
+      if (!p) return null;
+      return (
+        <section key={id} className="py-16 md:py-24">
+          <div className="container">
+            {p.title && <h2 className="text-3xl md:text-4xl font-extrabold mb-4">{p.title}</h2>}
+            {p.image && <img src={p.image} alt={p.imageAlt} className="rounded-2xl w-full mb-6" />}
+            <div className="max-w-3xl text-foreground/80">
+              <TextBlocksView blocks={p.textBlocks} fallbackBody={p.body} />
+            </div>
+          </div>
+        </section>
+      );
+    }
+    switch (id as HomeBlockId) {
       case "hero":            return onHome("hero") ? <Hero key={id} /> : null;
       case "trustStrip":      return homeBlocks.trustStrip ? <TrustStrip key={id} /> : null;
       case "stats":           return homeBlocks.stats ? <StatsBand key={id} /> : null;
@@ -79,29 +120,7 @@ const Index = () => {
       {showLoader && <HomeLoader onDone={() => setAnimDone(true)} />}
       <Navbar />
       <main>
-        {orderedBuiltins.map(renderBuiltin)}
-        {homeSections.filter((s) => s.enabled && (s.groupKey ?? "home") === "home").map((s) => (
-          <section key={s.id} className="py-16 md:py-24">
-            <div className="container">
-              {s.title && <h2 className="text-3xl md:text-4xl font-extrabold mb-4">{s.title}</h2>}
-              {s.image && <img src={s.image} alt={s.imageAlt} className="rounded-2xl w-full mb-6" />}
-              <div className="max-w-3xl text-foreground/80">
-                <TextBlocksView blocks={s.textBlocks} fallbackBody={s.body} />
-              </div>
-            </div>
-          </section>
-        ))}
-        {customPages.filter((p) => p.published && (p.groupKey ?? "") === "home").map((p) => (
-          <section key={p.id} className="py-16 md:py-24">
-            <div className="container">
-              {p.title && <h2 className="text-3xl md:text-4xl font-extrabold mb-4">{p.title}</h2>}
-              {p.image && <img src={p.image} alt={p.imageAlt} className="rounded-2xl w-full mb-6" />}
-              <div className="max-w-3xl text-foreground/80">
-                <TextBlocksView blocks={p.textBlocks} fallbackBody={p.body} />
-              </div>
-            </div>
-          </section>
-        ))}
+        {orderedIds.map(renderBlock)}
       </main>
       <Footer />
       <WhatsAppButton />
@@ -110,3 +129,4 @@ const Index = () => {
 };
 
 export default Index;
+
