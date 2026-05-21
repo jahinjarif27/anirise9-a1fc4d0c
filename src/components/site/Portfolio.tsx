@@ -86,6 +86,7 @@ export const Portfolio = () => {
           </div>
         )}
       </div>
+      <SectionNote id="portfolioPage" />
     </section>
   );
 };
