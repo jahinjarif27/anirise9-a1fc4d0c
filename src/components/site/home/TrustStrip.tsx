@@ -1,4 +1,6 @@
 import { useAdmin } from "@/context/AdminContext";
+import { SectionNote } from "@/components/site/SectionNote";
+
 
 export const TrustStrip = () => {
   const { trustLogos } = useAdmin();
