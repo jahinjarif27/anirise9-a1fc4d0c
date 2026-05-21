@@ -7,6 +7,7 @@ import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
 import NotFound from "./NotFound";
 import { MarkdownContent } from "@/components/site/MarkdownContent";
+import { TextBlocksView } from "@/components/site/TextBlocksView";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
