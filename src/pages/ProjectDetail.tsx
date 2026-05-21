@@ -50,7 +50,7 @@ const ProjectDetail = () => {
         <Navbar />
         <main className="container py-32 text-center">
           <h1 className="text-3xl font-bold mb-4">Project not found</h1>
-          <Link to="/portfolio" className="text-accent underline">Back to projects</Link>
+          <Link to={`/${portfolioSlug}`} className="text-accent underline">Back to projects</Link>
         </main>
         <Footer />
       </div>
@@ -68,7 +68,7 @@ const ProjectDetail = () => {
       <Navbar />
       <main className="pt-28 pb-20">
         <div className="container max-w-5xl">
-          <Link to="/portfolio" className="inline-flex items-center gap-1 text-sm font-semibold text-accent mb-6 hover:gap-2 transition-all">
+          <Link to={`/${portfolioSlug}`} className="inline-flex items-center gap-1 text-sm font-semibold text-accent mb-6 hover:gap-2 transition-all">
             <ArrowLeft className="h-4 w-4" /> All projects
           </Link>
 
