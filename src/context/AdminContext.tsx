@@ -805,9 +805,9 @@ type AdminCtx = {
   logout: () => void;
   loading: boolean;
   posts: BlogPost[];
-  addPost: (p: Omit<BlogPost, "id">) => void;
-  updatePost: (id: string, p: Partial<BlogPost>) => void;
-  deletePost: (id: string) => void;
+  addPost: (p: Omit<BlogPost, "id">) => Promise<boolean>;
+  updatePost: (id: string, p: Partial<BlogPost>) => Promise<boolean>;
+  deletePost: (id: string) => Promise<boolean>;
   content: SiteContent;
   updateContent: (c: Partial<SiteContent>) => void;
   contact: ContactInfo;
@@ -1248,20 +1248,23 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   // ---------------------------------------------------------------
   // Blog (admin-action backed)
   // ---------------------------------------------------------------
-  const addPost = async (p: Omit<BlogPost, "id">) => {
+  const addPost = async (p: Omit<BlogPost, "id">): Promise<boolean> => {
     const r = await adminCall("blog_create", toDbPost(p));
-    if (!r.ok || !r.data) return console.error("blog_create failed", r.error);
+    if (!r.ok || !r.data) { console.error("blog_create failed", r.error); return false; }
     setPosts((prev) => [fromDbPost(r.data), ...prev]);
+    return true;
   };
-  const updatePost = async (id: string, p: Partial<BlogPost>) => {
+  const updatePost = async (id: string, p: Partial<BlogPost>): Promise<boolean> => {
     const r = await adminCall("blog_update", { id, patch: toDbPost(p) });
-    if (!r.ok || !r.data) return console.error("blog_update failed", r.error);
+    if (!r.ok || !r.data) { console.error("blog_update failed", r.error); return false; }
     setPosts((prev) => prev.map((x) => (x.id === id ? fromDbPost(r.data) : x)));
+    return true;
   };
-  const deletePost = async (id: string) => {
+  const deletePost = async (id: string): Promise<boolean> => {
     const r = await adminCall("blog_delete", { id });
-    if (!r.ok) return console.error("blog_delete failed", r.error);
+    if (!r.ok) { console.error("blog_delete failed", r.error); return false; }
     setPosts((prev) => prev.filter((x) => x.id !== id));
+    return true;
   };
 
   // ---------------------------------------------------------------

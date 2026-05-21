@@ -56,6 +56,17 @@ Deno.serve(async (req) => {
     const caseStudies: any[] = Array.isArray(s.case_studies) ? s.case_studies : [];
     const svcList: any[] = Array.isArray(s.content?.servicesList) ? s.content.servicesList : [];
 
+    const savedSitemap = typeof s.seo?.sitemap === 'string' ? s.seo.sitemap.trim() : '';
+    if (savedSitemap.startsWith('<?xml') && savedSitemap.includes('<urlset')) {
+      return new Response(savedSitemap.endsWith('\n') ? savedSitemap : `${savedSitemap}\n`, {
+        headers: {
+          ...cors,
+          'Content-Type': 'application/xml; charset=utf-8',
+          'Cache-Control': 'no-store, max-age=0, s-maxage=0',
+        },
+      });
+    }
+
     const entries: Entry[] = [];
 
     // Built-in pages
@@ -165,8 +176,7 @@ Deno.serve(async (req) => {
       headers: {
         ...cors,
         'Content-Type': 'application/xml; charset=utf-8',
-        // Short cache so admin changes are reflected within ~30s. Bypass with ?t=timestamp.
-        'Cache-Control': 'public, max-age=30, s-maxage=30',
+        'Cache-Control': 'no-store, max-age=0, s-maxage=0',
       },
     });
   } catch (e) {
