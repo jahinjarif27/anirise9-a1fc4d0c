@@ -13,6 +13,7 @@ import { Send } from "lucide-react";
 import { toast } from "sonner";
 import { useAdmin } from "@/context/AdminContext";
 import { useServices } from "@/lib/useServices";
+import { SectionNote } from "@/components/site/SectionNote";
 
 const TIMELINE_OPTIONS = [
   "As Soon As Possible",
