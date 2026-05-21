@@ -584,7 +584,7 @@ const AdminDashboard = () => {
   if (!isAuthed) return <AdminLogin />;
 
   const renderPageEditor = () => {
-    if (activePage === "home-order") {
+    if (activePage === "home-overview" || activePage === "home-order") {
       const builtinLabels: Record<string, string> = {
         hero: "Hero", trustStrip: "Trust strip", stats: "Stats band",
         servicesPreview: "Services preview", about: "About",
@@ -617,19 +617,22 @@ const AdminDashboard = () => {
       };
       const items = ordered.map((id) => ({ id, label: labelFor(id) }));
       return (
-        <Card className="p-5 sm:p-6 space-y-3">
-          <SectionHeader icon={Layers} title="Home page section order" subtitle="Drag to reorder every block on the home page — built-in, custom sections, and custom pages assigned to home." />
-          <SortableList
-            items={items}
-            onReorder={(next) => updateContent({ homeOrder: next.map((i) => i.id) })}
-            renderItem={(item) => (
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-sm font-medium truncate">{item.label}</span>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{item.id}</span>
-              </div>
-            )}
-          />
-        </Card>
+        <div className="space-y-6">
+          <Card className="p-5 sm:p-6 space-y-3">
+            <SectionHeader icon={Layers} title="Home page section order" subtitle="Drag to reorder every block on the home page — built-in, custom sections, and custom pages assigned to home." />
+            <SortableList
+              items={items}
+              onReorder={(next) => updateContent({ homeOrder: next.map((i) => i.id) })}
+              renderItem={(item) => (
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-medium truncate">{item.label}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{item.id}</span>
+                </div>
+              )}
+            />
+          </Card>
+          <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} />
+        </div>
       );
     }
     if (activePage.startsWith("custom:")) {
