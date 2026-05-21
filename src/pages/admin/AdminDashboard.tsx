@@ -384,7 +384,7 @@ const AdminDashboard = () => {
   const {
     isAuthed, logout, posts, addPost, updatePost, deletePost,
     content, updateContent, visits,
-    seo, updateSeo, appearance, updateAppearance, fontChoices,
+    seo, updateSeo, appearance, updateAppearance, fontChoices, saveAllNow,
     contact, updateContact, regenerateSitemap,
     portfolio, addPortfolioItem, updatePortfolioItem, deletePortfolioItem,
     addRedirect, updateRedirect, deleteRedirect,
