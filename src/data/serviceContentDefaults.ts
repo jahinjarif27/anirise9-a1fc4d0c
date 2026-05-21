@@ -41,6 +41,21 @@ export type ServiceContent = {
   ctaBlurb: string;
   ctaLabel: string;
   ctaUrl: string;
+  /** Optional order of internal sections. Unknown/missing ids fall back to default order. */
+  sectionOrder?: string[];
+};
+
+/** Canonical list of internal sections on a service page (in default order). */
+export const SERVICE_SECTION_IDS = ["hero", "whyCards", "process", "deliverables", "chart", "faq", "cta"] as const;
+export type ServiceSectionId = typeof SERVICE_SECTION_IDS[number];
+export const SERVICE_SECTION_LABELS: Record<ServiceSectionId, string> = {
+  hero: "Hero",
+  whyCards: "Why cards",
+  process: "Process",
+  deliverables: "Deliverables",
+  chart: "Chart",
+  faq: "FAQ",
+  cta: "CTA",
 };
 
 const blank: ServiceContent = {
