@@ -56,16 +56,9 @@ Deno.serve(async (req) => {
     const caseStudies: any[] = Array.isArray(s.case_studies) ? s.case_studies : [];
     const svcList: any[] = Array.isArray(s.content?.servicesList) ? s.content.servicesList : [];
 
-    const savedSitemap = typeof s.seo?.sitemap === 'string' ? s.seo.sitemap.trim() : '';
-    if (savedSitemap.startsWith('<?xml') && savedSitemap.includes('<urlset')) {
-      return new Response(savedSitemap.endsWith('\n') ? savedSitemap : `${savedSitemap}\n`, {
-        headers: {
-          ...cors,
-          'Content-Type': 'application/xml; charset=utf-8',
-          'Cache-Control': 'no-store, max-age=0, s-maxage=0',
-        },
-      });
-    }
+    // NOTE: We intentionally ignore any saved `seo.sitemap` blob in the DB.
+    // Always regenerate live from real data so admin changes reflect instantly
+    // and stray text/typos in the saved blob never leak into the served XML.
 
     const entries: Entry[] = [];
 
