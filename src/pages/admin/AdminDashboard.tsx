@@ -1798,7 +1798,6 @@ const AdminDashboard = () => {
           </a>
         </Card>
 
-        <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} />
         <SeoBlock pageKey="strategy-call" seo={seo} updatePageSeo={updatePageSeo} />
       </div>
     );
