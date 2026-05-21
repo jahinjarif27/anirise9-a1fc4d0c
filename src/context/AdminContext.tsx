@@ -46,7 +46,11 @@ type SiteContent = {
   servicesList?: AdminService[];
   /** Phase 4 — drag-and-drop home page block order. Unknown ids fall back to default. */
   homeOrder?: string[];
+  /** Per-section admin paragraph notes (heading + text + alignment), keyed by section id. */
+  sectionNotes?: Record<string, SectionNote>;
 };
+
+export type SectionNote = { heading?: string; text?: string; align?: TextAlign };
 
 // Phase 3 — multi-paragraph blocks (re-exported for consumers)
 export type TextAlign = "left" | "center" | "right" | "justify";
