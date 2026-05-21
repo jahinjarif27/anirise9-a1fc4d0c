@@ -211,6 +211,7 @@ export const ProcessSteps = () => {
           animation: process-flow 1.2s ease-out forwards;
         }
       `}</style>
+      <SectionNote id="processFlow" />
     </section>
   );
 };
