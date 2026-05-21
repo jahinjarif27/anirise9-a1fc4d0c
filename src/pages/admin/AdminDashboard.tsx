@@ -1543,7 +1543,15 @@ const AdminDashboard = () => {
               }
             />
             <Field label="Section title"><Input value={sec.title} onChange={(e) => updateHomeSection(sec.id, { title: e.target.value })} /></Field>
-            <Field label="Section content"><Textarea rows={4} value={sec.body} onChange={(e) => updateHomeSection(sec.id, { body: e.target.value })} /></Field>
+            <Field label="Section content (single block)"><Textarea rows={4} value={sec.body} onChange={(e) => updateHomeSection(sec.id, { body: e.target.value })} placeholder="Use paragraphs editor below for multi-paragraph + alignment." /></Field>
+            <div className="rounded-xl border border-border bg-secondary/30 p-3">
+              <TextBlocksEditor
+                value={sec.textBlocks}
+                onChange={(tb) => updateHomeSection(sec.id, { textBlocks: tb })}
+                label="Paragraphs (multi-paragraph + alignment)"
+                hint="When present, replaces the section content field above."
+              />
+            </div>
             <ImageUpload label="Section image" value={sec.image} onChange={(v) => updateHomeSection(sec.id, { image: v })} aspect="aspect-[16/9]" altValue={sec.imageAlt} onAltChange={(v) => updateHomeSection(sec.id, { imageAlt: v })} />
             <div className="flex justify-end pt-3 border-t border-border/60">
               <Button variant="outline" size="sm" onClick={() => { deleteHomeSection(sec.id); setActivePage("home"); toast.success("Section removed"); }}>
