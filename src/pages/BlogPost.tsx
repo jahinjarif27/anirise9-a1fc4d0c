@@ -22,7 +22,7 @@ const BlogPostPage = () => {
   useSEO({
     title: override.metaTitle || (post ? `${post.title} — AniRise` : "Article — AniRise"),
     description: override.metaDescription || post?.excerpt?.slice(0, 158) || "Article from the AniRise blog.",
-    path: `/blog/${slug ?? ""}`,
+    path: expectedPath,
     canonical: override.canonicalAuto === false ? override.canonicalUrl : undefined,
     robots: override.robots === "noindex" ? "noindex, nofollow" : undefined,
     schemas: userSchemas.length > 0 ? userSchemas : undefined,
@@ -52,7 +52,7 @@ const BlogPostPage = () => {
         <Navbar />
         <main className="pt-32 pb-20 container text-center">
           <h1 className="text-3xl font-bold text-foreground">Post not found</h1>
-          <Link to="/blog" className="mt-4 inline-block text-accent">← Back to blog</Link>
+          <Link to={`/${blogSlug}`} className="mt-4 inline-block text-accent">← Back to blog</Link>
         </main>
         <Footer />
       </div>
@@ -64,7 +64,7 @@ const BlogPostPage = () => {
       <Navbar />
       <main className="pt-32 pb-20">
         <article className="container max-w-3xl">
-          <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent mb-6"><ArrowLeft className="h-4 w-4" /> Back to blog</Link>
+          <Link to={`/${blogSlug}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent mb-6"><ArrowLeft className="h-4 w-4" /> Back to blog</Link>
           <span className="inline-block text-[10px] font-bold tracking-widest uppercase text-accent bg-accent/10 px-2 py-1 rounded">{post.category}</span>
           <h1 className="mt-4 text-4xl sm:text-5xl font-extrabold text-foreground leading-tight">{post.title}</h1>
           <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
