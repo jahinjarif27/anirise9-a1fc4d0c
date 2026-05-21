@@ -46,6 +46,7 @@ const BlogPostPage = () => {
   });
 
   if (loading) return null;
+  if (sectionRedirect) return <Navigate to={expectedPath} replace />;
   if (!post || override.status === "draft") {
     return (
       <div className="min-h-screen bg-background">
