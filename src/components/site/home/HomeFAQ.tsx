@@ -1,6 +1,7 @@
 import { Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useAdmin } from "@/context/AdminContext";
+import { SectionNote } from "@/components/site/SectionNote";
 
 export const HomeFAQ = () => {
   const { homeFaqs } = useAdmin();
@@ -23,6 +24,7 @@ export const HomeFAQ = () => {
           ))}
         </Accordion>
       </div>
+      <SectionNote id="homeFaq" />
     </section>
   );
 };

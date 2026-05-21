@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAdmin, PROJECT_CATEGORIES } from "@/context/AdminContext";
 import { cn } from "@/lib/utils";
+import { SectionNote } from "@/components/site/SectionNote";
 
 export const Portfolio = () => {
   const { content, portfolio } = useAdmin();
@@ -85,6 +86,7 @@ export const Portfolio = () => {
           </div>
         )}
       </div>
+      <SectionNote id="portfolioPage" />
     </section>
   );
 };

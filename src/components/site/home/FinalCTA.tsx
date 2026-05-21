@@ -2,6 +2,7 @@ import { Facebook, Instagram, Mail, Phone, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/context/AdminContext";
+import { SectionNote } from "@/components/site/SectionNote";
 
 export const FinalCTA = () => {
   const { finalCta, contact } = useAdmin();
@@ -68,6 +69,7 @@ export const FinalCTA = () => {
           </Button>
         </div>
       </div>
+      <SectionNote id="finalCta" />
     </section>
   );
 };

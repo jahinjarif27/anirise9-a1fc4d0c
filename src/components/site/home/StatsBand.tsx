@@ -1,4 +1,5 @@
 import { useAdmin } from "@/context/AdminContext";
+import { SectionNote } from "@/components/site/SectionNote";
 
 export const StatsBand = () => {
   const { stats } = useAdmin();
@@ -15,6 +16,7 @@ export const StatsBand = () => {
           ))}
         </div>
       </div>
+      <SectionNote id="stats" />
     </section>
   );
 };

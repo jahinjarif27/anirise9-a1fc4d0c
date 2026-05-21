@@ -1,4 +1,6 @@
 import { useAdmin } from "@/context/AdminContext";
+import { SectionNote } from "@/components/site/SectionNote";
+
 
 export const TrustStrip = () => {
   const { trustLogos } = useAdmin();
@@ -26,6 +28,7 @@ export const TrustStrip = () => {
         </div>
       </div>
       <style>{`@keyframes scroll { from { transform: translateX(0) } to { transform: translateX(-50%) } }`}</style>
+      <SectionNote id="trustStrip" />
     </section>
   );
 };

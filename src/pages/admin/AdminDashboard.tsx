@@ -1685,6 +1685,7 @@ const AdminDashboard = () => {
               )}
             </TabsTrigger>
             <TabsTrigger value="blog"><FileText className="h-4 w-4 mr-1" /> Blog</TabsTrigger>
+            <TabsTrigger value="notes"><FileEdit className="h-4 w-4 mr-1" /> Section Notes</TabsTrigger>
             <TabsTrigger value="reviews">
               <MessageSquare className="h-4 w-4 mr-1" /> Reviews
               {reviews.filter((r) => !r.approved).length > 0 && (
@@ -2302,8 +2303,73 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
+          {/* SECTION NOTES — admin paragraph + heading under each section */}
+          <TabsContent value="notes" className="space-y-4">
+            <Card className="p-5">
+              <SectionHeader
+                icon={FileEdit}
+                title="Section notes"
+                subtitle="Add an optional heading + paragraph under any section. Leave both empty to hide. Alignment controls how the text sits in the page width."
+              />
+              <div className="mt-4 grid gap-4">
+                {[
+                  { id: "servicesPreview", label: "Home — Services preview" },
+                  { id: "processFlow",     label: "Home — Process flow (6-step)" },
+                  { id: "whyChoose",       label: "Home — Why Choose AniRise" },
+                  { id: "stats",           label: "Home — Stats band" },
+                  { id: "caseStudies",     label: "Home — Case studies" },
+                  { id: "trustStrip",      label: "Home — Trust strip" },
+                  { id: "homeFaq",         label: "Home — FAQ" },
+                  { id: "strategyCall",    label: "Home — Strategy call" },
+                  { id: "finalCta",        label: "Home — Final CTA" },
+                  { id: "servicesPage",    label: "Services page" },
+                  { id: "portfolioPage",   label: "Projects / Portfolio page" },
+                ].map((row) => {
+                  const note = content.sectionNotes?.[row.id] || {};
+                  const align = (note.align || "left") as "left" | "center" | "right" | "justify";
+                  const save = (patch: Partial<typeof note>) => {
+                    const next = { ...(content.sectionNotes || {}) };
+                    next[row.id] = { ...note, ...patch };
+                    updateContent({ sectionNotes: next });
+                  };
+                  return (
+                    <div key={row.id} className="rounded-xl border border-border p-4 space-y-3 bg-card">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <p className="font-bold text-sm">{row.label}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Align</span>
+                          <Select value={align} onValueChange={(v) => save({ align: v as any })}>
+                            <SelectTrigger className="h-8 w-32"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="left">Left</SelectItem>
+                              <SelectItem value="center">Center</SelectItem>
+                              <SelectItem value="right">Right</SelectItem>
+                              <SelectItem value="justify">Justify</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <Input
+                        placeholder="Heading (optional)"
+                        value={note.heading || ""}
+                        onChange={(e) => save({ heading: e.target.value })}
+                      />
+                      <Textarea
+                        rows={4}
+                        placeholder="Paragraph (optional). Leave both empty to hide this section's note."
+                        value={note.text || ""}
+                        onChange={(e) => save({ text: e.target.value })}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          </TabsContent>
+
           {/* REVIEWS */}
           <TabsContent value="reviews" className="space-y-4">
+
             <Card className="p-5">
               <div className="flex items-center justify-between mb-4">
                 <div>
