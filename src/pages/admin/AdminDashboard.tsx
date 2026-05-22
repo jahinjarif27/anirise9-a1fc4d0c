@@ -1102,6 +1102,15 @@ const AdminDashboard = () => {
                 </div>
 
                 <Textarea value={c.body || ""} onChange={(e) => updateCaseStudy(c.id, { body: e.target.value })} placeholder="Extra long-form content (appended below)" rows={4} />
+
+                <SeoBlock
+                  pageKey={`case:${c.id}`}
+                  seo={seo}
+                  updatePageSeo={updatePageSeo}
+                  defaultPath={`/case-studies/${c.id}`}
+                  disableSlug
+                />
+
                 <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove case study</Button>
               </div>
             </details>
