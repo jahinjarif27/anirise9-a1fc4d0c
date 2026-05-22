@@ -5,7 +5,7 @@ import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { SectionNote } from "@/components/site/SectionNote";
 import { useAdmin } from "@/context/AdminContext";
-import { useSEO } from "@/hooks/useSEO";
+import { useSEO, fromPageSeo } from "@/hooks/useSEO";
 import { getPageSlug } from "@/lib/pageConfig";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -35,16 +35,31 @@ const ProjectDetail = () => {
   // If the parent section slug was overridden, redirect /portfolio/... → /<override>/...
   const sectionRedirect = !!p && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
 
+  const override: any = p ? (seo.pageSeo?.[`proj:${p.id}`] || {}) : {};
+  const isDraft = override.status === "draft";
+
   useSEO({
-    title: p ? `${p.title} — Project | AniRise` : "Project | AniRise",
-    description: p?.description || "AniRise project case.",
+    title: override.metaTitle || (p ? `${p.title} — Project | AniRise` : "Project | AniRise"),
+    description: override.metaDescription || p?.description || "AniRise project case.",
     path: expectedPath,
+    canonical: override.canonicalAuto === false ? override.canonicalUrl : undefined,
+    robots: override.robots === "noindex" || isDraft ? "noindex, nofollow" : undefined,
+    og: {
+      title: override.ogTitle || undefined,
+      description: override.ogDescription || undefined,
+      image: override.ogImage || p?.image || undefined,
+      type: "article",
+    },
+    ...((): any => {
+      const x = fromPageSeo(override);
+      return { keywords: x.keywords, schemas: x.schemas };
+    })(),
   });
 
   if (loading) return null;
   if (itemRedirect) return <Navigate to={`/${portfolioSlug}/${p!.slug}`} replace />;
   if (sectionRedirect) return <Navigate to={expectedPath} replace />;
-  if (!p) {
+  if (!p || isDraft) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
