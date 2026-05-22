@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
     // Services (admin-managed)
     for (const sv of svcList) {
       if (sv.published === false) continue;
-      const ps = pageSeo[`service:${sv.slug}`] || {};
+      const ps = pageSeo[`svc:${sv.slug}`] || {};
       if (ps.status === 'draft' || ps.robots === 'noindex') continue;
       const tail = (sv.urlSlug?.trim() || sv.slug || '').replace(/^\/+/, '');
       if (!tail) continue;
