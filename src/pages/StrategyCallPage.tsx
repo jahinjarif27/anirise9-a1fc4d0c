@@ -2,7 +2,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { StrategyCall } from "@/components/site/home/StrategyCall";
-import { useSEO } from "@/hooks/useSEO";
+import { useSEO, fromPageSeo } from "@/hooks/useSEO";
 import { useAdmin } from "@/context/AdminContext";
 
 const StrategyCallPage = () => {
@@ -14,6 +14,9 @@ const StrategyCallPage = () => {
       override?.metaDescription ||
       "Book a free strategy call with AniRise. Share your business challenges and get a tailored growth plan within 24 hours.",
     path: "/strategy-call",
+    canonical: override?.canonicalAuto === false ? override?.canonicalUrl : undefined,
+    robots: override?.robots === "noindex" ? "noindex, nofollow" : undefined,
+    ...fromPageSeo(override),
   });
   return (
     <div className="min-h-screen bg-background">
