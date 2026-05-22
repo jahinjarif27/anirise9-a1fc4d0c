@@ -3,7 +3,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
-import { useSEO } from "@/hooks/useSEO";
+import { useSEO, fromPageSeo } from "@/hooks/useSEO";
 import { getPageSlug } from "@/lib/pageConfig";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { MarkdownContent } from "@/components/site/MarkdownContent";
@@ -17,16 +17,27 @@ const BlogPostPage = () => {
   const expectedPath = `/${blogSlug}/${slug ?? ""}`;
   const sectionRedirect = !!post && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
   const override: any = seo.pageSeo?.[`blog/${slug ?? ""}`] || {};
-  const userSchemas = Array.isArray(override.schemas) ? override.schemas.filter((s: any) => s.enabled) : [];
+  const overrideExtra = fromPageSeo(override);
+  // If the user added their own schemas via admin, use them; otherwise fall back to BlogPosting JSON-LD.
+  const userSchemas = overrideExtra.schemas;
+  // Use admin OG; default OG image to the post cover if none provided.
+  const ogMerged = {
+    title: override.ogTitle || undefined,
+    description: override.ogDescription || undefined,
+    image: override.ogImage || post?.cover || undefined,
+    type: "article",
+  };
 
   useSEO({
     title: override.metaTitle || (post ? `${post.title} — AniRise` : "Article — AniRise"),
     description: override.metaDescription || post?.excerpt?.slice(0, 158) || "Article from the AniRise blog.",
+    keywords: overrideExtra.keywords,
     path: expectedPath,
     canonical: override.canonicalAuto === false ? override.canonicalUrl : undefined,
     robots: override.robots === "noindex" ? "noindex, nofollow" : undefined,
-    schemas: userSchemas.length > 0 ? userSchemas : undefined,
-    jsonLd: userSchemas.length === 0 && post
+    og: ogMerged,
+    schemas: userSchemas,
+    jsonLd: !userSchemas && post
       ? {
           "@context": "https://schema.org",
           "@type": "BlogPosting",

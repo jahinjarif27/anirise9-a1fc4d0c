@@ -16,7 +16,7 @@ import { ProcessSteps } from "@/components/site/home/ProcessSteps";
 import { HomeLoader } from "@/components/site/HomeLoader";
 import { useAdmin } from "@/context/AdminContext";
 import { DEFAULT_HOME_ORDER, type HomeBlockId } from "@/context/AdminContext";
-import { useSEO } from "@/hooks/useSEO";
+import { useSEO, fromPageSeo } from "@/hooks/useSEO";
 import { useState } from "react";
 import { TextBlocksView } from "@/components/site/TextBlocksView";
 
@@ -26,8 +26,8 @@ const Index = () => {
   const showLoader = loading || !animDone;
   const onHome = (k: string) => (pageLocation[k] ?? "home") === "home";
   const ps = seo.pageSeo?.home;
-  const userSchemas = ps?.schemas?.filter((s) => s.enabled) ?? [];
-  const fallbackJsonLd = userSchemas.length === 0
+  const psExtra = fromPageSeo(ps);
+  const fallbackJsonLd = !psExtra.schemas
     ? {
         "@context": "https://schema.org",
         "@type": "Organization",
@@ -44,7 +44,7 @@ const Index = () => {
     path: "/",
     canonical: ps?.canonicalAuto === false ? ps?.canonicalUrl : undefined,
     robots: ps?.robots === "noindex" ? "noindex, nofollow" : undefined,
-    schemas: userSchemas.length > 0 ? userSchemas : undefined,
+    ...psExtra,
     jsonLd: fallbackJsonLd,
   });
 

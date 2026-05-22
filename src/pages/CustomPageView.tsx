@@ -4,7 +4,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
-import { useSEO } from "@/hooks/useSEO";
+import { useSEO, fromPageSeo } from "@/hooks/useSEO";
 import NotFound from "./NotFound";
 import { MarkdownContent } from "@/components/site/MarkdownContent";
 import { TextBlocksView } from "@/components/site/TextBlocksView";
@@ -22,7 +22,7 @@ function CustomPageContent({ page }: { page: NonNullable<ReturnType<typeof useAd
     path: `/${page.slug}`,
     canonical: ps?.canonicalAuto === false ? ps?.canonicalUrl : undefined,
     robots: ps?.robots === "noindex" ? "noindex, nofollow" : undefined,
-    schemas: ps?.schemas?.filter((s: any) => s.enabled),
+    ...fromPageSeo(ps),
   });
 
 

@@ -4,7 +4,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
-import { useSEO } from "@/hooks/useSEO";
+import { useSEO, fromPageSeo } from "@/hooks/useSEO";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   ResponsiveContainer,
@@ -20,17 +20,31 @@ import {
 
 const CaseStudyDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { caseStudies, loading } = useAdmin();
+  const { caseStudies, seo, loading } = useAdmin();
   const cs = caseStudies.find((c) => c.id === id);
-  if (loading) return null;
+  const override: any = (cs && seo.pageSeo?.[`case:${cs.id}`]) || {};
+  const isDraft = override.status === "draft";
 
   useSEO({
-    title: cs ? `${cs.title} — Case Study | AniRise` : "Case Study | AniRise",
-    description: cs?.description || "AniRise case study.",
+    title: override.metaTitle || (cs ? `${cs.title} — Case Study | AniRise` : "Case Study | AniRise"),
+    description: override.metaDescription || cs?.description || "AniRise case study.",
     path: `/case-studies/${id}`,
+    canonical: override.canonicalAuto === false ? override.canonicalUrl : undefined,
+    robots: override.robots === "noindex" || isDraft ? "noindex, nofollow" : undefined,
+    og: {
+      title: override.ogTitle || undefined,
+      description: override.ogDescription || undefined,
+      image: override.ogImage || cs?.image || undefined,
+      type: "article",
+    },
+    ...((): any => {
+      const x = fromPageSeo(override);
+      return { keywords: x.keywords, schemas: x.schemas };
+    })(),
   });
 
-  if (!cs) {
+  if (loading) return null;
+  if (!cs || isDraft) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />

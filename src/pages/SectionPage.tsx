@@ -4,7 +4,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { Contact } from "@/components/site/Contact";
-import { useSEO } from "@/hooks/useSEO";
+import { useSEO, fromPageSeo } from "@/hooks/useSEO";
 import { useAdmin } from "@/context/AdminContext";
 import { getPagePath, isPageDraft, BUILTIN_DEFAULT_SLUGS, type BuiltInPageKey } from "@/lib/pageConfig";
 
@@ -59,7 +59,7 @@ export const SectionPage = ({ Section, title, sectionKey }: Props) => {
     path,
     canonical: ps?.canonicalAuto === false ? ps?.canonicalUrl : undefined,
     robots: ps?.robots === "noindex" ? "noindex, nofollow" : undefined,
-    schemas: ps?.schemas?.filter((s) => s.enabled),
+    ...fromPageSeo(ps),
   });
 
 
