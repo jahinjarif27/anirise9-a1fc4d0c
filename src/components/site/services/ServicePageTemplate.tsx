@@ -247,7 +247,10 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
   ];
 
   return (
-    <ServiceLayout title={service?.title ?? c.heroEyebrow ?? "Service"} description={c.heroBlurb} path={`/services/${publicSlug}`}>
+    <ServiceLayout title={service?.title ?? c.heroEyebrow ?? "Service"} description={c.heroBlurb} path={`/services/${publicSlug}`} seoKey={`svc:${slug}`}>
+      {/* sectionOrder may include disabled sections — filter against active. */}
+      {c.sectionOrder.filter((id) => SERVICE_SECTION_IDS.includes(id as ServiceSectionId) && sections[id as ServiceSectionId]).map((id) => sections[id as ServiceSectionId])}
+    </ServiceLayout>
       {orderedIds.map((id) => sections[id])}
       <SectionNote id={`svc:${slug}`} />
     </ServiceLayout>
