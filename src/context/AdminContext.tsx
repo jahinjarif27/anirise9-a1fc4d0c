@@ -1460,7 +1460,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
 
     // Services (admin-managed) — public detail pages
     for (const s of (content.servicesList || []).filter((x) => x.published)) {
-      const cfg: any = ps[`service:${s.slug}`] || {};
+      const cfg: any = ps[`svc:${s.slug}`] || {};
       if (cfg.status === "draft" || cfg.robots === "noindex") continue;
       const tail = (s.urlSlug && s.urlSlug.trim()) || s.slug;
       entries.push({ path: `/services/${tail}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.8" });
