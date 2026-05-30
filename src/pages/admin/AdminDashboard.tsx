@@ -116,7 +116,7 @@ const SCHEMA_TYPE_OPTIONS = [
 
 const SeoBlock = ({
   pageKey, seo, updatePageSeo, defaultPath, disableSlug = false, slugPrefix,
-  externalSlug, onExternalSlugChange,
+  externalSlug, onExternalSlugChange, onSaveNow,
 }: {
   pageKey: string;
   seo: any; updatePageSeo: (key: string, patch: any) => void;
@@ -129,6 +129,7 @@ const SeoBlock = ({
   /** When set, the slug input reads/writes this external value instead of pageSeo[key].slug. */
   externalSlug?: string;
   onExternalSlugChange?: (next: string) => void;
+  onSaveNow?: () => Promise<boolean>;
 }) => {
   // Allow extended keys (svc:*, proj:*) by checking defaultPath presence.
   if (!INDEXABLE_PAGE_KEYS.has(pageKey) && !defaultPath) return null;
@@ -164,9 +165,10 @@ const SeoBlock = ({
     update({ schemas: schemas.filter((x) => x.id !== id) });
   };
 
-  const onSave = () => {
+  const onSave = async () => {
     update({});
-    toast.success(`SEO saved for ${previewPath} — live on next page load`);
+    const ok = onSaveNow ? await onSaveNow() : true;
+    if (ok) toast.success(`SEO saved for ${previewPath} — live now`);
   };
 
   const sanitizeTail = (v: string) =>
@@ -265,7 +267,7 @@ const SeoBlock = ({
         </div>
         {canonicalAuto ? (
           <p className="text-[11px] text-muted-foreground font-mono break-all">
-            https://anirise.com.bd{previewPath}
+            {(seo.canonicalUrl || "https://anirise.com.bd").replace(/\/$/, "")}{previewPath}
           </p>
         ) : (
           <Input
@@ -454,6 +456,17 @@ const AdminDashboard = () => {
     setEditingId(null);
     setBlogMode("simple");
     setDraft({ slug: "", title: "", excerpt: "", category: "SEO", author: "AniRise Team", date: new Date().toISOString().slice(0, 10), readTime: "5 min", cover: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80", coverAlt: "", ctaEnabled: false, ctaLabel: "", ctaUrl: "", body: "" });
+  };
+
+  const persistNow = async (message = "Saved — live now") => {
+    const tId = toast.loading("Saving…");
+    const r = await saveAllNow();
+    if (!r.ok) {
+      toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
+      return false;
+    }
+    toast.success(message, { id: tId });
+    return true;
   };
 
   const downloadFile = (filename: string, content: string, type: string) => {
