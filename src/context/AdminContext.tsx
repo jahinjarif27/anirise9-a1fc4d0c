@@ -957,6 +957,16 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({});
   const [serviceContent, setServiceContent] = useState<Record<string, ServiceContent>>(defaultServiceContent);
   const [processFlow, setProcessFlow] = useState<ProcessFlow>(defaultProcessFlow);
+  const latestSettingsRef = useRef<any>(null);
+
+  latestSettingsRef.current = {
+    content, contact, portfolio, seo, appearance,
+    custom_pages: customPages, home_sections: homeSections, section_groups: sectionGroups,
+    page_location: pageLocation, home_membership: homeMembership, home_blocks: homeBlocks,
+    home_faqs: homeFaqs, service_faqs: serviceFaqs, stats, trust_logos: trustLogos,
+    case_studies: caseStudies, final_cta: finalCta, service_previews: servicePreviews,
+    service_content: serviceContent, process_flow: processFlow,
+  };
 
   // Prevent the initial DB-load setState from triggering a save back to DB
   const hydrated = useRef(false);
@@ -1100,34 +1110,14 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
 
   // Build the full payload sent to update_site_settings — used by both the
   // debounced auto-save and the explicit saveAllNow() force-flush.
-  const buildSettingsPayload = () => ({
-    content,
-    contact,
-    portfolio,
-    seo,
-    appearance,
-    custom_pages: customPages,
-    home_sections: homeSections,
-    section_groups: sectionGroups,
-    page_location: pageLocation,
-    home_membership: homeMembership,
-    home_blocks: homeBlocks,
-    home_faqs: homeFaqs,
-    service_faqs: serviceFaqs,
-    stats,
-    trust_logos: trustLogos,
-    case_studies: caseStudies,
-    final_cta: finalCta,
-    service_previews: servicePreviews,
-    service_content: serviceContent,
-    process_flow: processFlow,
-  });
+  const buildSettingsPayload = () => latestSettingsRef.current;
 
   // Force-flush any pending debounced save and persist immediately.
   // Returns { ok, error? } so the caller can show feedback.
   const saveAllNow = async (): Promise<{ ok: boolean; error?: string }> => {
     if (!isAuthed) return { ok: false, error: "Not authenticated" };
     if (saveTimer.current) { clearTimeout(saveTimer.current); saveTimer.current = null; }
+    await new Promise((resolve) => setTimeout(resolve, 0));
     const r = await adminCall("update_site_settings", buildSettingsPayload());
     return { ok: r.ok, error: r.error };
   };
@@ -1140,7 +1130,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       adminCall("update_site_settings", buildSettingsPayload()).then((r) => {
         if (!r.ok) console.error("[site_settings] save failed", r.error);
       });
-    }, 500);
+    }, 250);
   }, [isAuthed, content, contact, portfolio, seo, appearance, customPages, homeSections, sectionGroups, pageLocation, homeMembership, homeBlocks, homeFaqs, serviceFaqs, stats, trustLogos, caseStudies, finalCta, servicePreviews, serviceContent, processFlow]);
 
   // ---------------------------------------------------------------
@@ -1470,7 +1460,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
 
     // Services (admin-managed) — public detail pages
     for (const s of (content.servicesList || []).filter((x) => x.published)) {
-      const cfg: any = ps[`service:${s.slug}`] || {};
+      const cfg: any = ps[`svc:${s.slug}`] || {};
       if (cfg.status === "draft" || cfg.robots === "noindex") continue;
       const tail = (s.urlSlug && s.urlSlug.trim()) || s.slug;
       entries.push({ path: `/services/${tail}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.8" });

@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/sitemap" },
+    { "source": "/robots.txt", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/robots" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
@@ -21,7 +22,7 @@
       "source": "/robots.txt",
       "headers": [
         { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
-        { "key": "Cache-Control", "value": "public, max-age=3600" }
+        { "key": "Cache-Control", "value": "no-store, max-age=0, s-maxage=0" }
       ]
     }
   ]
