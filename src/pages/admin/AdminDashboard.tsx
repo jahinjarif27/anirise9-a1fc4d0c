@@ -645,7 +645,7 @@ const AdminDashboard = () => {
               )}
             />
           </Card>
-          <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} />
+          <SeoBlock pageKey="home" seo={seo} updatePageSeo={updatePageSeo} onSaveNow={() => persistNow("Home SEO saved — live now")} />
         </div>
       );
     }
@@ -757,7 +757,7 @@ const AdminDashboard = () => {
               <Button variant="outline" size="sm" onClick={() => { deleteCustomPage(cp.id); setActivePage("hero"); toast.success("Page deleted"); }}>
                 <Trash2 className="h-4 w-4 text-destructive" /> Delete page
               </Button>
-              <Button variant="hero" size="sm" onClick={() => toast.success("Saved")}><Save className="h-4 w-4" /> Save</Button>
+              <Button variant="hero" size="sm" onClick={() => persistNow("Page saved — live now")}><Save className="h-4 w-4" /> Save</Button>
             </div>
           </Card>
 
@@ -918,7 +918,7 @@ const AdminDashboard = () => {
               <Search className="h-4 w-4" />
               <h4 className="font-bold">Page SEO</h4>
               <span className="text-[11px] text-muted-foreground">/{cp.parent ? cp.parent + "/" : ""}{cp.slug}</span>
-              <Button size="sm" variant="hero" className="ml-auto" onClick={() => toast.success(`SEO saved for /${cp.slug} — live on next page load`)}>
+              <Button size="sm" variant="hero" className="ml-auto" onClick={() => persistNow(`SEO saved for /${cp.slug} — live now`)}>
                 <Save className="h-4 w-4" /> Save SEO
               </Button>
             </div>
