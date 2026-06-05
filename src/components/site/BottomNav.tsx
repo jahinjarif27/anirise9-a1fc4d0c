@@ -9,7 +9,7 @@ import { useAdmin } from "@/context/AdminContext";
 import { useServices } from "@/lib/useServices";
 
 const SECTION_LABELS: Record<string, string> = {
-  hero: "Home", services: "Services", portfolio: "Projects",
+  hero: "Home", services: "Services", portfolio: "Portfolio",
   blog: "Blog", testimonials: "Testimonials", contact: "Contact",
 };
 
