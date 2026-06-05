@@ -50,7 +50,7 @@ type SiteContent = {
   sectionNotes?: Record<string, SectionNote>;
 };
 
-export type SectionNote = { heading?: string; text?: string; align?: TextAlign };
+export type SectionNote = { heading?: string; subheading?: string; text?: string; align?: TextAlign };
 
 // Phase 3 — multi-paragraph blocks (re-exported for consumers)
 export type TextAlign = "left" | "center" | "right" | "justify";
