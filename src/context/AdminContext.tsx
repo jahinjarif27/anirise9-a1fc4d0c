@@ -1515,11 +1515,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   };
   const regenerateSitemap = () => setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl) }));
 
-  useEffect(() => {
-    if (!seo.autoSitemap) return;
-    setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl) }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [posts, customPages, portfolio, caseStudies, content.servicesList, seo.pageSeo, seo.autoSitemap, seo.canonicalUrl]);
+  // NOTE: sitemap auto-regeneration intentionally disabled here.
+  // The live edge function (`/sitemap.xml`) regenerates from real DB data
+  // on every request, so the admin-stored `seo.sitemap` is treated as a
+  // pure manual override — never silently overwritten by this client.
+  // Use the `Regenerate` / `regenerateSitemap()` button to opt-in to a fresh preview.
 
   return (
     <Ctx.Provider
