@@ -1954,14 +1954,15 @@ const AdminDashboard = () => {
 
           {/* PAGES */}
           <TabsContent value="pages" className="space-y-6">
-            <div className="grid lg:grid-cols-[280px_1fr] gap-5">
-              <Card className="p-0 h-fit lg:sticky lg:top-20 overflow-hidden">
-                <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center gap-2">
+            <div className="grid lg:grid-cols-[280px_1fr] gap-5 lg:items-start">
+              <Card className="p-0 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
+                <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center gap-2 shrink-0">
                   <Layers className="h-4 w-4 text-accent" />
                   <span className="text-sm font-bold">Site pages</span>
                 </div>
 
-                <div className="p-2 space-y-1">
+                <div className="p-2 space-y-1 overflow-y-auto flex-1 min-h-0">
+
                   {/* HOME page group */}
                   {(() => {
                     const isOpen = openGroups["home"] ?? false;
