@@ -88,11 +88,11 @@ export const ProcessSteps = () => {
           )}
         </div>
 
-        {/* Bento grid: 2 cols on mobile, 4 cols on desktop. auto-rows give the messy bento feel. */}
+        {/* Balanced bento: 2 cols mobile · 3 cols tablet · 4 cols desktop. Every cell is filled. */}
         <div
-          className="relative grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5"
-          style={{ gridAutoRows: "minmax(150px, auto)" }}
+          className="relative grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 auto-rows-[minmax(170px,auto)] lg:auto-rows-[minmax(180px,1fr)]"
         >
+
           {steps.map((s, i) => {
             const shape = TILE_SHAPES[i % TILE_SHAPES.length];
             const isActive = active === i;
