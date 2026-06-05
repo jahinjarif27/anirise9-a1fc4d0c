@@ -1954,14 +1954,15 @@ const AdminDashboard = () => {
 
           {/* PAGES */}
           <TabsContent value="pages" className="space-y-6">
-            <div className="grid lg:grid-cols-[280px_1fr] gap-5">
-              <Card className="p-0 h-fit lg:sticky lg:top-20 overflow-hidden">
-                <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center gap-2">
+            <div className="grid lg:grid-cols-[280px_1fr] gap-5 lg:items-start">
+              <Card className="p-0 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] overflow-hidden flex flex-col">
+                <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center gap-2 shrink-0">
                   <Layers className="h-4 w-4 text-accent" />
                   <span className="text-sm font-bold">Site pages</span>
                 </div>
 
-                <div className="p-2 space-y-1">
+                <div className="p-2 space-y-1 overflow-y-auto flex-1 min-h-0">
+
                   {/* HOME page group */}
                   {(() => {
                     const isOpen = openGroups["home"] ?? false;
@@ -2925,8 +2926,49 @@ const AdminDashboard = () => {
                     <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw text</label>
                     <Textarea rows={8} className="font-mono text-xs" value={seo.robotsTxt} onChange={(e) => updateSeo({ robotsTxt: e.target.value })} />
                   </div>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        const url = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/robots?t=${Date.now()}`;
+                        const tId = toast.loading("Fetching live robots.txt…");
+                        try {
+                          const res = await fetch(url, { cache: "no-store" });
+                          const txt = await res.text();
+                          toast.success(`Live robots.txt OK — ${txt.split(/\r?\n/).length} lines`, { id: tId });
+                          console.log("[live robots.txt]", txt);
+                        } catch (e: any) {
+                          toast.error(`Fetch failed: ${e?.message || e}`, { id: tId });
+                        }
+                      }}
+                    >
+                      <RefreshCw className="h-4 w-4" /> Verify live robots.txt
+                    </Button>
+                    <Button
+                      variant="hero"
+                      size="sm"
+                      onClick={async () => {
+                        const tId = toast.loading("Saving robots.txt…");
+                        const r = await saveAllNow();
+                        if (!r.ok) {
+                          toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
+                          return;
+                        }
+                        try {
+                          await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/robots?t=${Date.now()}`, { cache: "no-store" });
+                        } catch {}
+                        toast.success("robots.txt saved — live URL refreshed", { id: tId });
+                      }}
+                    >
+                      <Save className="h-4 w-4" /> Save robots.txt
+                    </Button>
+                  </div>
                 </Card>
               </TabsContent>
+
+
+
 
               <TabsContent value="redirects" className="space-y-4 mt-0">
                 <Card className="p-5 sm:p-6 space-y-5">
