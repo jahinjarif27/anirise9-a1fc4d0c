@@ -6,7 +6,7 @@ import { useServices } from "@/lib/useServices";
 
 const PAGE_KEYS = [
   { key: "home", label: "Home", defaultSlug: "" },
-  { key: "portfolio", label: "Projects", defaultSlug: "portfolio" },
+  { key: "portfolio", label: "Portfolio", defaultSlug: "portfolio" },
   { key: "blog", label: "Blog", defaultSlug: "blog" },
   { key: "contact", label: "Contact", defaultSlug: "contact" },
   { key: "strategy-call", label: "Book A Strategy Call", defaultSlug: "strategy-call" },
