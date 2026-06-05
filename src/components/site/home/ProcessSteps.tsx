@@ -120,7 +120,9 @@ export const ProcessSteps = () => {
                 tabIndex={0}
                 className={[
                   shape.mobile,
+                  shape.tablet,
                   shape.desktop,
+
                   sizeClass,
                   "group relative rounded-3xl border bg-card/80 backdrop-blur-sm transition-all duration-500 cursor-default outline-none overflow-hidden",
                   "shadow-card hover:shadow-elegant flex flex-col justify-between",
