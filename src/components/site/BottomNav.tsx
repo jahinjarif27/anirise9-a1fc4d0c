@@ -78,7 +78,7 @@ export const BottomNav = () => {
           </div>
           <button onClick={() => go("/portfolio")} className={itemCls("/portfolio")}>
             <Briefcase className="h-5 w-5" />
-            <span className="text-[10px] font-semibold tracking-wide">PROJECTS</span>
+            <span className="text-[10px] font-semibold tracking-wide">PORTFOLIO</span>
           </button>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
