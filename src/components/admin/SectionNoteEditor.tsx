@@ -1,5 +1,5 @@
-// Reusable inline editor for a single SectionNote (heading + paragraph + alignment).
-// Used in service and project editors so each detail page can have its own optional paragraph.
+// Reusable inline editor for a single SectionNote (heading + subheading + paragraph + alignment).
+// Paragraph supports Markdown links: [label](https://example.com)
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,7 +9,7 @@ import { useAdmin, type SectionNote, type TextAlign } from "@/context/AdminConte
 export const SectionNoteEditor = ({
   noteId,
   label = "Paragraph note",
-  subtitle = "Optional heading + paragraph rendered below the page. Leave both empty to hide.",
+  subtitle = "Optional heading, subheading & paragraph rendered below the section. Leave all empty to hide.",
 }: { noteId: string; label?: string; subtitle?: string }) => {
   const { content, updateContent } = useAdmin();
   const note: SectionNote = content.sectionNotes?.[noteId] || {};
@@ -44,12 +44,21 @@ export const SectionNoteEditor = ({
         value={note.heading || ""}
         onChange={(e) => save({ heading: e.target.value })}
       />
+      <Input
+        placeholder="Subheading (optional)"
+        value={note.subheading || ""}
+        onChange={(e) => save({ subheading: e.target.value })}
+      />
       <Textarea
-        rows={4}
-        placeholder="Paragraph (optional). Leave both empty to hide."
+        rows={5}
+        placeholder="Paragraph (optional). Use [label](https://link.com) to add links. Leave all empty to hide."
         value={note.text || ""}
         onChange={(e) => save({ text: e.target.value })}
       />
+      <p className="text-[11px] text-muted-foreground">
+        Tip: links use Markdown — <code className="px-1 rounded bg-secondary/60">[Visit Google](https://google.com)</code>.
+        Bare URLs auto-link too.
+      </p>
     </div>
   );
 };
