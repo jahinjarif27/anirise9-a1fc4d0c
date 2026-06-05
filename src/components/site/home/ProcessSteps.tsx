@@ -10,23 +10,19 @@ const Ico = ({ name, className }: { name: string; className?: string }) => {
   return C ? <C className={className} /> : <Sparkles className={className} />;
 };
 
-// Bento placement: each step gets an asymmetric tile size + position.
-// Both mobile (2-col) and desktop (4-col) keep a "messy but balanced" bento layout.
-// Tailwind needs full class strings to be detected, so we list them explicitly.
-const TILE_SHAPES: { mobile: string; desktop: string; size: "lg" | "md" | "sm" }[] = [
-  // Step 1 – big anchor top-left
-  { mobile: "col-span-2 row-span-2", desktop: "lg:col-span-2 lg:row-span-2", size: "lg" },
-  // Step 2 – tall right
-  { mobile: "col-span-2 row-span-1", desktop: "lg:col-span-2 lg:row-span-1", size: "md" },
-  // Step 3 – small
-  { mobile: "col-span-1 row-span-1", desktop: "lg:col-span-1 lg:row-span-1", size: "sm" },
-  // Step 4 – wide
-  { mobile: "col-span-1 row-span-1", desktop: "lg:col-span-1 lg:row-span-2", size: "md" },
-  // Step 5 – small
-  { mobile: "col-span-2 row-span-1", desktop: "lg:col-span-2 lg:row-span-1", size: "md" },
-  // Step 6 – big finisher bottom-right
-  { mobile: "col-span-2 row-span-2", desktop: "lg:col-span-2 lg:row-span-2", size: "lg" },
+// Balanced bento: fills the grid completely on every breakpoint.
+// Mobile (2 cols): rows of [wide][solo][solo][wide][solo][solo]
+// Tablet (3 cols): rows of [wide,solo][solo,wide][solo,solo+solo]
+// Desktop (4 cols × 3 rows = 12 cells, total cells = 12): T1=4, T2=2, T3=1, T4=1, T5=2, T6=2
+const TILE_SHAPES: { mobile: string; tablet: string; desktop: string; size: "lg" | "md" | "sm" }[] = [
+  { mobile: "col-span-2 row-span-1", tablet: "md:col-span-2 md:row-span-1", desktop: "lg:col-span-2 lg:row-span-2", size: "lg" },
+  { mobile: "col-span-1 row-span-1", tablet: "md:col-span-1 md:row-span-1", desktop: "lg:col-span-2 lg:row-span-1", size: "md" },
+  { mobile: "col-span-1 row-span-1", tablet: "md:col-span-1 md:row-span-1", desktop: "lg:col-span-1 lg:row-span-1", size: "sm" },
+  { mobile: "col-span-2 row-span-1", tablet: "md:col-span-2 md:row-span-1", desktop: "lg:col-span-1 lg:row-span-1", size: "sm" },
+  { mobile: "col-span-1 row-span-1", tablet: "md:col-span-3 md:row-span-1", desktop: "lg:col-span-2 lg:row-span-1", size: "md" },
+  { mobile: "col-span-1 row-span-1", tablet: "md:col-span-3 md:row-span-1", desktop: "lg:col-span-2 lg:row-span-1", size: "md" },
 ];
+
 
 export const ProcessSteps = () => {
   const { processFlow } = useAdmin();
