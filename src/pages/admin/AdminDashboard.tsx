@@ -2964,6 +2964,10 @@ const AdminDashboard = () => {
                       <Save className="h-4 w-4" /> Save robots.txt
                     </Button>
                   </div>
+                </Card>
+              </TabsContent>
+
+
 
 
               <TabsContent value="redirects" className="space-y-4 mt-0">
