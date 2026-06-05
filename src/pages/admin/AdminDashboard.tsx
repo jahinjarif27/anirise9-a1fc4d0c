@@ -2926,8 +2926,45 @@ const AdminDashboard = () => {
                     <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw text</label>
                     <Textarea rows={8} className="font-mono text-xs" value={seo.robotsTxt} onChange={(e) => updateSeo({ robotsTxt: e.target.value })} />
                   </div>
-                </Card>
-              </TabsContent>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        const url = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/robots?t=${Date.now()}`;
+                        const tId = toast.loading("Fetching live robots.txt…");
+                        try {
+                          const res = await fetch(url, { cache: "no-store" });
+                          const txt = await res.text();
+                          toast.success(`Live robots.txt OK — ${txt.split(/\r?\n/).length} lines`, { id: tId });
+                          console.log("[live robots.txt]", txt);
+                        } catch (e: any) {
+                          toast.error(`Fetch failed: ${e?.message || e}`, { id: tId });
+                        }
+                      }}
+                    >
+                      <RefreshCw className="h-4 w-4" /> Verify live robots.txt
+                    </Button>
+                    <Button
+                      variant="hero"
+                      size="sm"
+                      onClick={async () => {
+                        const tId = toast.loading("Saving robots.txt…");
+                        const r = await saveAllNow();
+                        if (!r.ok) {
+                          toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
+                          return;
+                        }
+                        try {
+                          await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/robots?t=${Date.now()}`, { cache: "no-store" });
+                        } catch {}
+                        toast.success("robots.txt saved — live URL refreshed", { id: tId });
+                      }}
+                    >
+                      <Save className="h-4 w-4" /> Save robots.txt
+                    </Button>
+                  </div>
+
 
               <TabsContent value="redirects" className="space-y-4 mt-0">
                 <Card className="p-5 sm:p-6 space-y-5">
