@@ -1561,6 +1561,9 @@ const AdminDashboard = () => {
               <CaseStudiesEditor />
             </Card>
           )}
+          {activePage === "case-studies" && (
+            <SectionNoteEditor noteId="caseStudiesPage" label="Paragraph for the Case Studies listing page" />
+          )}
           {activePage === "about" && (
             <Card className="p-5 sm:p-6 space-y-4">
               <SectionHeader icon={Users} title="Pillars" subtitle="Three highlight points shown with checkmarks." />
@@ -1599,6 +1602,9 @@ const AdminDashboard = () => {
                 }}><Plus className="h-4 w-4" /> Add pillar</Button>
               </div>
             </Card>
+          )}
+          {activePage === "about" && (
+            <SectionNoteEditor noteId="about" label="Paragraph for the About page" />
           )}
           {activePage === "portfolio" && (
             <Card className="p-5 sm:p-6 space-y-4">
