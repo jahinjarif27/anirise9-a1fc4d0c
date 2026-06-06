@@ -1493,14 +1493,11 @@ const AdminDashboard = () => {
         ],
         image: { label: "Section image", key: "contactImage", altKey: "contactImageAlt", aspect: "aspect-[16/9]" },
       },
-      about: {
-        icon: Sparkles, title: "About section", subtitle: "Headline, blurb and image shown on the About page and home About block.",
-        fields: [
-          { label: "Headline", key: "aboutHeadline" },
-          { label: "Blurb", key: "aboutBlurb", multiline: true },
-        ],
-        image: { label: "About image", key: "aboutImage", altKey: "aboutImageAlt", aspect: "aspect-square" },
+      "case-studies": {
+        icon: TrendingUp, title: "Case studies page", subtitle: "Standalone /case-studies listing page — add, edit, and remove every case study below.",
+        fields: [],
       },
+
       "case-studies": {
         icon: TrendingUp, title: "Case studies page", subtitle: "Standalone /case-studies listing page — add, edit, and remove every case study below.",
         fields: [],
