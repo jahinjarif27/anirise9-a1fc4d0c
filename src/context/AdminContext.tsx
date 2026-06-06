@@ -802,7 +802,7 @@ const defaultSectionGroups: SectionGroup[] = [
 ];
 const defaultPageLocation: Record<string, string> = {
   hero: "home", services: "", about: "", portfolio: "",
-  blog: "home", testimonials: "", contact: "",
+  blog: "home", testimonials: "", contact: "", "case-studies": "",
 };
 const defaultHomeMembership: Record<SectionKey, boolean> = {
   hero: true, services: false, about: false, portfolio: false, blog: true, testimonials: false, contact: false,
