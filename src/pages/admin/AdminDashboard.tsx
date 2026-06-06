@@ -1005,7 +1005,13 @@ const AdminDashboard = () => {
                 <ImageUpload value={sp.image} onChange={(url) => updateServicePreview(s.slug, { image: url })} />
                 <Input value={sp.imageAlt || ""} onChange={(e) => updateServicePreview(s.slug, { imageAlt: e.target.value })} placeholder="Image alt text (for SEO)" />
                 <Input value={sp.title || ""} onChange={(e) => updateServicePreview(s.slug, { title: e.target.value })} placeholder={`Card title (default: ${s.label})`} />
-                <Textarea rows={8} value={sp.desc || ""} onChange={(e) => updateServicePreview(s.slug, { desc: e.target.value })} placeholder="Full paragraph shown in the Services page deep-dive section. Supports Markdown: **bold**, [link](https://...), etc." />
+                <LinkableTextarea
+                  label="Card paragraph"
+                  rows={8}
+                  value={sp.desc || ""}
+                  onChange={(v) => updateServicePreview(s.slug, { desc: v })}
+                  placeholder="Full paragraph shown in the Services page deep-dive section. Supports Markdown: **bold**, [link](https://...), etc."
+                />
                 <p className="text-xs text-muted-foreground">This paragraph also appears next to the image on the Services page. Leave empty to fall back to the card description.</p>
               </div>
             );
