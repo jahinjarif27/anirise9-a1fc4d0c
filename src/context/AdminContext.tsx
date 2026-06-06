@@ -61,6 +61,9 @@ type SiteContent = {
   footerConnectHeading?: string;
   footerCopyright?: string;
   footerByline?: string;
+  /** Admin-managed footer link lists. When non-empty, replace the auto-generated lists. */
+  footerPagesItems?: { id: string; label: string; href: string }[];
+  footerServicesItems?: { id: string; label: string; href: string }[];
   /** Admin-managed services list (replaces hardcoded src/data/services.ts) */
   servicesList?: AdminService[];
   /** Phase 4 — drag-and-drop home page block order. Unknown ids fall back to default. */
