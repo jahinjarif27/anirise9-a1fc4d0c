@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 import { useServices, type RuntimeService } from "@/lib/useServices";
 import { SectionNote } from "@/components/site/SectionNote";
+import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 type Service = RuntimeService;
 
