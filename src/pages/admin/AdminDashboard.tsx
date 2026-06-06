@@ -119,7 +119,7 @@ const SCHEMA_TYPE_OPTIONS = [
   "FAQPage", "WebPage", "WebSite", "Organization", "LocalBusiness", "Person", "Event",
 ];
 
-const SeoBlock = ({
+export const SeoBlock = ({
   pageKey, seo, updatePageSeo, defaultPath, disableSlug = false, slugPrefix,
   externalSlug, onExternalSlugChange, onSaveNow,
 }: {
