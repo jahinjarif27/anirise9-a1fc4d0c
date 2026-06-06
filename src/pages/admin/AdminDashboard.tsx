@@ -2154,7 +2154,7 @@ const AdminDashboard = () => {
                   {/* Other built-in pages */}
                   {(() => {
                     const isOpen = openGroups["other"] ?? false;
-                    const others = ["about", "testimonials", "contact", "case-studies"];
+                    const others = ["about", "testimonials", "contact", "case-studies", "footer"];
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, other: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
