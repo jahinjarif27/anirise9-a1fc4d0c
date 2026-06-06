@@ -7,6 +7,7 @@ import portfolio1 from "@/assets/portfolio-1.jpg";
 import portfolio2 from "@/assets/portfolio-2.jpg";
 import portfolio3 from "@/assets/portfolio-3.jpg";
 import { defaultServiceContent, ServiceContent } from "@/data/serviceContentDefaults";
+import { defaultServicePreviews } from "@/data/servicePreviewDefaults";
 export type { ServiceContent } from "@/data/serviceContentDefaults";
 
 // ============================================================
