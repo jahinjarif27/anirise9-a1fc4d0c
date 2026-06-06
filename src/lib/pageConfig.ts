@@ -16,6 +16,7 @@ export type BuiltInPageKey =
   | "testimonials"
   | "contact"
   | "about"
+  | "case-studies"
   | "strategy-call";
 
 export const BUILTIN_DEFAULT_SLUGS: Record<BuiltInPageKey, string> = {
@@ -26,6 +27,7 @@ export const BUILTIN_DEFAULT_SLUGS: Record<BuiltInPageKey, string> = {
   testimonials: "testimonials",
   contact: "contact",
   about: "about",
+  "case-studies": "case-studies",
   "strategy-call": "strategy-call",
 };
 
@@ -37,6 +39,7 @@ export const BUILTIN_PAGE_LABELS: Record<BuiltInPageKey, string> = {
   testimonials: "Testimonials",
   contact: "Contact",
   about: "About",
+  "case-studies": "Case studies",
   "strategy-call": "Strategy Call",
 };
 
