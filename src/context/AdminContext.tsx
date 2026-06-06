@@ -50,6 +50,17 @@ type SiteContent = {
   /** Navbar top bar — small label + value chip (e.g. "Revenue Driven for our clients" / "$10,000+"). Editable from Home → Trust strip. */
   topBarLabel?: string;
   topBarValue?: string;
+  /** Footer — admin-editable from Pages → Footer. */
+  footerLogo?: string;
+  footerBrandName?: string;
+  footerTagline?: string;
+  footerCtaLabel?: string;
+  footerCtaHref?: string;
+  footerPagesHeading?: string;
+  footerServicesHeading?: string;
+  footerConnectHeading?: string;
+  footerCopyright?: string;
+  footerByline?: string;
   /** Admin-managed services list (replaces hardcoded src/data/services.ts) */
   servicesList?: AdminService[];
   /** Phase 4 — drag-and-drop home page block order. Unknown ids fall back to default. */
@@ -394,6 +405,16 @@ const defaultContent: SiteContent = {
   contactImageAlt: "",
   topBarLabel: "Revenue Driven for our clients",
   topBarValue: "$10,000+",
+  footerLogo: "",
+  footerBrandName: "AniRise",
+  footerTagline: "Visibility · Growth · Success. Helping brands rise online with SEO, web, and marketing.",
+  footerCtaLabel: "Book A Strategy Call",
+  footerCtaHref: "/strategy-call",
+  footerPagesHeading: "Pages",
+  footerServicesHeading: "Services",
+  footerConnectHeading: "Connect",
+  footerCopyright: "© {year} AniRise. All rights reserved.",
+  footerByline: "Visibility — Growth — Success",
   servicesList: [
     { id: "svc-website-seo",          slug: "website-seo",          title: "Website SEO",           desc: "Rank higher on Google. We optimize your site's structure, content, and authority to drive organic traffic that converts.", iconName: "Search",       published: true, order: 1 },
     { id: "svc-ecommerce-seo",        slug: "ecommerce-seo",        title: "Ecommerce SEO",         desc: "Get your products in front of buyers. Product-page optimization, schema, and category strategy built to scale revenue.",       iconName: "ShoppingCart", published: true, order: 2 },
@@ -807,7 +828,7 @@ const defaultSectionGroups: SectionGroup[] = [
 ];
 const defaultPageLocation: Record<string, string> = {
   hero: "home", services: "", about: "", portfolio: "",
-  blog: "home", testimonials: "", contact: "", "case-studies": "",
+  blog: "home", testimonials: "", contact: "", "case-studies": "", footer: "home",
 };
 const defaultHomeMembership: Record<SectionKey, boolean> = {
   hero: true, services: false, about: false, portfolio: false, blog: true, testimonials: false, contact: false,

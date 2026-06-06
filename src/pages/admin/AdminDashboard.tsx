@@ -57,6 +57,7 @@ const SITE_PAGES = [
   { key: "testimonials", label: "Testimonials" },
   { key: "contact", label: "Contact" },
   { key: "case-studies", label: "Case studies" },
+  { key: "footer", label: "Footer" },
 ];
 
 const HOME_BLOCKS = [
@@ -1508,6 +1509,21 @@ const AdminDashboard = () => {
         icon: TrendingUp, title: "Case studies page", subtitle: "Standalone /case-studies listing page — add, edit, and remove every case study below.",
         fields: [],
       },
+      footer: {
+        icon: Layers, title: "Footer", subtitle: "Edit everything shown in the site footer. The 'Crafted by Jahin' signature line is fixed and cannot be removed.",
+        fields: [
+          { label: "Brand name", key: "footerBrandName" },
+          { label: "Tagline / description", key: "footerTagline", multiline: true },
+          { label: "CTA button label (leave empty to hide)", key: "footerCtaLabel" },
+          { label: "CTA button link", key: "footerCtaHref" },
+          { label: "Pages column heading", key: "footerPagesHeading" },
+          { label: "Services column heading", key: "footerServicesHeading" },
+          { label: "Connect column heading", key: "footerConnectHeading" },
+          { label: "Copyright line (use {year} for current year)", key: "footerCopyright" },
+          { label: "Bottom byline (right side)", key: "footerByline" },
+        ],
+        image: { label: "Footer logo", key: "footerLogo", altKey: "footerBrandName", aspect: "aspect-square" },
+      },
     };
 
 
@@ -2153,7 +2169,7 @@ const AdminDashboard = () => {
                   {/* Other built-in pages */}
                   {(() => {
                     const isOpen = openGroups["other"] ?? false;
-                    const others = ["about", "testimonials", "contact", "case-studies"];
+                    const others = ["about", "testimonials", "contact", "case-studies", "footer"];
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, other: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">
