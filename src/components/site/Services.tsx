@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 import { useServices, type RuntimeService } from "@/lib/useServices";
 import { SectionNote } from "@/components/site/SectionNote";
+import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 type Service = RuntimeService;
 
@@ -53,30 +54,13 @@ const ZigzagRow = ({ service, index }: { service: Service; index: number }) => {
       </div>
 
       <div>
-        <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase mb-3">
-          Service {String(index + 1).padStart(2, "0")}
-        </p>
-        <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight mb-4">
+        <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight mb-5">
           {service.title}
         </h3>
-        <p className="text-base text-muted-foreground leading-relaxed mb-5">
-          {desc}
-        </p>
-        <ul className="space-y-2 mb-6">
-          {[
-            "Tailored strategy for your brand",
-            "Measurable results & transparent reporting",
-            "Dedicated support across the engagement",
-          ].map((item) => (
-            <li key={item} className="flex items-start gap-2 text-sm text-foreground/85">
-              <CheckCircle2 className="h-4 w-4 text-accent shrink-0 mt-0.5" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
+        <MarkdownContent content={desc} className="prose-base" />
         <Link
           to={`/services/${service.publicSlug}`}
-          className="inline-flex items-center gap-1 text-sm font-semibold text-accent hover:gap-2 transition-all"
+          className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:gap-2 transition-all"
         >
           Explore {service.title} <ArrowRight className="h-4 w-4" />
         </Link>
