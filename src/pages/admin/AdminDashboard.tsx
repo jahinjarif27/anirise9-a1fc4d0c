@@ -26,6 +26,7 @@ import { ServiceContentEditor } from "@/components/admin/ServiceContentEditor";
 import { TextBlocksEditor } from "@/components/admin/TextBlocksEditor";
 import { SortableList } from "@/components/admin/SortableList";
 import { SectionNoteEditor } from "@/components/admin/SectionNoteEditor";
+import { LinkableTextarea } from "@/components/admin/LinkableTextarea";
 import { Switch } from "@/components/ui/switch";
 import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
