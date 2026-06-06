@@ -1675,7 +1675,10 @@ const AdminDashboard = () => {
               </div>
             </Card>
           )}
-          <SeoBlock pageKey={activePage} seo={seo} updatePageSeo={updatePageSeo} />
+          {/* Hide Page SEO for sections that live on the home page — they are not standalone pages. */}
+          {((pageLocation[activePage] ?? "home") !== "home") && (
+            <SeoBlock pageKey={activePage} seo={seo} updatePageSeo={updatePageSeo} />
+          )}
         </div>
       );
     }
