@@ -28,6 +28,10 @@ type SiteContent = {
   aboutBlurb: string;
   aboutImage: string;
   aboutImageAlt: string;
+  aboutEyebrow?: string;
+  aboutStatValue?: string;
+  aboutStatLabel?: string;
+  aboutPillars?: { title: string; desc: string }[];
   portfolioTitle: string;
   portfolioBlurb: string;
   portfolioImage: string;
