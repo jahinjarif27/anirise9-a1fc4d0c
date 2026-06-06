@@ -79,9 +79,9 @@ export const Footer = () => {
         <div>
           <h4 className="font-semibold mb-4">{servicesHeading}</h4>
           <ul className="space-y-2 text-sm text-primary-foreground/70">
-            {services.map((s) => (
+            {servicesItems.map((s) => (
               <li key={s.slug}>
-                <Link to={`/services/${s.publicSlug}`} className="hover:text-accent transition-smooth">
+                <Link to={s.href} className="hover:text-accent transition-smooth">
                   {s.title}
                 </Link>
               </li>
