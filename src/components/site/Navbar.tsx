@@ -13,7 +13,8 @@ import { useAdmin } from "@/context/AdminContext";
 import { useServices } from "@/lib/useServices";
 
 const SECTION_LABELS: Record<string, string> = {
-  hero: "Home", services: "Services", portfolio: "Portfolio",
+  hero: "Home", services: "Services", about: "About", portfolio: "Portfolio",
+  "case-studies": "Case studies",
   blog: "Blog", testimonials: "Testimonials", contact: "Contact",
 };
 
@@ -23,12 +24,13 @@ export const Navbar = () => {
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
   // Built-in section nav — use admin-set slug + filter draft pages.
-  type NavKey = "hero" | "services" | "portfolio" | "blog" | "testimonials" | "contact";
+  type NavKey = "hero" | "services" | "about" | "portfolio" | "case-studies" | "blog" | "testimonials" | "contact";
   const NAV_TO_SEO_KEY: Record<NavKey, string> = {
-    hero: "home", services: "services", portfolio: "portfolio",
+    hero: "home", services: "services", about: "about", portfolio: "portfolio",
+    "case-studies": "case-studies",
     blog: "blog", testimonials: "testimonials", contact: "contact",
   };
-  const sectionKeys: NavKey[] = ["hero", "services", "portfolio", "blog", "testimonials", "contact"];
+  const sectionKeys: NavKey[] = ["hero", "services", "about", "portfolio", "case-studies", "blog", "testimonials", "contact"];
   const links = sectionKeys
     .filter((k) => {
       const seoKey = NAV_TO_SEO_KEY[k];
