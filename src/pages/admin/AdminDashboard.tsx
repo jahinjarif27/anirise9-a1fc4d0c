@@ -27,6 +27,7 @@ import { TextBlocksEditor } from "@/components/admin/TextBlocksEditor";
 import { SortableList } from "@/components/admin/SortableList";
 import { SectionNoteEditor } from "@/components/admin/SectionNoteEditor";
 import { LinkableTextarea } from "@/components/admin/LinkableTextarea";
+import { CaseStudiesEditor } from "@/components/admin/CaseStudiesEditor";
 import { Switch } from "@/components/ui/switch";
 import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
