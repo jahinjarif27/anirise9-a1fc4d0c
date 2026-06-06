@@ -1459,8 +1459,11 @@ const AdminDashboard = () => {
       about: {
         icon: Users, title: "About section", subtitle: "Who we are",
         fields: [
+          { label: "Eyebrow (small uppercase tag)", key: "aboutEyebrow" },
           { label: "Headline", key: "aboutHeadline" },
           { label: "Blurb", key: "aboutBlurb", multiline: true },
+          { label: "Stat value (e.g. 100%)", key: "aboutStatValue" },
+          { label: "Stat label (e.g. Client Focused)", key: "aboutStatLabel" },
         ],
         image: { label: "About image", key: "aboutImage", altKey: "aboutImageAlt", aspect: "aspect-square" },
       },
