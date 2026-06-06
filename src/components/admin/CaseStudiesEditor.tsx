@@ -21,7 +21,7 @@ import { useAdmin } from "@/context/AdminContext";
  * either entry point.
  */
 export const CaseStudiesEditor = () => {
-  const { caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy } = useAdmin();
+  const { caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy, seo, updatePageSeo } = useAdmin();
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
