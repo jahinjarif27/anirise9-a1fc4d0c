@@ -1230,9 +1230,13 @@ const AdminDashboard = () => {
                   </Select>
                 </Field>
                 <div className="sm:col-span-2">
-                  <Field label="Card paragraph (shown on Services overview card)">
-                    <Textarea rows={6} value={adminSvc.desc} onChange={(e) => updateService(adminSvc.id, { desc: e.target.value })} placeholder="Full paragraph that appears on the service card. Write as long as you need." />
-                  </Field>
+                  <LinkableTextarea
+                    label="Card paragraph (shown on Services overview card)"
+                    rows={6}
+                    value={adminSvc.desc}
+                    onChange={(v) => updateService(adminSvc.id, { desc: v })}
+                    placeholder="Full paragraph that appears on the service card. Write as long as you need."
+                  />
                 </div>
                 <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-border/60">
                   <div className="flex items-center gap-2">
