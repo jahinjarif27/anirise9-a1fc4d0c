@@ -2791,46 +2791,11 @@ const AdminDashboard = () => {
                       <Button variant="outline" size="sm" onClick={() => downloadFile("sitemap.xml", seo.sitemap, "application/xml")}><Download className="h-4 w-4" /> Download</Button>
                     </div>
                   </div>
-                  {(() => {
-                    const urls = Array.from(seo.sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)).map((m, i) => {
-                      const loc = (m[1].match(/<loc>([\s\S]*?)<\/loc>/) || [])[1] || "";
-                      const pr = (m[1].match(/<priority>([\s\S]*?)<\/priority>/) || [])[1] || "0.8";
-                      return { id: i, loc, pr };
-                    });
-                    const writeBack = (next: { loc: string; pr: string; on: boolean }[]) => {
-                      const inner = next.filter(u => u.on).map(u => `  <url><loc>${u.loc}</loc><priority>${u.pr}</priority></url>`).join("\n");
-                      updateSeo({ sitemap: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${inner}\n</urlset>` });
-                    };
-                    const items = urls.map(u => ({ ...u, on: true }));
-                    return (
-                      <div className="rounded-xl border border-border overflow-hidden">
-                        <div className="px-4 py-2.5 bg-secondary/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
-                          <span>URL entries ({items.length})</span>
-                          <Button size="sm" variant="ghost" className="h-7" onClick={() => writeBack([...items, { loc: `${seo.canonicalUrl}/new-page`, pr: "0.5", on: true }])}>
-                            <Plus className="h-3.5 w-3.5" /> Add URL
-                          </Button>
-                        </div>
-                        <ul className="divide-y divide-border">
-                          {items.map((u, i) => (
-                            <li key={i} className="p-3 flex flex-wrap items-center gap-2">
-                              <Switch checked={u.on} onCheckedChange={(v) => { const next = [...items]; next[i] = { ...u, on: v }; writeBack(next); }} />
-                              <Input className="h-9 flex-1 min-w-[180px] font-mono text-xs" value={u.loc}
-                                onChange={(e) => { const next = [...items]; next[i] = { ...u, loc: e.target.value }; writeBack(next); }} />
-                              <Select value={u.pr} onValueChange={(v) => { const next = [...items]; next[i] = { ...u, pr: v }; writeBack(next); }}>
-                                <SelectTrigger className="h-9 w-[130px]"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                  {["1.0","0.9","0.8","0.7","0.6","0.5","0.3","0.1"].map(p => <SelectItem key={p} value={p}>Priority {p}</SelectItem>)}
-                                </SelectContent>
-                              </Select>
-                              <Button variant="ghost" size="sm" onClick={() => { const next = items.filter((_, j) => j !== i); writeBack(next); toast.success("Removed"); }}>
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    );
-                  })()}
+                  <SitemapUrlsEditor
+                    sitemap={seo.sitemap}
+                    canonicalUrl={seo.canonicalUrl}
+                    onChange={(xml) => updateSeo({ sitemap: xml })}
+                  />
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
                     <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value })} />
