@@ -28,7 +28,10 @@ const ZigzagRow = ({ service, index }: { service: Service; index: number }) => {
   const preview = servicePreviews?.[service.slug];
   const image = preview?.image;
   const imageAlt = preview?.imageAlt || `${service.title} preview`;
-  const heading = preview?.title?.trim() || service.title;
+  const hasTitleOverride = typeof preview?.title === "string";
+  const trimmedTitle = preview?.title?.trim() ?? "";
+  const heading = hasTitleOverride ? trimmedTitle : service.title;
+  const showHeading = heading.length > 0;
   const desc = preview?.desc?.trim() || service.desc;
   const reverse = index % 2 === 1;
   const Icon = service.icon;
@@ -55,9 +58,11 @@ const ZigzagRow = ({ service, index }: { service: Service; index: number }) => {
       </div>
 
       <div>
-        <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight mb-5">
-          {heading}
-        </h3>
+        {showHeading && (
+          <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight mb-5">
+            {heading}
+          </h3>
+        )}
         <MarkdownContent content={desc} className="prose-lg sm:prose-xl text-lg sm:text-xl leading-relaxed" />
         <Link
           to={`/services/${service.publicSlug}`}

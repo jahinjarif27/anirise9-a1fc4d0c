@@ -7,9 +7,9 @@ export const defaultServicePreviews: Record<string, ServicePreview> = {
   "website-seo": {
     image: "",
     imageAlt: "Website SEO dashboard showing keyword rankings and organic traffic growth",
-    title: "Website SEO that earns lasting visibility",
+    title: "",
     desc:
-      "Your website is the foundation of every digital touchpoint — and **Website SEO** is what makes it actually findable. We start with a deep technical audit to fix crawl issues, broken links, slow pages, and weak metadata. Then we research the keywords your real customers are typing into Google and map them across the right pages so each one has a clear purpose. From there we strengthen on-page content, internal links, schema markup, and site architecture so search engines understand exactly what you offer. Over the long run we build topical authority through high-quality content and trusted backlinks. The result isn't a one-time traffic bump — it's compounding organic visibility that brings in qualified leads month after month, without paying for every click.",
+      "Search is where buying decisions begin, and **Website SEO** is how we make sure your business is the answer people find first. We dig into your site from the ground up — fixing technical issues, speeding up pages, cleaning up broken links, and tightening every piece of metadata so search engines can crawl and understand your content without friction. Then we research the exact phrases your customers are typing into Google and map them to the right pages with intent, structure, and clarity. We sharpen on-page copy, internal linking, schema, and site architecture so each page earns its place in the rankings. Over time we build genuine authority through high-quality content and trusted backlinks, so your visibility compounds month after month. The outcome isn't a quick spike — it's a steady stream of qualified, ready-to-buy traffic that keeps growing long after the work is done, without you having to pay for every single click.",
   },
   "ecommerce-seo": {
     image: "",
