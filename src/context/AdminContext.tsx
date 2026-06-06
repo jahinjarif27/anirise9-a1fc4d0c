@@ -418,6 +418,8 @@ const defaultContent: SiteContent = {
   footerConnectHeading: "Connect",
   footerCopyright: "© {year} AniRise. All rights reserved.",
   footerByline: "Visibility — Growth — Success",
+  footerPagesItems: [],
+  footerServicesItems: [],
   servicesList: [
     { id: "svc-website-seo",          slug: "website-seo",          title: "Website SEO",           desc: "Rank higher on Google. We optimize your site's structure, content, and authority to drive organic traffic that converts.", iconName: "Search",       published: true, order: 1 },
     { id: "svc-ecommerce-seo",        slug: "ecommerce-seo",        title: "Ecommerce SEO",         desc: "Get your products in front of buyers. Product-page optimization, schema, and category strategy built to scale revenue.",       iconName: "ShoppingCart", published: true, order: 2 },
