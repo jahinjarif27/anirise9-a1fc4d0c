@@ -137,6 +137,17 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Seeded legal pages — always advertised so they appear even before admin saves.
+    const customSlugs = new Set(customPages.map((p: any) => (p?.slug || '').replace(/^\/+/, '')));
+    for (const legal of [
+      { slug: 'privacy-policy', priority: '0.3' },
+      { slug: 'terms-of-service', priority: '0.3' },
+    ]) {
+      if (customSlugs.has(legal.slug)) continue;
+      entries.push({ path: `/${legal.slug}`, changefreq: 'yearly', priority: legal.priority });
+    }
+
+
     // Portfolio items
     for (const it of portfolio) {
       const ps = pageSeo[`proj:${it.id}`] || {};
