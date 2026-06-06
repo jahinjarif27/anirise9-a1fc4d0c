@@ -19,7 +19,7 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 export const Navbar = () => {
-  const { contact, customPages, login, seo } = useAdmin();
+  const { contact, content, customPages, login, seo } = useAdmin();
   const services = useServices();
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
