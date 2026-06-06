@@ -1528,6 +1528,12 @@ const AdminDashboard = () => {
               )}
             </div>
           </Card>
+          {activePage === "case-studies" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader icon={TrendingUp} title="Case studies" subtitle="Add, edit and remove individual case studies — same fields as project detail pages." />
+              <CaseStudiesEditor />
+            </Card>
+          )}
           {activePage === "portfolio" && (
             <Card className="p-5 sm:p-6 space-y-4">
               <SectionHeader
