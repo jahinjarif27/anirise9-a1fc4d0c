@@ -154,6 +154,16 @@ export const CaseStudiesEditor = () => {
 
                 <SectionNoteEditor noteId={`case:${c.id}`} label="Paragraph for this case study page" />
 
+                <SeoBlock
+                  pageKey={`case:${c.id}`}
+                  seo={seo}
+                  updatePageSeo={updatePageSeo}
+                  defaultPath={`/case-studies/${c.id}`}
+                  disableSlug
+                />
+
+
+
                 <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove case study</Button>
               </div>
             </details>
