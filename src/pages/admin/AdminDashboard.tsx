@@ -1313,7 +1313,13 @@ const AdminDashboard = () => {
                   <ImageUpload value={sp.image} onChange={(url) => updateServicePreview(slug, { image: url })} />
                   <Input value={sp.imageAlt || ""} onChange={(e) => updateServicePreview(slug, { imageAlt: e.target.value })} placeholder="Image alt text (for SEO)" />
                   <Input value={sp.title || ""} onChange={(e) => updateServicePreview(slug, { title: e.target.value })} placeholder={`Heading override (default: ${svc.label})`} />
-                  <Textarea rows={10} value={sp.desc || ""} onChange={(e) => updateServicePreview(slug, { desc: e.target.value })} placeholder="Full paragraph shown in the Services page deep-dive section. Supports Markdown: **bold**, [link](https://...), lists, etc." />
+                  <LinkableTextarea
+                    label="Deep-dive paragraph"
+                    rows={10}
+                    value={sp.desc || ""}
+                    onChange={(v) => updateServicePreview(slug, { desc: v })}
+                    placeholder="Full paragraph shown in the Services page deep-dive section. Supports Markdown: **bold**, [link](https://...), lists, etc."
+                  />
                   <p className="text-xs text-muted-foreground">Leave empty to fall back to the card paragraph above.</p>
                 </div>
               );
