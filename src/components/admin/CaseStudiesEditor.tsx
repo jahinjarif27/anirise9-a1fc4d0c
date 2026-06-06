@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { SectionNoteEditor } from "@/components/admin/SectionNoteEditor";
+import { SeoBlock } from "@/pages/admin/AdminDashboard";
 import { useAdmin } from "@/context/AdminContext";
 
 /**
