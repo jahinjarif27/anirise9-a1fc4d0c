@@ -28,6 +28,10 @@ type SiteContent = {
   aboutBlurb: string;
   aboutImage: string;
   aboutImageAlt: string;
+  aboutEyebrow?: string;
+  aboutStatValue?: string;
+  aboutStatLabel?: string;
+  aboutPillars?: { title: string; desc: string }[];
   portfolioTitle: string;
   portfolioBlurb: string;
   portfolioImage: string;
@@ -362,6 +366,14 @@ const defaultContent: SiteContent = {
   aboutBlurb: "AniRise is a digital agency helping brands rise online with SEO, web development, and marketing.",
   aboutImage: logoImg,
   aboutImageAlt: "AniRise brand mark",
+  aboutEyebrow: "About AniRise",
+  aboutStatValue: "100%",
+  aboutStatLabel: "Client Focused",
+  aboutPillars: [
+    { title: "Visibility", desc: "Get discovered by the right audience at the right moment." },
+    { title: "Growth", desc: "Scale traffic, leads, and revenue with proven strategies." },
+    { title: "Success", desc: "A clear roadmap toward measurable, lasting business success." },
+  ],
   portfolioTitle: "Recent Work",
   portfolioBlurb: "A snapshot of projects where we've turned visibility into real business growth.",
   portfolioImage: "",
@@ -790,7 +802,7 @@ const defaultSectionGroups: SectionGroup[] = [
 ];
 const defaultPageLocation: Record<string, string> = {
   hero: "home", services: "", about: "", portfolio: "",
-  blog: "home", testimonials: "", contact: "",
+  blog: "home", testimonials: "", contact: "", "case-studies": "",
 };
 const defaultHomeMembership: Record<SectionKey, boolean> = {
   hero: true, services: false, about: false, portfolio: false, blog: true, testimonials: false, contact: false,

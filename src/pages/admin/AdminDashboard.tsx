@@ -1459,8 +1459,11 @@ const AdminDashboard = () => {
       about: {
         icon: Users, title: "About section", subtitle: "Who we are",
         fields: [
+          { label: "Eyebrow (small uppercase tag)", key: "aboutEyebrow" },
           { label: "Headline", key: "aboutHeadline" },
           { label: "Blurb", key: "aboutBlurb", multiline: true },
+          { label: "Stat value (e.g. 100%)", key: "aboutStatValue" },
+          { label: "Stat label (e.g. Client Focused)", key: "aboutStatLabel" },
         ],
         image: { label: "About image", key: "aboutImage", altKey: "aboutImageAlt", aspect: "aspect-square" },
       },
@@ -1532,6 +1535,45 @@ const AdminDashboard = () => {
             <Card className="p-5 sm:p-6 space-y-4">
               <SectionHeader icon={TrendingUp} title="Case studies" subtitle="Add, edit and remove individual case studies — same fields as project detail pages." />
               <CaseStudiesEditor />
+            </Card>
+          )}
+          {activePage === "about" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader icon={Users} title="Pillars" subtitle="Three highlight points shown with checkmarks." />
+              <div className="space-y-4">
+                {(((content as any).aboutPillars ?? []) as { title: string; desc: string }[]).map((p, idx) => (
+                  <div key={idx} className="grid sm:grid-cols-[1fr_2fr_auto] gap-2 items-start p-3 rounded-lg border border-border bg-background/40">
+                    <Input
+                      value={p.title}
+                      placeholder="Title"
+                      onChange={(e) => {
+                        const next = [...(((content as any).aboutPillars ?? []) as any[])];
+                        next[idx] = { ...next[idx], title: e.target.value };
+                        updateContent({ aboutPillars: next } as any);
+                      }}
+                    />
+                    <Textarea
+                      rows={2}
+                      value={p.desc}
+                      placeholder="Description"
+                      onChange={(e) => {
+                        const next = [...(((content as any).aboutPillars ?? []) as any[])];
+                        next[idx] = { ...next[idx], desc: e.target.value };
+                        updateContent({ aboutPillars: next } as any);
+                      }}
+                    />
+                    <Button variant="ghost" size="icon" onClick={() => {
+                      const next = [...(((content as any).aboutPillars ?? []) as any[])];
+                      next.splice(idx, 1);
+                      updateContent({ aboutPillars: next } as any);
+                    }}><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+                ))}
+                <Button variant="hero" size="sm" onClick={() => {
+                  const next = [...(((content as any).aboutPillars ?? []) as any[]), { title: "New pillar", desc: "" }];
+                  updateContent({ aboutPillars: next } as any);
+                }}><Plus className="h-4 w-4" /> Add pillar</Button>
+              </div>
             </Card>
           )}
           {activePage === "portfolio" && (
