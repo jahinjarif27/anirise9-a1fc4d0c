@@ -1696,6 +1696,37 @@ const AdminDashboard = () => {
               />
             </Card>
           )}
+          {activePage === "services" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader icon={FileEdit} title="Deep-dive paragraphs (zigzag section)" subtitle="Image + long paragraph shown for each service in the /services deep-dive zigzag. Edit per service below." />
+              <div className="space-y-4">
+                {siteServices.map((s) => {
+                  const sp = servicePreviews[s.slug] || { image: "", imageAlt: "", title: "", desc: "" };
+                  return (
+                    <details key={s.slug} className="p-4 rounded-xl border border-border/60 bg-card" open>
+                      <summary className="cursor-pointer font-semibold text-foreground flex items-center justify-between">
+                        <span>{s.label}</span>
+                        <span className="text-xs text-muted-foreground">/{s.slug}</span>
+                      </summary>
+                      <div className="mt-4 space-y-3">
+                        <ImageUpload value={sp.image} onChange={(url) => updateServicePreview(s.slug, { image: url })} />
+                        <Input value={sp.imageAlt || ""} onChange={(e) => updateServicePreview(s.slug, { imageAlt: e.target.value })} placeholder="Image alt text (for SEO)" />
+                        <Input value={sp.title || ""} onChange={(e) => updateServicePreview(s.slug, { title: e.target.value })} placeholder={`Heading override (default: ${s.label})`} />
+                        <LinkableTextarea
+                          label="Deep-dive paragraph"
+                          rows={10}
+                          value={sp.desc || ""}
+                          onChange={(v) => updateServicePreview(s.slug, { desc: v })}
+                          placeholder="Full paragraph shown in the Services page deep-dive section. Supports Markdown: **bold**, [link](https://...), lists, etc."
+                        />
+                        <p className="text-[11px] text-muted-foreground">Leave empty to fall back to the card paragraph for this service.</p>
+                      </div>
+                    </details>
+                  );
+                })}
+              </div>
+            </Card>
+          )}
           {activePage === "contact" && (
             <Card className="p-5 sm:p-6 space-y-4">
               <SectionHeader icon={Phone} title="Contact details" subtitle="Visible across the site" />
