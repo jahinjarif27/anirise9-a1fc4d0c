@@ -922,6 +922,14 @@ const defaultLegalPages: CustomPage[] = [
   },
 ];
 
+// Ensure seeded legal pages exist; never overwrite admin edits.
+function mergeLegalPages(pages: CustomPage[]): CustomPage[] {
+  const have = new Set(pages.map((p) => p.slug));
+  const missing = defaultLegalPages.filter((p) => !have.has(p.slug));
+  return missing.length ? [...pages, ...missing] : pages;
+}
+
+
 // ============================================================
 // Context
 // ============================================================
