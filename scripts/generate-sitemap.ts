@@ -103,7 +103,7 @@ async function fetchDynamicEntries(): Promise<{
       services = svcList
         .filter((s) => s.published !== false)
         .map((s) => {
-          const cfg = pageSeo[`service:${s.slug}`] || {};
+          const cfg = pageSeo[`svc:${s.slug}`] || {};
           if (cfg.status === "draft" || cfg.robots === "noindex") return null;
           const tail = (s.urlSlug && s.urlSlug.trim()) || s.slug;
           return {
