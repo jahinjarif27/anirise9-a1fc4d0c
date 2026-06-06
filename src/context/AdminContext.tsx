@@ -50,6 +50,17 @@ type SiteContent = {
   /** Navbar top bar — small label + value chip (e.g. "Revenue Driven for our clients" / "$10,000+"). Editable from Home → Trust strip. */
   topBarLabel?: string;
   topBarValue?: string;
+  /** Footer — admin-editable from Pages → Footer. */
+  footerLogo?: string;
+  footerBrandName?: string;
+  footerTagline?: string;
+  footerCtaLabel?: string;
+  footerCtaHref?: string;
+  footerPagesHeading?: string;
+  footerServicesHeading?: string;
+  footerConnectHeading?: string;
+  footerCopyright?: string;
+  footerByline?: string;
   /** Admin-managed services list (replaces hardcoded src/data/services.ts) */
   servicesList?: AdminService[];
   /** Phase 4 — drag-and-drop home page block order. Unknown ids fall back to default. */
