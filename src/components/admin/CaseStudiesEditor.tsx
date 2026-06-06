@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { SectionNoteEditor } from "@/components/admin/SectionNoteEditor";
+import { SeoBlock } from "@/pages/admin/AdminDashboard";
 import { useAdmin } from "@/context/AdminContext";
 
 /**
@@ -20,7 +21,7 @@ import { useAdmin } from "@/context/AdminContext";
  * either entry point.
  */
 export const CaseStudiesEditor = () => {
-  const { caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy } = useAdmin();
+  const { caseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy, seo, updatePageSeo } = useAdmin();
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -152,6 +153,16 @@ export const CaseStudiesEditor = () => {
                 <Textarea value={c.body || ""} onChange={(e) => updateCaseStudy(c.id, { body: e.target.value })} placeholder="Extra long-form content (appended below)" rows={4} />
 
                 <SectionNoteEditor noteId={`case:${c.id}`} label="Paragraph for this case study page" />
+
+                <SeoBlock
+                  pageKey={`case:${c.id}`}
+                  seo={seo}
+                  updatePageSeo={updatePageSeo}
+                  defaultPath={`/case-studies/${c.id}`}
+                  disableSlug
+                />
+
+
 
                 <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove case study</Button>
               </div>

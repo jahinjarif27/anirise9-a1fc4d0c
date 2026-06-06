@@ -105,12 +105,13 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
 // Only these admin pageKeys map to a real public URL where meta tags actually ship.
 // Listed once here so we never render SEO controls for pages clients can't index.
 const INDEXABLE_PAGE_KEYS = new Set([
-  "home", "services", "portfolio", "blog", "testimonials", "contact", "strategy-call",
+  "home", "services", "about", "portfolio", "blog", "testimonials", "contact", "strategy-call", "case-studies",
 ]);
 
 const PAGE_URL_PREVIEW: Record<string, string> = {
-  home: "/", services: "/services", portfolio: "/portfolio", blog: "/blog",
+  home: "/", services: "/services", about: "/about", portfolio: "/portfolio", blog: "/blog",
   testimonials: "/testimonials", contact: "/contact", "strategy-call": "/strategy-call",
+  "case-studies": "/case-studies",
 };
 
 const SCHEMA_TYPE_OPTIONS = [
@@ -118,7 +119,7 @@ const SCHEMA_TYPE_OPTIONS = [
   "FAQPage", "WebPage", "WebSite", "Organization", "LocalBusiness", "Person", "Event",
 ];
 
-const SeoBlock = ({
+export const SeoBlock = ({
   pageKey, seo, updatePageSeo, defaultPath, disableSlug = false, slugPrefix,
   externalSlug, onExternalSlugChange, onSaveNow,
 }: {
