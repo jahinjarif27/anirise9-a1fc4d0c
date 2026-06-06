@@ -57,7 +57,7 @@ const ZigzagRow = ({ service, index }: { service: Service; index: number }) => {
         <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight mb-5">
           {service.title}
         </h3>
-        <MarkdownContent content={desc} className="prose-base" />
+        <MarkdownContent content={desc} className="prose-lg sm:prose-xl text-lg sm:text-xl leading-relaxed" />
         <Link
           to={`/services/${service.publicSlug}`}
           className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:gap-2 transition-all"
