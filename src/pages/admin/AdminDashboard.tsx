@@ -55,6 +55,7 @@ const SITE_PAGES = [
   { key: "blog", label: "Blog section" },
   { key: "testimonials", label: "Testimonials" },
   { key: "contact", label: "Contact" },
+  { key: "case-studies", label: "Case studies" },
 ];
 
 const HOME_BLOCKS = [
@@ -1124,14 +1125,6 @@ const AdminDashboard = () => {
 
                 <Textarea value={c.body || ""} onChange={(e) => updateCaseStudy(c.id, { body: e.target.value })} placeholder="Extra long-form content (appended below)" rows={4} />
 
-                <SeoBlock
-                  pageKey={`case:${c.id}`}
-                  seo={seo}
-                  updatePageSeo={updatePageSeo}
-                  defaultPath={`/case-studies/${c.id}`}
-                  disableSlug
-                />
-
                 <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove case study</Button>
               </div>
             </details>
@@ -1609,6 +1602,10 @@ const AdminDashboard = () => {
         ],
         image: { label: "Section image", key: "contactImage", altKey: "contactImageAlt", aspect: "aspect-[16/9]" },
       },
+      "case-studies": {
+        icon: TrendingUp, title: "Case studies page", subtitle: "Standalone /case-studies listing page — manage individual case studies from the Home → Case studies block.",
+        fields: [],
+      },
     };
 
     if (builtInPages[activePage]) {
@@ -2076,13 +2073,6 @@ const AdminDashboard = () => {
                               );
                             })}
                             <li>
-                              <button onClick={() => setActivePage("about")}
-                                className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "about" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
-                                <FileEdit className="h-3 w-3 opacity-60" />
-                                <span className="truncate">About section</span>
-                              </button>
-                            </li>
-                            <li>
                               <button onClick={() => setActivePage("blog")}
                                 className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors ${activePage === "blog" ? "bg-accent/15 text-accent font-semibold" : "hover:bg-secondary text-foreground/70"}`}>
                                 <FileText className="h-3 w-3 opacity-60" />
@@ -2215,7 +2205,7 @@ const AdminDashboard = () => {
                   {/* Other built-in pages */}
                   {(() => {
                     const isOpen = openGroups["other"] ?? false;
-                    const others = ["testimonials", "contact"];
+                    const others = ["about", "testimonials", "contact", "case-studies"];
                     return (
                       <Collapsible open={isOpen} onOpenChange={(v) => setOpenGroups((p) => ({ ...p, other: v }))}>
                         <CollapsibleTrigger className="w-full text-left px-2.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-secondary transition-colors">

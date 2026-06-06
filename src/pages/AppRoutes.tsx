@@ -24,10 +24,12 @@ import { Portfolio } from "@/components/site/Portfolio";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Contact } from "@/components/site/Contact";
 import { About } from "@/components/site/About";
+import { CaseStudies } from "@/components/site/home/CaseStudies";
 
 const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title: string }> = {
   services: { Component: Services, title: "Services" },
   portfolio: { Component: Portfolio, title: "Projects" },
+  "case-studies": { Component: CaseStudies, title: "Case studies" },
   projects: { Component: Portfolio, title: "Projects" },
   testimonials: { Component: Testimonials, title: "Testimonials" },
   contact: { Component: Contact, title: "Contact" },
