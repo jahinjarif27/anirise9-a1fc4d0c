@@ -15,13 +15,20 @@ const PAGE_KEYS = [
 export const Footer = () => {
   const { contact, content, seo } = useAdmin();
   const services = useServices();
-  const pages = PAGE_KEYS
-    .filter((p) => seo.pageSeo?.[p.key]?.status !== "draft")
-    .map((p) => {
-      const custom = seo.pageSeo?.[p.key]?.slug?.trim();
-      const slug = custom && custom.length > 0 ? custom.replace(/^\/+/, "") : p.defaultSlug;
-      return { label: p.label, href: slug ? `/${slug}` : "/" };
-    });
+  const pagesOverride = ((content as any).footerPagesItems || []) as { id: string; label: string; href: string }[];
+  const servicesOverride = ((content as any).footerServicesItems || []) as { id: string; label: string; href: string }[];
+  const pages = pagesOverride.length > 0
+    ? pagesOverride.map((p) => ({ label: p.label, href: p.href }))
+    : PAGE_KEYS
+        .filter((p) => seo.pageSeo?.[p.key]?.status !== "draft")
+        .map((p) => {
+          const custom = seo.pageSeo?.[p.key]?.slug?.trim();
+          const slug = custom && custom.length > 0 ? custom.replace(/^\/+/, "") : p.defaultSlug;
+          return { label: p.label, href: slug ? `/${slug}` : "/" };
+        });
+  const servicesItems = servicesOverride.length > 0
+    ? servicesOverride.map((s) => ({ title: s.label, href: s.href, slug: s.id }))
+    : services.map((s) => ({ title: s.title, href: `/services/${s.publicSlug}`, slug: s.slug }));
 
   const logo = (content as any).footerLogo || defaultLogo;
   const brand = (content as any).footerBrandName || "AniRise";
