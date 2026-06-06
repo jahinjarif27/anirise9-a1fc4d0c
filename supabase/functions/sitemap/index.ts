@@ -142,7 +142,8 @@ Deno.serve(async (req) => {
     for (const legal of [
       { slug: 'privacy-policy', priority: '0.3' },
       { slug: 'terms-of-service', priority: '0.3' },
-    ]) {
+      { slug: 'refund-policy', priority: '0.3' },
+    ] as const) {
       if (customSlugs.has(legal.slug)) continue;
       entries.push({ path: `/${legal.slug}`, changefreq: 'yearly', priority: legal.priority });
     }

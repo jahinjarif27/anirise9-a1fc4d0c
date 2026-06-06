@@ -184,6 +184,7 @@ async function fetchDynamicEntries(): Promise<{
     for (const legal of [
       { slug: "privacy-policy" },
       { slug: "terms-of-service" },
+      { slug: "refund-policy" },
     ]) {
       if (existingCustomSlugs.has(legal.slug)) continue;
       extras.push({

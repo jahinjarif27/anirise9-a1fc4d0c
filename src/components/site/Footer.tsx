@@ -133,6 +133,7 @@ export const Footer = () => {
           <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <Link to="/privacy-policy" className="hover:text-accent transition-smooth">Privacy Policy</Link>
             <Link to="/terms-of-service" className="hover:text-accent transition-smooth">Terms of Service</Link>
+            <Link to="/refund-policy" className="hover:text-accent transition-smooth">Refund Policy</Link>
             {byline && <span>{byline}</span>}
           </nav>
         </div>
