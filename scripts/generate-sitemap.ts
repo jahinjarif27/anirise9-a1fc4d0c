@@ -179,6 +179,21 @@ async function fetchDynamicEntries(): Promise<{
       });
     });
 
+    // Seeded legal pages — always present even before admin saves
+    const existingCustomSlugs = new Set((row.custom_pages || []).map((p) => String(p.slug || "").replace(/^\/+/, "")));
+    for (const legal of [
+      { slug: "privacy-policy" },
+      { slug: "terms-of-service" },
+    ]) {
+      if (existingCustomSlugs.has(legal.slug)) continue;
+      extras.push({
+        path: `/${legal.slug}`,
+        changefreq: "yearly",
+        priority: "0.3",
+        lastmod: settingsDate,
+      });
+    }
+
     return { pageEntries, extras, services, blog };
   } catch {
     for (const p of STATIC_PAGE_KEYS) {
