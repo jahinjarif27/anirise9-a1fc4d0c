@@ -57,6 +57,7 @@ const SITE_PAGES = [
   { key: "testimonials", label: "Testimonials" },
   { key: "contact", label: "Contact" },
   { key: "case-studies", label: "Case studies" },
+  { key: "footer", label: "Footer" },
 ];
 
 const HOME_BLOCKS = [
