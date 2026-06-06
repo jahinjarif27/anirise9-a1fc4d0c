@@ -954,7 +954,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [trustLogos, setTrustLogos] = useState<TrustLogo[]>(defaultTrustLogos);
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(defaultCaseStudies);
   const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
-  const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({});
+  const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({ ...defaultServicePreviews });
   const [serviceContent, setServiceContent] = useState<Record<string, ServiceContent>>(defaultServiceContent);
   const [processFlow, setProcessFlow] = useState<ProcessFlow>(defaultProcessFlow);
   const latestSettingsRef = useRef<any>(null);
@@ -1063,7 +1063,21 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (Array.isArray(sa.trust_logos) && sa.trust_logos.length) setTrustLogos(sa.trust_logos);
         if (Array.isArray(sa.case_studies) && sa.case_studies.length) setCaseStudies(sa.case_studies);
         if (sa.final_cta && Object.keys(sa.final_cta).length) setFinalCta({ ...defaultFinalCta, ...sa.final_cta });
-        if (sa.service_previews && Object.keys(sa.service_previews).length) setServicePreviews(sa.service_previews);
+        if (sa.service_previews && Object.keys(sa.service_previews).length) {
+          // Merge defaults so newly added services and empty fields get sensible copy.
+          const merged: Record<string, ServicePreview> = { ...defaultServicePreviews };
+          Object.keys(sa.service_previews).forEach((k) => {
+            const def = defaultServicePreviews[k] ?? { image: "", imageAlt: "", title: "", desc: "" };
+            const inc = sa.service_previews[k] ?? {};
+            merged[k] = {
+              image: inc.image ?? def.image,
+              imageAlt: inc.imageAlt || def.imageAlt,
+              title: inc.title || def.title,
+              desc: inc.desc || def.desc,
+            };
+          });
+          setServicePreviews(merged);
+        }
         if (sa.service_content && Object.keys(sa.service_content).length) {
           const merged: Record<string, ServiceContent> = { ...defaultServiceContent };
           Object.keys(sa.service_content).forEach((k) => {
