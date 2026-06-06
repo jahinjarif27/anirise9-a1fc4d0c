@@ -33,9 +33,9 @@ export const ServicesPreview = () => {
         </div>
       </div>
 
-      {/* Continuous auto-scroll marquee */}
+      {/* Continuous auto-scroll marquee (also manually swipeable) */}
       <div
-        className="relative w-full overflow-hidden group"
+        className="relative w-full overflow-x-auto overflow-y-hidden group [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{
           maskImage:
             "linear-gradient(to right, transparent, black 6%, black 94%, transparent)",
@@ -43,7 +43,8 @@ export const ServicesPreview = () => {
             "linear-gradient(to right, transparent, black 6%, black 94%, transparent)",
         }}
       >
-        <div className="flex gap-6 w-max animate-services-marquee group-hover:[animation-play-state:paused]">
+        <div className="flex gap-6 w-max animate-services-marquee [animation-duration:18s] md:[animation-duration:40s] group-hover:[animation-play-state:paused] hover:[animation-play-state:paused] active:[animation-play-state:paused] focus-within:[animation-play-state:paused]">
+
           {loop.map((s, idx) => {
             const sp = servicePreviews?.[s.slug];
             return (
