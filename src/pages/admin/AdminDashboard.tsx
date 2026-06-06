@@ -964,6 +964,14 @@ const AdminDashboard = () => {
 
 
       if (blockKey === "trustStrip") return wrap("Client logos / brand names marquee on the home page.", <>
+        <div className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+          <p className="text-sm font-semibold text-foreground">Navbar top bar</p>
+          <p className="text-xs text-muted-foreground">Shown at the very top of every page, next to the phone number. Leave both empty to hide.</p>
+          <div className="grid sm:grid-cols-2 gap-2">
+            <Input placeholder="Label (e.g. Revenue Driven for our clients)" value={(content as any).topBarLabel || ""} onChange={(e) => updateContent({ topBarLabel: e.target.value } as any)} />
+            <Input placeholder="Value (e.g. $10,000+)" value={(content as any).topBarValue || ""} onChange={(e) => updateContent({ topBarValue: e.target.value } as any)} />
+          </div>
+        </div>
         <div className="flex justify-end">
           <Button size="sm" onClick={() => { addTrustLogo({ name: "New Brand", image: "" }); toast.success("Logo added"); }}><Plus className="h-4 w-4" /> Add logo</Button>
         </div>

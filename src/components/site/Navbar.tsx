@@ -19,7 +19,7 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 export const Navbar = () => {
-  const { contact, customPages, login, seo } = useAdmin();
+  const { contact, content, customPages, login, seo } = useAdmin();
   const services = useServices();
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
@@ -109,12 +109,18 @@ export const Navbar = () => {
             </span>
             <span className="truncate text-sm sm:text-base">{contact.phoneDisplay}</span>
           </a>
-          <div className="hidden md:flex items-center gap-2 ml-2">
-            <span className="font-semibold tracking-wider uppercase text-[10px] opacity-90">Revenue Driven for our clients</span>
-            <span className="inline-flex items-center gap-1 font-bold">
-              <TrendingUp className="h-4 w-4" /> $10,000+
-            </span>
-          </div>
+          {(content.topBarLabel || content.topBarValue) && (
+            <div className="hidden md:flex items-center gap-2 ml-2">
+              {content.topBarLabel && (
+                <span className="font-semibold tracking-wider uppercase text-[10px] opacity-90">{content.topBarLabel}</span>
+              )}
+              {content.topBarValue && (
+                <span className="inline-flex items-center gap-1 font-bold">
+                  <TrendingUp className="h-4 w-4" /> {content.topBarValue}
+                </span>
+              )}
+            </div>
+          )}
           <a
             href="/strategy-call"
             className="inline-flex items-center rounded-full bg-background text-primary font-bold px-4 sm:px-5 py-1.5 text-xs sm:text-sm hover:opacity-90 shrink-0"

@@ -47,6 +47,9 @@ type SiteContent = {
   contactBlurb: string;
   contactImage: string;
   contactImageAlt: string;
+  /** Navbar top bar — small label + value chip (e.g. "Revenue Driven for our clients" / "$10,000+"). Editable from Home → Trust strip. */
+  topBarLabel?: string;
+  topBarValue?: string;
   /** Admin-managed services list (replaces hardcoded src/data/services.ts) */
   servicesList?: AdminService[];
   /** Phase 4 — drag-and-drop home page block order. Unknown ids fall back to default. */
@@ -389,6 +392,8 @@ const defaultContent: SiteContent = {
   contactBlurb: "Tell us about your business. We'll reply within 24 hours with a clear, honest path forward.",
   contactImage: "",
   contactImageAlt: "",
+  topBarLabel: "Revenue Driven for our clients",
+  topBarValue: "$10,000+",
   servicesList: [
     { id: "svc-website-seo",          slug: "website-seo",          title: "Website SEO",           desc: "Rank higher on Google. We optimize your site's structure, content, and authority to drive organic traffic that converts.", iconName: "Search",       published: true, order: 1 },
     { id: "svc-ecommerce-seo",        slug: "ecommerce-seo",        title: "Ecommerce SEO",         desc: "Get your products in front of buyers. Product-page optimization, schema, and category strategy built to scale revenue.",       iconName: "ShoppingCart", published: true, order: 2 },
