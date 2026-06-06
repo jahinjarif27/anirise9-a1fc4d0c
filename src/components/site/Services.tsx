@@ -33,7 +33,7 @@ const ZigzagRow = ({ service, index }: { service: Service; index: number }) => {
   const Icon = service.icon;
 
   return (
-    <div className={`grid lg:grid-cols-2 gap-8 lg:gap-14 items-center ${reverse ? "lg:[&>*:first-child]:order-2" : ""}`}>
+    <div className={`grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-14 items-center ${reverse ? "md:[&>*:first-child]:order-2" : ""}`}>
       <div className="relative">
         <div className="aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-primary shadow-elegant grid place-items-center p-6">
           {image ? (
