@@ -128,9 +128,13 @@ export const Footer = () => {
         </div>
       </div>
       <div className="border-t border-primary-foreground/10">
-        <div className="container py-5 text-xs text-primary-foreground/60 flex flex-wrap items-center justify-between gap-2">
+        <div className="container py-5 text-xs text-primary-foreground/60 flex flex-wrap items-center justify-between gap-3">
           <p>{copyright}</p>
-          {byline && <p>{byline}</p>}
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <Link to="/privacy-policy" className="hover:text-accent transition-smooth">Privacy Policy</Link>
+            <Link to="/terms-of-service" className="hover:text-accent transition-smooth">Terms of Service</Link>
+            {byline && <span>{byline}</span>}
+          </nav>
         </div>
       </div>
       {/* Fixed signature — not editable from admin */}
