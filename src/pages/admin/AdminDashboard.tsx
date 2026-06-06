@@ -2509,47 +2509,10 @@ const AdminDashboard = () => {
                   { id: "homeFaq",         label: "Home — FAQ" },
                   { id: "strategyCall",    label: "Home — Strategy call" },
                   { id: "finalCta",        label: "Home — Final CTA" },
-                  { id: "servicesPage",    label: "Services page" },
                   { id: "portfolioPage",   label: "Projects / Portfolio page" },
-                ].map((row) => {
-                  const note = content.sectionNotes?.[row.id] || {};
-                  const align = (note.align || "left") as "left" | "center" | "right" | "justify";
-                  const save = (patch: Partial<typeof note>) => {
-                    const next = { ...(content.sectionNotes || {}) };
-                    next[row.id] = { ...note, ...patch };
-                    updateContent({ sectionNotes: next });
-                  };
-                  return (
-                    <div key={row.id} className="rounded-xl border border-border p-4 space-y-3 bg-card">
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <p className="font-bold text-sm">{row.label}</p>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Align</span>
-                          <Select value={align} onValueChange={(v) => save({ align: v as any })}>
-                            <SelectTrigger className="h-8 w-32"><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="left">Left</SelectItem>
-                              <SelectItem value="center">Center</SelectItem>
-                              <SelectItem value="right">Right</SelectItem>
-                              <SelectItem value="justify">Justify</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <Input
-                        placeholder="Heading (optional)"
-                        value={note.heading || ""}
-                        onChange={(e) => save({ heading: e.target.value })}
-                      />
-                      <Textarea
-                        rows={4}
-                        placeholder="Paragraph (optional). Leave both empty to hide this section's note."
-                        value={note.text || ""}
-                        onChange={(e) => save({ text: e.target.value })}
-                      />
-                    </div>
-                  );
-                })}
+                ].map((row) => (
+                  <SectionNoteEditor key={row.id} noteId={row.id} label={row.label} />
+                ))}
               </div>
             </Card>
           </TabsContent>
