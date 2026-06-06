@@ -1223,8 +1223,8 @@ const AdminDashboard = () => {
                   </Select>
                 </Field>
                 <div className="sm:col-span-2">
-                  <Field label="Short description (shown on Services overview card)">
-                    <Textarea rows={2} value={adminSvc.desc} onChange={(e) => updateService(adminSvc.id, { desc: e.target.value })} />
+                  <Field label="Card paragraph (shown on Services overview card)">
+                    <Textarea rows={6} value={adminSvc.desc} onChange={(e) => updateService(adminSvc.id, { desc: e.target.value })} placeholder="Full paragraph that appears on the service card. Write as long as you need." />
                   </Field>
                 </div>
                 <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-border/60">
@@ -1291,6 +1291,23 @@ const AdminDashboard = () => {
               </Card>
             );
           })()}
+
+          {/* Deep-dive zigzag paragraph + image for this service (also used on /services page) */}
+          <Card className="p-5 sm:p-6 space-y-3">
+            <SectionHeader icon={FileEdit} title="Deep-dive paragraph (Services page)" subtitle="Image + long paragraph shown in the zigzag section on /services and as the side image/paragraph next to this service." />
+            {(() => {
+              const sp = servicePreviews[slug] || { image: "", imageAlt: "", title: "", desc: "" };
+              return (
+                <div className="space-y-3">
+                  <ImageUpload value={sp.image} onChange={(url) => updateServicePreview(slug, { image: url })} />
+                  <Input value={sp.imageAlt || ""} onChange={(e) => updateServicePreview(slug, { imageAlt: e.target.value })} placeholder="Image alt text (for SEO)" />
+                  <Input value={sp.title || ""} onChange={(e) => updateServicePreview(slug, { title: e.target.value })} placeholder={`Heading override (default: ${svc.label})`} />
+                  <Textarea rows={10} value={sp.desc || ""} onChange={(e) => updateServicePreview(slug, { desc: e.target.value })} placeholder="Full paragraph shown in the Services page deep-dive section. Supports Markdown: **bold**, [link](https://...), lists, etc." />
+                  <p className="text-xs text-muted-foreground">Leave empty to fall back to the card paragraph above.</p>
+                </div>
+              );
+            })()}
+          </Card>
 
           {/* Per-service paragraph note */}
           <Card className="p-5 sm:p-6 space-y-3">
