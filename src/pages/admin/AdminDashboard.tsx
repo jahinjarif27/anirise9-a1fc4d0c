@@ -1497,13 +1497,8 @@ const AdminDashboard = () => {
         icon: TrendingUp, title: "Case studies page", subtitle: "Standalone /case-studies listing page — add, edit, and remove every case study below.",
         fields: [],
       },
-
-      "case-studies": {
-        icon: TrendingUp, title: "Case studies page", subtitle: "Standalone /case-studies listing page — add, edit, and remove every case study below.",
-        fields: [],
-      },
-
     };
+
 
     if (builtInPages[activePage]) {
       const cfg = builtInPages[activePage];
