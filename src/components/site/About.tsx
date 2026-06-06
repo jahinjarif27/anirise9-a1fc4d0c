@@ -1,5 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
+import { SectionNote } from "@/components/site/SectionNote";
 
 const FALLBACK_PILLARS = [
   { title: "Visibility", desc: "Get discovered by the right audience at the right moment." },
@@ -55,6 +56,7 @@ export const About = () => {
           </div>
         </div>
       </div>
+      <SectionNote id="about" />
     </section>
   );
 };

@@ -14,17 +14,20 @@ const BUILTIN_DEFAULT_SLUGS: Record<string, string> = {
   testimonials: 'testimonials',
   contact: 'contact',
   about: 'about',
+  'case-studies': 'case-studies',
   'strategy-call': 'strategy-call',
 };
 
 const PRIORITY_DEFAULT: Record<string, string> = {
   home: '1.0', services: '0.9', portfolio: '0.9', blog: '0.8',
-  testimonials: '0.6', contact: '0.7', about: '0.7', 'strategy-call': '0.7',
+  testimonials: '0.6', contact: '0.7', about: '0.7',
+  'case-studies': '0.8', 'strategy-call': '0.7',
 };
 
 const CHANGEFREQ_DEFAULT: Record<string, string> = {
   home: 'weekly', services: 'weekly', portfolio: 'monthly', blog: 'weekly',
-  testimonials: 'monthly', contact: 'yearly', about: 'yearly', 'strategy-call': 'monthly',
+  testimonials: 'monthly', contact: 'yearly', about: 'yearly',
+  'case-studies': 'monthly', 'strategy-call': 'monthly',
 };
 
 const esc = (s: string) =>

@@ -5,6 +5,7 @@ import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO, fromPageSeo } from "@/hooks/useSEO";
+import { SectionNote } from "@/components/site/SectionNote";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   ResponsiveContainer,
@@ -188,6 +189,7 @@ const CaseStudyDetail = () => {
             <div className="prose prose-lg max-w-none whitespace-pre-line text-foreground/85">{cs.body}</div>
           )}
         </div>
+        <SectionNote id={`case:${cs.id}`} />
       </main>
       <Footer />
       <WhatsAppButton />

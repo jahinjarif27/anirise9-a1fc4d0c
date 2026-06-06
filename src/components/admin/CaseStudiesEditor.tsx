@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { SectionNoteEditor } from "@/components/admin/SectionNoteEditor";
 import { useAdmin } from "@/context/AdminContext";
 
 /**
@@ -149,6 +150,8 @@ export const CaseStudiesEditor = () => {
                 </div>
 
                 <Textarea value={c.body || ""} onChange={(e) => updateCaseStudy(c.id, { body: e.target.value })} placeholder="Extra long-form content (appended below)" rows={4} />
+
+                <SectionNoteEditor noteId={`case:${c.id}`} label="Paragraph for this case study page" />
 
                 <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCaseStudy(c.id)}><Trash2 className="h-4 w-4" /> Remove case study</Button>
               </div>
