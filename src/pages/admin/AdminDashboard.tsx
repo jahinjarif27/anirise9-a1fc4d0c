@@ -1558,42 +1558,65 @@ const AdminDashboard = () => {
           </Card>
           {activePage === "footer" && (
             <>
-              {(["footerPagesItems", "footerServicesItems"] as const).map((key) => {
-                const isPages = key === "footerPagesItems";
-                const title = isPages ? "Pages column links" : "Services column links";
-                const subtitle = isPages
-                  ? "Override the auto-generated Pages list. Leave empty to use site pages automatically."
-                  : "Override the auto-generated Services list. Leave empty to use the services list automatically.";
-                const items = (((content as any)[key] ?? []) as { id: string; label: string; href: string }[]);
-                const setItems = (next: typeof items) => updateContent({ [key]: next } as any);
-                return (
-                  <Card key={key} className="p-5 sm:p-6 space-y-3">
-                    <SectionHeader icon={Link2} title={title} subtitle={subtitle} action={
-                      <Button variant="hero" size="sm" onClick={() => setItems([...items, { id: Date.now().toString(), label: "New link", href: "/" }])}>
-                        <Plus className="h-4 w-4" /> Add link
-                      </Button>
-                    } />
-                    {items.length === 0 && (
-                      <p className="text-xs text-muted-foreground">No overrides — using auto-generated list.</p>
-                    )}
-                    <div className="space-y-2">
-                      {items.map((it, idx) => (
-                        <div key={it.id} className="grid sm:grid-cols-[1fr_1fr_auto] gap-2 items-center p-3 rounded-lg border border-border bg-background/40">
-                          <Input value={it.label} placeholder="Label" onChange={(e) => {
-                            const next = [...items]; next[idx] = { ...it, label: e.target.value }; setItems(next);
-                          }} />
-                          <Input value={it.href} placeholder="/path or https://..." onChange={(e) => {
-                            const next = [...items]; next[idx] = { ...it, href: e.target.value }; setItems(next);
-                          }} />
-                          <Button variant="ghost" size="icon" onClick={() => {
-                            const next = [...items]; next.splice(idx, 1); setItems(next);
-                          }}><Trash2 className="h-4 w-4" /></Button>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                );
-              })}
+              {(() => {
+                const FOOTER_PAGE_KEYS = [
+                  { key: "home", label: "Home", defaultSlug: "" },
+                  { key: "portfolio", label: "Portfolio", defaultSlug: "portfolio" },
+                  { key: "blog", label: "Blog", defaultSlug: "blog" },
+                  { key: "contact", label: "Contact", defaultSlug: "contact" },
+                  { key: "strategy-call", label: "Book A Strategy Call", defaultSlug: "strategy-call" },
+                ];
+                const pagesDefaults = FOOTER_PAGE_KEYS
+                  .filter((p) => seo.pageSeo?.[p.key]?.status !== "draft")
+                  .map((p) => {
+                    const custom = seo.pageSeo?.[p.key]?.slug?.trim();
+                    const slug = custom && custom.length > 0 ? custom.replace(/^\/+/, "") : p.defaultSlug;
+                    return { id: `auto-${p.key}`, label: p.label, href: slug ? `/${slug}` : "/" };
+                  });
+                const servicesDefaults = siteServices.map((s) => ({
+                  id: `auto-${s.slug}`,
+                  label: s.label,
+                  href: `/services/${s.slug}`,
+                }));
+                return (["footerPagesItems", "footerServicesItems"] as const).map((key) => {
+                  const isPages = key === "footerPagesItems";
+                  const title = isPages ? "Pages column links" : "Services column links";
+                  const subtitle = isPages
+                    ? "Existing pages are pre-filled. Edit, delete or add links — your changes replace the auto-generated list."
+                    : "Existing services are pre-filled. Edit, delete or add links — your changes replace the auto-generated list.";
+                  const stored = (((content as any)[key] ?? []) as { id: string; label: string; href: string }[]);
+                  const defaults = isPages ? pagesDefaults : servicesDefaults;
+                  const items = stored.length > 0 ? stored : defaults;
+                  const setItems = (next: typeof items) => updateContent({ [key]: next } as any);
+                  return (
+                    <Card key={key} className="p-5 sm:p-6 space-y-3">
+                      <SectionHeader icon={Link2} title={title} subtitle={subtitle} action={
+                        <Button variant="hero" size="sm" onClick={() => setItems([...items, { id: Date.now().toString(), label: "New link", href: "/" }])}>
+                          <Plus className="h-4 w-4" /> Add link
+                        </Button>
+                      } />
+                      <div className="space-y-2">
+                        {items.map((it, idx) => (
+                          <div key={it.id} className="grid sm:grid-cols-[1fr_1fr_auto] gap-2 items-center p-3 rounded-lg border border-border bg-background/40">
+                            <Input value={it.label} placeholder="Label" onChange={(e) => {
+                              const next = [...items]; next[idx] = { ...it, label: e.target.value }; setItems(next);
+                            }} />
+                            <Input value={it.href} placeholder="/path or https://..." onChange={(e) => {
+                              const next = [...items]; next[idx] = { ...it, href: e.target.value }; setItems(next);
+                            }} />
+                            <Button variant="ghost" size="icon" onClick={() => {
+                              const next = [...items]; next.splice(idx, 1); setItems(next);
+                            }}><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        ))}
+                        {items.length === 0 && (
+                          <p className="text-xs text-muted-foreground">No links yet — click "Add link" to create one.</p>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                });
+              })()}
             </>
           )}
           {activePage === "case-studies" && (
