@@ -1246,7 +1246,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       ]);
       if (!alive) return;
 
-      const s = settingsRes.data;
+      const s = sanitizeStaleAssets(settingsRes.data);
       if (s) {
         if (s.content && Object.keys(s.content).length) setContent({ ...defaultContent, ...(s.content as any) });
         if (s.contact && Object.keys(s.contact).length) setContact({ ...defaultContact, ...(s.contact as any) });
