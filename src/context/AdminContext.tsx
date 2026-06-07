@@ -10,6 +10,39 @@ import { defaultServiceContent, ServiceContent } from "@/data/serviceContentDefa
 import { defaultServicePreviews } from "@/data/servicePreviewDefaults";
 export type { ServiceContent } from "@/data/serviceContentDefaults";
 
+// ------------------------------------------------------------
+// Stale bundler-asset URL repair
+// ------------------------------------------------------------
+// Older site_settings rows may contain hashed Vite asset URLs like
+// "/assets/hero-illustration-jyDNbWvQ.jpg" that 404 after every rebuild
+// because the hash changes. Map known prefixes back to the current
+// bundled import so persisted data keeps rendering.
+const STALE_ASSET_MAP: Record<string, string> = {
+  "hero-illustration": heroImg,
+  "anirise-logo": logoImg,
+  "portfolio-1": portfolio1,
+  "portfolio-2": portfolio2,
+  "portfolio-3": portfolio3,
+};
+const STALE_ASSET_RE = /^\/assets\/([a-zA-Z0-9_-]+?)-[A-Za-z0-9_-]{6,}\.(?:jpg|jpeg|png|webp|svg|gif)$/i;
+const repairAssetUrl = (s: string): string => {
+  const m = STALE_ASSET_RE.exec(s);
+  if (!m) return s;
+  return STALE_ASSET_MAP[m[1]] ?? s;
+};
+const sanitizeStaleAssets = <T,>(value: T): T => {
+  if (typeof value === "string") return repairAssetUrl(value) as unknown as T;
+  if (Array.isArray(value)) return value.map((v) => sanitizeStaleAssets(v)) as unknown as T;
+  if (value && typeof value === "object") {
+    const out: any = {};
+    for (const k of Object.keys(value as any)) out[k] = sanitizeStaleAssets((value as any)[k]);
+    return out;
+  }
+  return value;
+};
+
+
+
 // ============================================================
 // Types (exported API unchanged so existing UI keeps working)
 // ============================================================
