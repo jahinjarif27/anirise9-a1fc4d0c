@@ -28,8 +28,14 @@ export const LinkableTextarea = forwardRef<HTMLTextAreaElement, Props>(
       selRef.current = { start: ta.selectionStart ?? 0, end: ta.selectionEnd ?? 0 };
     };
 
+    const normalizeUrl = (raw: string) => {
+      const u = raw.trim();
+      if (!u) return "";
+      if (/^(https?:\/\/|mailto:|tel:|\/|#)/i.test(u)) return u;
+      return `https://${u}`;
+    };
     const insertLink = () => {
-      const url = linkUrl.trim();
+      const url = normalizeUrl(linkUrl);
       if (!url) return;
       const ta = innerRef.current;
       const current = value || "";
