@@ -67,7 +67,7 @@ export const Hero = () => {
           </div>
         </div>
 
-        <div className="relative animate-fade-up [animation-delay:200ms] opacity-0 [animation-fill-mode:forwards]">
+        <div className="relative animate-fade-up [animation-delay:200ms] opacity-0 [animation-fill-mode:forwards] w-full max-w-md lg:max-w-lg mx-auto">
           <div className="absolute inset-0 bg-gradient-primary rounded-[2rem] rotate-3 opacity-20" aria-hidden />
           <img
             src={content.heroImage}
