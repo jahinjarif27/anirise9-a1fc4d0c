@@ -120,8 +120,11 @@ const ProjectDetail = () => {
           )}
 
           {p.image && (
-            <img src={p.image} alt={p.imageAlt || p.title} className="w-full rounded-2xl mb-12 aspect-[16/9] object-cover" />
+            <div className="mb-12 lg:max-w-2xl lg:mx-auto">
+              <img src={p.image} alt={p.imageAlt || p.title} className="w-full rounded-2xl aspect-[16/9] object-cover" />
+            </div>
           )}
+
 
           {p.techStack && p.techStack.length > 0 && (
             <section className="mb-12">
