@@ -19,7 +19,7 @@ export const About = () => {
     <section id="about" className="py-24 bg-secondary/40">
       <div className="container grid lg:grid-cols-2 gap-14 items-center">
         <div className="relative">
-          <div className="aspect-square max-w-md mx-auto rounded-[2rem] bg-gradient-primary p-10 shadow-elegant grid place-items-center">
+          <div className="aspect-square max-w-md lg:max-w-sm mx-auto rounded-[2rem] bg-gradient-primary p-10 shadow-elegant grid place-items-center">
             <img src={content.aboutImage} alt={content.aboutImageAlt} width={320} height={320} className="w-2/3 rounded-3xl shadow-elegant object-cover" loading="lazy" />
           </div>
           {(statValue || statLabel) && (
