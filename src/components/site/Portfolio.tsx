@@ -55,7 +55,7 @@ export const Portfolio = () => {
         {filtered.length === 0 ? (
           <p className="text-center text-muted-foreground py-12">No projects in this category yet.</p>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,260px))] lg:justify-center gap-6 lg:gap-5">
             {filtered.map((it) => (
               <Link
                 key={it.id}
@@ -70,7 +70,7 @@ export const Portfolio = () => {
                     width={800}
                     height={600}
                     loading="lazy"
-                    className="w-full aspect-[4/3] lg:aspect-[16/11] object-cover group-hover:scale-105 transition-smooth"
+                    className="w-full aspect-[4/3] lg:aspect-[16/9] object-cover group-hover:scale-105 transition-smooth"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/40 to-transparent" />
                   <span className="absolute top-3 right-3 inline-flex items-center justify-center h-9 w-9 rounded-full bg-accent text-accent-foreground shadow-elegant opacity-90 group-hover:opacity-100 group-hover:rotate-[-45deg] transition-smooth">
