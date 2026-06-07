@@ -20,9 +20,16 @@ export const SectionNoteEditor = ({
   const note: SectionNote = content.sectionNotes?.[noteId] || {};
   const align = (note.align || "left") as TextAlign;
   const textRef = useRef<HTMLTextAreaElement>(null);
+  const selRef = useRef<{ start: number; end: number }>({ start: 0, end: 0 });
   const [linkLabel, setLinkLabel] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [linkOpen, setLinkOpen] = useState(false);
+
+  const captureSel = () => {
+    const ta = textRef.current;
+    if (!ta) return;
+    selRef.current = { start: ta.selectionStart ?? 0, end: ta.selectionEnd ?? 0 };
+  };
 
   const save = (patch: Partial<SectionNote>) => {
     const next = { ...(content.sectionNotes || {}) };
@@ -33,29 +40,28 @@ export const SectionNoteEditor = ({
   const insertLink = () => {
     const url = linkUrl.trim();
     if (!url) return;
-    const label = linkLabel.trim() || url;
-    const md = `[${label}](${url})`;
-    const ta = textRef.current;
+    const labelText = linkLabel.trim();
     const current = note.text || "";
-    if (ta) {
-      const start = ta.selectionStart ?? current.length;
-      const end = ta.selectionEnd ?? current.length;
-      const selected = current.slice(start, end);
-      const insert = selected ? `[${selected}](${url})` : md;
-      const next = current.slice(0, start) + insert + current.slice(end);
-      save({ text: next });
-      requestAnimationFrame(() => {
-        ta.focus();
-        const pos = start + insert.length;
-        ta.setSelectionRange(pos, pos);
-      });
-    } else {
-      save({ text: (current ? current + " " : "") + md });
-    }
+    const ta = textRef.current;
+    const { start: s, end: e } = selRef.current;
+    const start = Math.min(s ?? current.length, current.length);
+    const end = Math.min(e ?? current.length, current.length);
+    const selected = current.slice(start, end);
+    const text = selected || labelText || url;
+    const insert = `[${text}](${url})`;
+    const next = current.slice(0, start) + insert + current.slice(end);
+    save({ text: next });
+    requestAnimationFrame(() => {
+      ta?.focus();
+      const pos = start + insert.length;
+      ta?.setSelectionRange(pos, pos);
+      selRef.current = { start: pos, end: pos };
+    });
     setLinkLabel("");
     setLinkUrl("");
     setLinkOpen(false);
   };
+
 
   return (
     <div className="rounded-xl border border-border p-4 sm:p-5 space-y-4 bg-card shadow-sm">
