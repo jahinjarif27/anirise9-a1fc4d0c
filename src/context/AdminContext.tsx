@@ -24,7 +24,7 @@ const STALE_ASSET_MAP: Record<string, string> = {
   "portfolio-2": portfolio2,
   "portfolio-3": portfolio3,
 };
-const STALE_ASSET_RE = /^\/assets\/([a-zA-Z0-9_-]+?)-[A-Za-z0-9_-]{6,}\.(?:jpg|jpeg|png|webp|svg|gif)$/i;
+const STALE_ASSET_RE = /^\/assets\/(.+)-[A-Za-z0-9_-]{6,}\.(?:jpg|jpeg|png|webp|svg|gif)$/i;
 const repairAssetUrl = (s: string): string => {
   const m = STALE_ASSET_RE.exec(s);
   if (!m) return s;
