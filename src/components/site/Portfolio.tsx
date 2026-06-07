@@ -55,7 +55,7 @@ export const Portfolio = () => {
         {filtered.length === 0 ? (
           <p className="text-center text-muted-foreground py-12">No projects in this category yet.</p>
         ) : (
-          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
             {filtered.map((it) => (
               <Link
                 key={it.id}
