@@ -87,6 +87,9 @@ export const Hero = () => {
                 variant="hero"
                 size="xl"
                 onClick={() => setVideoOpen(true)}
+                onMouseEnter={warmYouTube}
+                onFocus={warmYouTube}
+                onTouchStart={warmYouTube}
               >
                 <Play /> Watch How We Work
               </Button>
