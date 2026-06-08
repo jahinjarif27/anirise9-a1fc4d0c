@@ -97,7 +97,7 @@ export const Hero = () => {
       </div>
 
       <Dialog open={videoOpen} onOpenChange={setVideoOpen}>
-        <DialogContent className="max-w-3xl p-0 overflow-hidden bg-background">
+        <DialogContent className="max-w-[92vw] sm:max-w-xl md:max-w-2xl p-0 overflow-hidden bg-background rounded-2xl">
           <div className="aspect-video w-full bg-black">
             {videoOpen && videoUrl && (
               isMp4 ? (
@@ -113,11 +113,8 @@ export const Hero = () => {
               )
             )}
           </div>
-          <div className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Ready to grow your brand?</p>
-              <p className="text-lg font-semibold text-foreground">Book a free strategy call with our team.</p>
-            </div>
+          <div className="p-5 flex flex-col items-center text-center gap-3">
+            <p className="text-base font-semibold text-foreground">Ready to grow your brand?</p>
             <Button asChild variant="hero" size="lg" onClick={() => setVideoOpen(false)}>
               <Link to="/strategy-call">
                 Book A Strategy Call <ArrowRight />
