@@ -69,7 +69,7 @@ export const SectionPage = ({ Section, title, sectionKey }: Props) => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-1 pt-32">
-        <Section />
+        {loading ? <div className="min-h-[40vh]" /> : <Section />}
         {!isContactPage && (
           <div className="border-t border-border/60 mt-12">
             <Contact />
