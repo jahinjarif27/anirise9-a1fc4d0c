@@ -1202,11 +1202,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [visits, setVisits] = useState(0);
   const [visitSeries, setVisitSeries] = useState<{ day: string; visits: number }[]>([]);
   const [homeBlocks, setHomeBlocks] = useState<HomeBlocks>(defaultHomeBlocks);
-  const [homeFaqs, setHomeFaqs] = useState<FaqItem[]>(defaultHomeFaqs);
+  const [homeFaqs, setHomeFaqs] = useState<FaqItem[]>([]);
   const [serviceFaqs, setServiceFaqs] = useState<Record<string, FaqItem[]>>(defaultServiceFaqs);
-  const [stats, setStats] = useState<StatItem[]>(defaultStats);
-  const [trustLogos, setTrustLogos] = useState<TrustLogo[]>(defaultTrustLogos);
-  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(defaultCaseStudies);
+  const [stats, setStats] = useState<StatItem[]>([]);
+  const [trustLogos, setTrustLogos] = useState<TrustLogo[]>([]);
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
   const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
   const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({ ...defaultServicePreviews });
   const [serviceContent, setServiceContent] = useState<Record<string, ServiceContent>>(defaultServiceContent);
