@@ -54,6 +54,7 @@ type SiteContent = {
   heroImage: string;
   heroImageAlt: string;
   heroVideoUrl?: string;
+  heroVideoEnabled?: boolean;
   servicesTitle: string;
   servicesBlurb: string;
   servicesImage: string;
