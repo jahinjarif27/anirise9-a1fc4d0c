@@ -10,6 +10,7 @@ export const Hero = () => {
   const [videoOpen, setVideoOpen] = useState(false);
 
   const videoUrl = content.heroVideoUrl?.trim();
+  const videoEnabled = content.heroVideoEnabled !== false && !!videoUrl;
   const isMp4 = !!videoUrl && /\.(mp4|webm|ogg)(\?|$)/i.test(videoUrl);
 
   return (
