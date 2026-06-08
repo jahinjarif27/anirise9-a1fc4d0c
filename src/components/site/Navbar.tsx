@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Menu, Phone, Search, TrendingUp, Facebook, Instagram, ChevronDown } from "lucide-react";
+import { Menu, Phone, TrendingUp, Facebook, Instagram, ChevronDown } from "lucide-react";
 import logo from "@/assets/anirise-logo.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -171,9 +171,6 @@ export const Navbar = () => {
             })}
           </ul>
           <div className="flex items-center gap-2">
-            <button aria-label="Search" className="h-10 w-10 grid place-items-center rounded-full hover:bg-secondary text-foreground">
-              <Search className="h-5 w-5" />
-            </button>
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <button
