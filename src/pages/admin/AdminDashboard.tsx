@@ -1787,10 +1787,10 @@ const AdminDashboard = () => {
               </div>
             </Card>
           )}
-          {/* Hide Page SEO for sections that live on the home page — they are not standalone pages. */}
-          {((pageLocation[activePage] ?? "home") !== "home") && (
-            <SeoBlock pageKey={activePage} seo={seo} updatePageSeo={updatePageSeo} />
-          )}
+          {/* Built-in sections (services, portfolio, about, testimonials, contact, case-studies, footer-page meta)
+              always have a standalone public route (e.g. /portfolio, /services) — so always expose SEO settings.
+              SeoBlock itself returns null for non-indexable keys. */}
+          <SeoBlock pageKey={activePage} seo={seo} updatePageSeo={updatePageSeo} onSaveNow={() => persistNow(`SEO saved for /${activePage} — live now`)} />
         </div>
       );
     }
