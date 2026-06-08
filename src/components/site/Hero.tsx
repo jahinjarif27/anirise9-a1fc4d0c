@@ -197,7 +197,7 @@ export const Hero = () => {
           <div className="relative aspect-video w-full bg-black">
             {videoOpen && videoUrl && (
               isMp4 ? (
-                <video src={videoUrl} controls autoPlay aria-label={videoTitle} poster={videoThumbnail || undefined} className="w-full h-full" />}
+                <video src={videoUrl} controls autoPlay aria-label={videoTitle} poster={videoThumbnail || undefined} className="w-full h-full" />
               ) : (
                 <iframe
                   src={`${videoUrl}${videoUrl.includes("?") ? "&" : "?"}autoplay=1&playsinline=1&rel=0&modestbranding=1`}
