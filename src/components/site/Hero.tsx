@@ -201,7 +201,7 @@ export const Hero = () => {
               ) : (
                 <iframe
                   src={`${videoUrl}${videoUrl.includes("?") ? "&" : "?"}autoplay=1&playsinline=1&rel=0&modestbranding=1`}
-                  title="Hero video"
+                  title={videoTitle}
                   className="w-full h-full"
                   loading="eager"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
