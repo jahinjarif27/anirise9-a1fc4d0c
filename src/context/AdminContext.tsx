@@ -55,6 +55,11 @@ type SiteContent = {
   heroImageAlt: string;
   heroVideoUrl?: string;
   heroVideoEnabled?: boolean;
+  heroVideoTitle?: string;
+  heroVideoDescription?: string;
+  heroVideoThumbnail?: string;
+  heroVideoUploadDate?: string;
+  heroVideoDuration?: string;
   servicesTitle: string;
   servicesBlurb: string;
   servicesImage: string;
@@ -412,6 +417,11 @@ const defaultContent: SiteContent = {
   heroImageAlt: "AniRise: SEO and growth illustration",
   heroVideoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
   heroVideoEnabled: true,
+  heroVideoTitle: "How AniRise Helps Your Brand Rise",
+  heroVideoDescription: "A quick look at how AniRise drives visibility, growth, and success for modern brands.",
+  heroVideoThumbnail: "",
+  heroVideoUploadDate: "",
+  heroVideoDuration: "",
   servicesTitle: "What We Do",
   servicesBlurb: "From visibility to growth — every service is built around helping your business succeed online.",
   servicesImage: "",
