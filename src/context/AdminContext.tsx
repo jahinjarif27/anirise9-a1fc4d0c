@@ -411,6 +411,7 @@ const defaultContent: SiteContent = {
   heroImage: heroImg,
   heroImageAlt: "AniRise: SEO and growth illustration",
   heroVideoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+  heroVideoEnabled: true,
   servicesTitle: "What We Do",
   servicesBlurb: "From visibility to growth — every service is built around helping your business succeed online.",
   servicesImage: "",
