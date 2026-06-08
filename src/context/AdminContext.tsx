@@ -849,6 +849,48 @@ const defaultCaseStudies: CaseStudy[] = [
       ],
     },
   },
+  {
+    id: "cs3",
+    title: "SaaS Signup Surge",
+    metric: "+220% signups",
+    description: "Landing page redesign + intent-driven content diye trial signup 3 gun bariye fela hoyeche.",
+    image: portfolio3,
+    link: "/portfolio",
+    eyebrow: "SaaS case study",
+    intro: "Ekta B2B SaaS startup-er jonno landing page CRO, messaging refresh ar bottom-funnel content strategy diye qualified trial signup dramatically bariye fela hoyeche.",
+    client: "B2B SaaS Startup",
+    industry: "SaaS",
+    duration: "60 days",
+    challenge: "High traffic chhilo kintu trial signup conversion rate kub low (0.8%), ar messaging target audience-er sathe resonate korchhilo na.",
+    solution: "Hero section rewrite, social proof integration, pricing page simplification, ar 8 ta comparison/alternative blog post publish.",
+    results: "Trial signup 220% briddhi, conversion rate 0.8% theke 2.6% e giyeche, ar qualified demo booking proti maashe 4x.",
+    stats: [
+      { id: "s1", label: "Trial signups", value: "+220%" },
+      { id: "s2", label: "Conversion rate", value: "0.8% → 2.6%" },
+      { id: "s3", label: "Demo bookings", value: "4x" },
+      { id: "s4", label: "CAC", value: "-35%" },
+    ],
+    table: {
+      title: "Before vs After (60 days)",
+      headers: ["Metric", "Before", "After"],
+      rows: [
+        ["Monthly signups", "120", "384"],
+        ["Conversion rate", "0.8%", "2.6%"],
+        ["Demo bookings / mo", "8", "32"],
+        ["Avg. CAC", "৳4,200", "৳2,730"],
+      ],
+    },
+    chart: {
+      title: "Weekly signups",
+      type: "line",
+      data: [
+        { id: "w1", label: "Wk 1", value: 28 },
+        { id: "w2", label: "Wk 3", value: 62 },
+        { id: "w3", label: "Wk 6", value: 96 },
+        { id: "w4", label: "Wk 8", value: 134 },
+      ],
+    },
+  },
 ];
 
 const defaultFinalCta: FinalCta = {
