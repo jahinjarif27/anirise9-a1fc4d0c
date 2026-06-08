@@ -2772,14 +2772,31 @@ const AdminDashboard = () => {
                   </div>
                 </Card>
 
-                {/* Per-page schemas in use across the site (read-only aggregation) */}
+                {/* Per-page schemas in use across the site (editable, writes back to pageSeo) */}
                 {(() => {
                   const pageEntries = Object.entries(seo.pageSeo || {})
                     .map(([key, v]: any) => ({
                       key,
-                      schemas: Array.isArray(v?.schemas) ? v.schemas.filter((x: any) => x && x.enabled !== false) : [],
+                      schemas: Array.isArray(v?.schemas) ? v.schemas : [],
                     }))
-                    .filter((e) => e.schemas.length > 0);
+                    .filter((e) => e.schemas.length > 0)
+                    .sort((a, b) => a.key.localeCompare(b.key));
+
+                  const editSchema = (pageKey: string, id: string, patch: any) => {
+                    const cur = Array.isArray(seo.pageSeo?.[pageKey]?.schemas) ? seo.pageSeo[pageKey].schemas : [];
+                    updatePageSeo(pageKey, { schemas: cur.map((x: any) => (x.id === id ? { ...x, ...patch } : x)) });
+                  };
+                  const removeSchemaFromPage = (pageKey: string, id: string) => {
+                    const cur = Array.isArray(seo.pageSeo?.[pageKey]?.schemas) ? seo.pageSeo[pageKey].schemas : [];
+                    updatePageSeo(pageKey, { schemas: cur.filter((x: any) => x.id !== id) });
+                    toast.success("Schema removed");
+                  };
+                  const addSchemaToPage = (pageKey: string) => {
+                    const cur = Array.isArray(seo.pageSeo?.[pageKey]?.schemas) ? seo.pageSeo[pageKey].schemas : [];
+                    const id = `ps_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+                    updatePageSeo(pageKey, { schemas: [...cur, { id, type: "Article", enabled: true, name: "New schema", json: "{}" }] });
+                  };
+
                   const builtIn = [
                     { where: "Home (/)", type: "WebSite", note: "Fallback when no admin schema set" },
                     { where: "Blog post (/blog/:slug)", type: "BlogPosting", note: "Auto-generated from post when no admin schema set" },
@@ -2791,27 +2808,69 @@ const AdminDashboard = () => {
                     <Card className="p-5 sm:p-6 space-y-4">
                       <div className="flex items-center gap-3 pb-3 border-b border-border/60">
                         <div className="h-10 w-10 rounded-xl bg-accent/15 text-accent grid place-items-center"><Code2 className="h-5 w-5" /></div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="font-bold leading-tight">Page-level schemas in use</p>
-                          <p className="text-[11px] text-muted-foreground">All JSON-LD added on individual pages ({totalPage} total). Edit each page from its admin tab.</p>
+                          <p className="text-[11px] text-muted-foreground">Edits here are saved straight back to each page's SEO ({totalPage} total).</p>
                         </div>
                       </div>
                       {pageEntries.length === 0 ? (
-                        <p className="text-[12px] text-muted-foreground">No per-page schemas added yet. Open a page editor and use its “Page-level JSON-LD schemas” block to add one.</p>
+                        <p className="text-[12px] text-muted-foreground">No per-page schemas added yet. Open any page editor and use its “Structured data (JSON-LD)” block to add one — it will show up here too.</p>
                       ) : (
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           {pageEntries.map((e) => (
-                            <div key={e.key} className="rounded-lg border border-border bg-secondary/20 p-3">
-                              <p className="text-xs font-mono text-foreground/80 mb-2">{e.key}</p>
-                              <div className="flex flex-wrap gap-1.5">
-                                {e.schemas.map((sc: any) => (
-                                  <Badge key={sc.id} variant="secondary" className="bg-accent/15 text-accent">
-                                    {sc.type}{sc.name ? ` · ${sc.name}` : ""}
-                                  </Badge>
-                                ))}
+                            <div key={e.key} className="rounded-xl border border-border bg-secondary/20 p-3 space-y-2">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge variant="outline" className="font-mono text-[10px]">{e.key}</Badge>
+                                <span className="text-[11px] text-muted-foreground">{e.schemas.length} schema{e.schemas.length > 1 ? "s" : ""}</span>
+                                <Button size="sm" variant="ghost" className="ml-auto h-7 text-[11px]" onClick={() => addSchemaToPage(e.key)}>
+                                  <Plus className="h-3.5 w-3.5" /> Add
+                                </Button>
                               </div>
+                              {e.schemas.map((sc: any) => {
+                                let valid = true;
+                                try { if (sc.json && sc.json.trim()) JSON.parse(sc.json); } catch { valid = false; }
+                                return (
+                                  <div key={sc.id} className={`rounded-lg border p-3 space-y-2 ${valid ? "border-border/60 bg-background" : "border-destructive/40 bg-destructive/5"}`}>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <Input
+                                        className="h-8 text-xs flex-1 min-w-[140px]"
+                                        value={sc.name || ""}
+                                        onChange={(ev) => editSchema(e.key, sc.id, { name: ev.target.value })}
+                                        placeholder="Schema name (internal only)"
+                                      />
+                                      <select
+                                        value={sc.type}
+                                        onChange={(ev) => editSchema(e.key, sc.id, { type: ev.target.value })}
+                                        className="h-8 px-2 rounded-md border border-input bg-background text-xs"
+                                      >
+                                        {SCHEMA_TYPE_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+                                      </select>
+                                      {!valid && <Badge variant="destructive" className="text-[10px]">Invalid JSON</Badge>}
+                                      <div className="flex items-center gap-1.5">
+                                        <Switch checked={sc.enabled !== false} onCheckedChange={(v) => editSchema(e.key, sc.id, { enabled: v })} />
+                                        <span className="text-[10px]">{sc.enabled !== false ? "On" : "Off"}</span>
+                                      </div>
+                                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => removeSchemaFromPage(e.key, sc.id)}>
+                                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                                      </Button>
+                                    </div>
+                                    <Textarea
+                                      rows={4}
+                                      className="font-mono text-[11px]"
+                                      value={sc.json || ""}
+                                      onChange={(ev) => editSchema(e.key, sc.id, { json: ev.target.value })}
+                                      placeholder='{"headline": "My article"}'
+                                    />
+                                  </div>
+                                );
+                              })}
                             </div>
                           ))}
+                          <div className="flex justify-end pt-1">
+                            <Button size="sm" variant="hero" onClick={async () => { const ok = await persistNow("Schemas saved — live now"); if (!ok) toast.error("Save failed"); }}>
+                              <Save className="h-4 w-4" /> Save changes
+                            </Button>
+                          </div>
                         </div>
                       )}
                       <div className="pt-3 border-t border-border/60">
