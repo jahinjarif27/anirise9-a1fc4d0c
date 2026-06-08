@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Facebook, ArrowRight, Play, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+
+const addPreconnect = (href: string) => {
+  if (typeof document === "undefined") return;
+  if (document.head.querySelector(`link[data-pc="${href}"]`)) return;
+  const l = document.createElement("link");
+  l.rel = "preconnect";
+  l.href = href;
+  l.crossOrigin = "";
+  l.setAttribute("data-pc", href);
+  document.head.appendChild(l);
+};
 
 export const Hero = () => {
   const { content, contact } = useAdmin();
