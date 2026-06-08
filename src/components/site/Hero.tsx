@@ -106,8 +106,8 @@ export const Hero = () => {
       </div>
 
       <Dialog open={videoOpen} onOpenChange={setVideoOpen}>
-        <DialogContent className="max-w-[92vw] sm:max-w-xl md:max-w-2xl p-0 overflow-hidden bg-background rounded-2xl">
-          <div className="aspect-video w-full bg-black">
+        <DialogContent className="max-w-[92vw] sm:max-w-xl md:max-w-2xl p-0 overflow-hidden bg-background rounded-2xl [&>button]:hidden">
+          <div className="relative aspect-video w-full bg-black">
             {videoOpen && videoUrl && (
               isMp4 ? (
                 <video src={videoUrl} controls autoPlay className="w-full h-full" />
@@ -121,9 +121,16 @@ export const Hero = () => {
                 />
               )
             )}
+            <button
+              type="button"
+              onClick={() => setVideoOpen(false)}
+              aria-label="Close video"
+              className="absolute top-2 right-2 z-10 h-9 w-9 grid place-items-center rounded-full bg-background/90 text-foreground shadow-md hover:bg-background transition"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
           <div className="p-5 flex flex-col items-center text-center gap-3">
-            <p className="text-base font-semibold text-foreground">Ready to grow your brand?</p>
             <Button asChild variant="hero" size="lg" onClick={() => setVideoOpen(false)}>
               <Link to="/strategy-call">
                 Book A Strategy Call <ArrowRight />
