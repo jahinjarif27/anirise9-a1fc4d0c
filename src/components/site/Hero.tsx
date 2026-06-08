@@ -9,9 +9,35 @@ export const Hero = () => {
   const { content, contact } = useAdmin();
   const [videoOpen, setVideoOpen] = useState(false);
 
-  const videoUrl = content.heroVideoUrl?.trim();
+  const rawVideoUrl = content.heroVideoUrl?.trim();
+  const isMp4 = !!rawVideoUrl && /\.(mp4|webm|ogg)(\?|$)/i.test(rawVideoUrl);
+
+  const getYouTubeId = (url: string): string | null => {
+    try {
+      const u = new URL(url);
+      const host = u.hostname.replace(/^www\./, "");
+      if (host === "youtu.be") return u.pathname.slice(1).split("/")[0] || null;
+      if (host.endsWith("youtube.com") || host.endsWith("youtube-nocookie.com")) {
+        if (u.pathname === "/watch") return u.searchParams.get("v");
+        const parts = u.pathname.split("/").filter(Boolean);
+        const i = parts.findIndex((p) => ["embed", "shorts", "v", "live"].includes(p));
+        if (i >= 0 && parts[i + 1]) return parts[i + 1];
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const ytId = rawVideoUrl && !isMp4 ? getYouTubeId(rawVideoUrl) : null;
+  const videoUrl = rawVideoUrl
+    ? isMp4
+      ? rawVideoUrl
+      : ytId
+        ? `https://www.youtube.com/embed/${ytId}`
+        : rawVideoUrl
+    : undefined;
   const videoEnabled = content.heroVideoEnabled !== false && !!videoUrl;
-  const isMp4 = !!videoUrl && /\.(mp4|webm|ogg)(\?|$)/i.test(videoUrl);
 
   return (
     <section id="home" className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 bg-gradient-hero overflow-hidden">
