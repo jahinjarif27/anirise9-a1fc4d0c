@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Menu, Phone, Search, TrendingUp, Facebook, Instagram, ChevronDown } from "lucide-react";
+import { Menu, Phone, TrendingUp, Facebook, Instagram, ChevronDown } from "lucide-react";
 import logo from "@/assets/anirise-logo.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
