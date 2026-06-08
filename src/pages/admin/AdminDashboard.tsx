@@ -2771,6 +2771,64 @@ const AdminDashboard = () => {
                     })}
                   </div>
                 </Card>
+
+                {/* Per-page schemas in use across the site (read-only aggregation) */}
+                {(() => {
+                  const pageEntries = Object.entries(seo.pageSeo || {})
+                    .map(([key, v]: any) => ({
+                      key,
+                      schemas: Array.isArray(v?.schemas) ? v.schemas.filter((x: any) => x && x.enabled !== false) : [],
+                    }))
+                    .filter((e) => e.schemas.length > 0);
+                  const builtIn = [
+                    { where: "Home (/)", type: "WebSite", note: "Fallback when no admin schema set" },
+                    { where: "Blog post (/blog/:slug)", type: "BlogPosting", note: "Auto-generated from post when no admin schema set" },
+                    { where: "Hero section (/)", type: "VideoObject", note: "Auto-emitted when hero video is enabled" },
+                    { where: "Sitewide", type: "Organization", note: "From Settings → Schema (global)" },
+                  ];
+                  const totalPage = pageEntries.reduce((n, e) => n + e.schemas.length, 0);
+                  return (
+                    <Card className="p-5 sm:p-6 space-y-4">
+                      <div className="flex items-center gap-3 pb-3 border-b border-border/60">
+                        <div className="h-10 w-10 rounded-xl bg-accent/15 text-accent grid place-items-center"><Code2 className="h-5 w-5" /></div>
+                        <div>
+                          <p className="font-bold leading-tight">Page-level schemas in use</p>
+                          <p className="text-[11px] text-muted-foreground">All JSON-LD added on individual pages ({totalPage} total). Edit each page from its admin tab.</p>
+                        </div>
+                      </div>
+                      {pageEntries.length === 0 ? (
+                        <p className="text-[12px] text-muted-foreground">No per-page schemas added yet. Open a page editor and use its “Page-level JSON-LD schemas” block to add one.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {pageEntries.map((e) => (
+                            <div key={e.key} className="rounded-lg border border-border bg-secondary/20 p-3">
+                              <p className="text-xs font-mono text-foreground/80 mb-2">{e.key}</p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {e.schemas.map((sc: any) => (
+                                  <Badge key={sc.id} variant="secondary" className="bg-accent/15 text-accent">
+                                    {sc.type}{sc.name ? ` · ${sc.name}` : ""}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div className="pt-3 border-t border-border/60">
+                        <p className="text-[11px] font-semibold text-muted-foreground mb-2">Built-in schemas emitted automatically</p>
+                        <div className="space-y-1.5">
+                          {builtIn.map((b) => (
+                            <div key={b.where + b.type} className="flex items-center gap-2 text-[12px]">
+                              <Badge variant="outline" className="font-mono">{b.type}</Badge>
+                              <span className="text-foreground/80">{b.where}</span>
+                              <span className="text-muted-foreground">— {b.note}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })()}
               </TabsContent>
 
               <TabsContent value="sitemap" className="space-y-4 mt-0">
