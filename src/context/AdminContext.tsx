@@ -53,6 +53,7 @@ type SiteContent = {
   heroTagline: string;
   heroImage: string;
   heroImageAlt: string;
+  heroVideoUrl?: string;
   servicesTitle: string;
   servicesBlurb: string;
   servicesImage: string;
@@ -408,6 +409,7 @@ const defaultContent: SiteContent = {
   heroTagline: "AniRise drives Visibility, fuels Growth, and builds a clear roadmap toward Success.",
   heroImage: heroImg,
   heroImageAlt: "AniRise: SEO and growth illustration",
+  heroVideoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
   servicesTitle: "What We Do",
   servicesBlurb: "From visibility to growth — every service is built around helping your business succeed online.",
   servicesImage: "",

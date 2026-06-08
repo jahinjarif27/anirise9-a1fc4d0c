@@ -1455,6 +1455,7 @@ const AdminDashboard = () => {
           { label: "Eyebrow", key: "heroEyebrow" },
           { label: "Headline", key: "heroHeadline" },
           { label: "Tagline", key: "heroTagline", multiline: true },
+          { label: "Hero video URL (YouTube embed or .mp4)", key: "heroVideoUrl" },
         ],
         image: { label: "Hero image", key: "heroImage", altKey: "heroImageAlt", aspect: "aspect-square" },
       },
