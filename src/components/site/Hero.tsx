@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Facebook, ArrowRight, Play, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+
+const addPreconnect = (href: string) => {
+  if (typeof document === "undefined") return;
+  if (document.head.querySelector(`link[data-pc="${href}"]`)) return;
+  const l = document.createElement("link");
+  l.rel = "preconnect";
+  l.href = href;
+  l.crossOrigin = "";
+  l.setAttribute("data-pc", href);
+  document.head.appendChild(l);
+};
 
 export const Hero = () => {
   const { content, contact } = useAdmin();
@@ -39,6 +50,22 @@ export const Hero = () => {
     : undefined;
   const videoEnabled = content.heroVideoEnabled !== false && !!videoUrl;
 
+  useEffect(() => {
+    if (!videoEnabled || isMp4) return;
+    addPreconnect("https://www.youtube.com");
+    addPreconnect("https://www.google.com");
+    addPreconnect("https://i.ytimg.com");
+    addPreconnect("https://s.ytimg.com");
+    addPreconnect("https://yt3.ggpht.com");
+  }, [videoEnabled, isMp4]);
+
+  const warmYouTube = () => {
+    if (!videoEnabled || isMp4) return;
+    addPreconnect("https://www.youtube.com");
+    addPreconnect("https://i.ytimg.com");
+    addPreconnect("https://s.ytimg.com");
+  };
+
   return (
     <section id="home" className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 bg-gradient-hero overflow-hidden">
       <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary/5 blur-3xl" aria-hidden />
@@ -60,6 +87,9 @@ export const Hero = () => {
                 variant="hero"
                 size="xl"
                 onClick={() => setVideoOpen(true)}
+                onMouseEnter={warmYouTube}
+                onFocus={warmYouTube}
+                onTouchStart={warmYouTube}
               >
                 <Play /> Watch How We Work
               </Button>
@@ -139,9 +169,10 @@ export const Hero = () => {
                 <video src={videoUrl} controls autoPlay className="w-full h-full" />
               ) : (
                 <iframe
-                  src={`${videoUrl}${videoUrl.includes("?") ? "&" : "?"}autoplay=1`}
+                  src={`${videoUrl}${videoUrl.includes("?") ? "&" : "?"}autoplay=1&playsinline=1&rel=0&modestbranding=1`}
                   title="Hero video"
                   className="w-full h-full"
+                  loading="eager"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
