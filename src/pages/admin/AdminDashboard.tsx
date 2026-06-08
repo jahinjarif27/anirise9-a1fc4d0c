@@ -1545,6 +1545,18 @@ const AdminDashboard = () => {
                     : <Input value={c[f.key]} onChange={(e) => updateContent({ [f.key]: e.target.value } as any)} />}
                 </Field>
               ))}
+              {activePage === "hero" && (
+                <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border bg-background/40">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Enable hero video</p>
+                    <p className="text-xs text-muted-foreground">When off, the "Watch How We Work" button is replaced with "Book A Strategy Call".</p>
+                  </div>
+                  <Switch
+                    checked={c.heroVideoEnabled !== false}
+                    onCheckedChange={(v) => updateContent({ heroVideoEnabled: v } as any)}
+                  />
+                </div>
+              )}
               {cfg.image && (
                 <ImageUpload
                   label={cfg.image.label}

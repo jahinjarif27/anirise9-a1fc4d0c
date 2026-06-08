@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Facebook, ArrowRight, Play } from "lucide-react";
+import { Facebook, ArrowRight, Play, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -10,6 +10,7 @@ export const Hero = () => {
   const [videoOpen, setVideoOpen] = useState(false);
 
   const videoUrl = content.heroVideoUrl?.trim();
+  const videoEnabled = content.heroVideoEnabled !== false && !!videoUrl;
   const isMp4 = !!videoUrl && /\.(mp4|webm|ogg)(\?|$)/i.test(videoUrl);
 
   return (
@@ -28,13 +29,21 @@ export const Hero = () => {
             {content.heroTagline}
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <Button
-              variant="hero"
-              size="xl"
-              onClick={() => setVideoOpen(true)}
-            >
-              <Play /> Watch How We Work
-            </Button>
+            {videoEnabled ? (
+              <Button
+                variant="hero"
+                size="xl"
+                onClick={() => setVideoOpen(true)}
+              >
+                <Play /> Watch How We Work
+              </Button>
+            ) : (
+              <Button asChild variant="hero" size="xl">
+                <Link to="/strategy-call">
+                  Book A Strategy Call <ArrowRight />
+                </Link>
+              </Button>
+            )}
             <Button asChild variant="outline" size="xl" className="rounded-full">
               <Link to="/services">Our Services</Link>
             </Button>
@@ -97,8 +106,8 @@ export const Hero = () => {
       </div>
 
       <Dialog open={videoOpen} onOpenChange={setVideoOpen}>
-        <DialogContent className="max-w-[92vw] sm:max-w-xl md:max-w-2xl p-0 overflow-hidden bg-background rounded-2xl">
-          <div className="aspect-video w-full bg-black">
+        <DialogContent className="max-w-[92vw] sm:max-w-xl md:max-w-2xl p-0 overflow-hidden bg-background rounded-2xl [&>button]:hidden">
+          <div className="relative aspect-video w-full bg-black">
             {videoOpen && videoUrl && (
               isMp4 ? (
                 <video src={videoUrl} controls autoPlay className="w-full h-full" />
@@ -112,9 +121,16 @@ export const Hero = () => {
                 />
               )
             )}
+            <button
+              type="button"
+              onClick={() => setVideoOpen(false)}
+              aria-label="Close video"
+              className="absolute top-2 right-2 z-10 h-9 w-9 grid place-items-center rounded-full bg-background/90 text-foreground shadow-md hover:bg-background transition"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
           <div className="p-5 flex flex-col items-center text-center gap-3">
-            <p className="text-base font-semibold text-foreground">Ready to grow your brand?</p>
             <Button asChild variant="hero" size="lg" onClick={() => setVideoOpen(false)}>
               <Link to="/strategy-call">
                 Book A Strategy Call <ArrowRight />
