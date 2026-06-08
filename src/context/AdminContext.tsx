@@ -1189,7 +1189,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [content, setContent] = useState<SiteContent>(defaultContent);
   const [contact, setContact] = useState<ContactInfo>(defaultContact);
-  const [portfolio, setPortfolio] = useState<PortfolioItem[]>(defaultPortfolio);
+  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [seo, setSeo] = useState<SeoSettings>(defaultSeo);
   const [customPages, setCustomPages] = useState<CustomPage[]>([]);
   const [homeSections, setHomeSections] = useState<HomeSection[]>([]);
