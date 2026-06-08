@@ -29,16 +29,21 @@ export const Hero = () => {
             {content.heroTagline}
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <Button
-              variant="hero"
-              size="xl"
-              onClick={() => setVideoOpen(true)}
-            >
-              <Play /> Watch How We Work
-            </Button>
-            <Button asChild variant="outline" size="xl" className="rounded-full">
-              <Link to="/services">Our Services</Link>
-            </Button>
+            {videoEnabled ? (
+              <Button
+                variant="hero"
+                size="xl"
+                onClick={() => setVideoOpen(true)}
+              >
+                <Play /> Watch How We Work
+              </Button>
+            ) : (
+              <Button asChild variant="hero" size="xl">
+                <Link to="/strategy-call">
+                  Book A Strategy Call <ArrowRight />
+                </Link>
+              </Button>
+            )}
           </div>
 
           <div className="mt-12 flex flex-wrap items-center gap-10">
