@@ -285,6 +285,7 @@ export const SeoBlock = ({
 
       {/* Robots */}
       <div className="rounded-xl border border-border/60 p-3 space-y-3 bg-secondary/30">
+        <div className="grid sm:grid-cols-2 gap-3">
           <div>
             <label className="text-[11px] font-medium mb-1 block">Robots</label>
             <select
