@@ -44,6 +44,9 @@ export const Hero = () => {
                 </Link>
               </Button>
             )}
+            <Button asChild variant="outline" size="xl" className="rounded-full">
+              <Link to="/services">Our Services</Link>
+            </Button>
           </div>
 
           <div className="mt-12 flex flex-wrap items-center gap-10">
