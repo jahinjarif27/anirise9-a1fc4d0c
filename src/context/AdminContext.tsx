@@ -1083,6 +1083,7 @@ type AdminCtx = {
   seo: SeoSettings;
   updateSeo: (s: Partial<SeoSettings>) => void;
   regenerateSitemap: () => void;
+  buildSitemap: (base: string) => string;
   saveAllNow: () => Promise<{ ok: boolean; error?: string }>;
   addRedirect: (r: Omit<Redirect, "id">) => void;
   updateRedirect: (id: string, r: Partial<Redirect>) => void;
