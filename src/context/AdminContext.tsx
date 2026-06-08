@@ -53,6 +53,7 @@ type SiteContent = {
   heroTagline: string;
   heroImage: string;
   heroImageAlt: string;
+  heroVideoUrl?: string;
   servicesTitle: string;
   servicesBlurb: string;
   servicesImage: string;
