@@ -3066,6 +3066,67 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">Per-page overrides are managed inside each page editor under <span className="font-semibold">Pages</span>.</p>
+
+                  {/* Canonical URLs in use across the site */}
+                  {(() => {
+                    const xml = buildSitemap(seo.canonicalUrl || "https://anirise.com.bd");
+                    const matches = Array.from(xml.matchAll(/<loc>([^<]+)<\/loc>/g)).map((m) => m[1]);
+                    const ps = seo.pageSeo || {};
+                    const overrides = Object.entries(ps)
+                      .filter(([, v]: any) => v && v.canonicalAuto === false && v.canonicalUrl)
+                      .map(([k, v]: any) => ({ key: k, url: v.canonicalUrl as string }));
+                    return (
+                      <div className="rounded-xl border border-border bg-secondary/30 p-4 space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <p className="text-sm font-semibold">Canonical URLs in use</p>
+                            <p className="text-[11px] text-muted-foreground">All canonical URLs currently emitted across the public site ({matches.length} total).</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-xs"
+                            onClick={() => {
+                              navigator.clipboard.writeText(matches.join("\n"));
+                              toast.success("Copied all canonical URLs");
+                            }}
+                          >
+                            Copy all
+                          </Button>
+                        </div>
+                        <div className="max-h-72 overflow-y-auto rounded-lg border border-border bg-background divide-y divide-border/60">
+                          {matches.length === 0 && (
+                            <p className="p-3 text-xs text-muted-foreground">No public pages found.</p>
+                          )}
+                          {matches.map((u, i) => (
+                            <div key={`${u}-${i}`} className="flex items-center gap-2 px-3 py-2 text-xs">
+                              <span className="font-mono truncate flex-1" title={u}>{u}</span>
+                              <a href={u} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline whitespace-nowrap">Open</a>
+                              <button
+                                type="button"
+                                onClick={() => { navigator.clipboard.writeText(u); toast.success("Copied"); }}
+                                className="text-muted-foreground hover:text-foreground whitespace-nowrap"
+                              >
+                                Copy
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        {overrides.length > 0 && (
+                          <div className="pt-2 border-t border-border/60">
+                            <p className="text-[11px] font-semibold text-muted-foreground mb-1.5">Pages with a manual canonical override</p>
+                            <ul className="space-y-1">
+                              {overrides.map((o) => (
+                                <li key={o.key} className="text-[11px] font-mono text-foreground/80 truncate">
+                                  <span className="text-muted-foreground">{o.key}:</span> {o.url}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </Card>
               </TabsContent>
 
