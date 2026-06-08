@@ -50,6 +50,37 @@ export const Hero = () => {
     : undefined;
   const videoEnabled = content.heroVideoEnabled !== false && !!videoUrl;
 
+  const videoTitle = content.heroVideoTitle?.trim() || "Hero video";
+  const videoDescription = content.heroVideoDescription?.trim() || "";
+  const videoThumbnail = content.heroVideoThumbnail?.trim()
+    || (ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : "");
+  const videoUploadDate = content.heroVideoUploadDate?.trim() || "";
+  const videoDuration = content.heroVideoDuration?.trim() || "";
+
+  useEffect(() => {
+    if (!videoEnabled) return;
+    const payload: Record<string, unknown> = {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      name: videoTitle,
+      description: videoDescription || videoTitle,
+      contentUrl: rawVideoUrl,
+    };
+    if (!isMp4 && ytId) payload.embedUrl = `https://www.youtube.com/embed/${ytId}`;
+    if (videoThumbnail) payload.thumbnailUrl = videoThumbnail;
+    if (videoUploadDate) payload.uploadDate = videoUploadDate;
+    if (videoDuration) payload.duration = videoDuration;
+    const tag = document.createElement("script");
+    tag.type = "application/ld+json";
+    tag.setAttribute("data-hero-video-jsonld", "true");
+    tag.text = JSON.stringify(payload);
+    document.head.querySelectorAll('script[data-hero-video-jsonld="true"]').forEach((n) => n.remove());
+    document.head.appendChild(tag);
+    return () => {
+      document.head.querySelectorAll('script[data-hero-video-jsonld="true"]').forEach((n) => n.remove());
+    };
+  }, [videoEnabled, videoTitle, videoDescription, videoThumbnail, videoUploadDate, videoDuration, rawVideoUrl, isMp4, ytId]);
+
   useEffect(() => {
     if (!videoEnabled || isMp4) return;
     addPreconnect("https://www.youtube.com");
