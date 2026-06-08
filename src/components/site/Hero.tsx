@@ -169,9 +169,10 @@ export const Hero = () => {
                 <video src={videoUrl} controls autoPlay className="w-full h-full" />
               ) : (
                 <iframe
-                  src={`${videoUrl}${videoUrl.includes("?") ? "&" : "?"}autoplay=1`}
+                  src={`${videoUrl}${videoUrl.includes("?") ? "&" : "?"}autoplay=1&playsinline=1&rel=0&modestbranding=1`}
                   title="Hero video"
                   className="w-full h-full"
+                  loading="eager"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
