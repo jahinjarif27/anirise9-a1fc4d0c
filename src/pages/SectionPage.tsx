@@ -25,7 +25,7 @@ const SECTION_DESCRIPTIONS: Record<string, string> = {
 };
 
 export const SectionPage = ({ Section, title, sectionKey }: Props) => {
-  const { seo } = useAdmin();
+  const { seo, loading } = useAdmin();
   const location = useLocation();
   const ps = sectionKey ? seo.pageSeo?.[sectionKey] : undefined;
 
