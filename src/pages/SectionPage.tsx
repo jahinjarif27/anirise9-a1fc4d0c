@@ -25,7 +25,7 @@ const SECTION_DESCRIPTIONS: Record<string, string> = {
 };
 
 export const SectionPage = ({ Section, title, sectionKey }: Props) => {
-  const { seo } = useAdmin();
+  const { seo, loading } = useAdmin();
   const location = useLocation();
   const ps = sectionKey ? seo.pageSeo?.[sectionKey] : undefined;
 
@@ -69,7 +69,7 @@ export const SectionPage = ({ Section, title, sectionKey }: Props) => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-1 pt-32">
-        <Section />
+        {loading ? <div className="min-h-[40vh]" /> : <Section />}
         {!isContactPage && (
           <div className="border-t border-border/60 mt-12">
             <Contact />

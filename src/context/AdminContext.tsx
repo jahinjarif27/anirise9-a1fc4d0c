@@ -1189,7 +1189,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [content, setContent] = useState<SiteContent>(defaultContent);
   const [contact, setContact] = useState<ContactInfo>(defaultContact);
-  const [portfolio, setPortfolio] = useState<PortfolioItem[]>(defaultPortfolio);
+  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [seo, setSeo] = useState<SeoSettings>(defaultSeo);
   const [customPages, setCustomPages] = useState<CustomPage[]>([]);
   const [homeSections, setHomeSections] = useState<HomeSection[]>([]);
@@ -1202,11 +1202,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [visits, setVisits] = useState(0);
   const [visitSeries, setVisitSeries] = useState<{ day: string; visits: number }[]>([]);
   const [homeBlocks, setHomeBlocks] = useState<HomeBlocks>(defaultHomeBlocks);
-  const [homeFaqs, setHomeFaqs] = useState<FaqItem[]>(defaultHomeFaqs);
+  const [homeFaqs, setHomeFaqs] = useState<FaqItem[]>([]);
   const [serviceFaqs, setServiceFaqs] = useState<Record<string, FaqItem[]>>(defaultServiceFaqs);
-  const [stats, setStats] = useState<StatItem[]>(defaultStats);
-  const [trustLogos, setTrustLogos] = useState<TrustLogo[]>(defaultTrustLogos);
-  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(defaultCaseStudies);
+  const [stats, setStats] = useState<StatItem[]>([]);
+  const [trustLogos, setTrustLogos] = useState<TrustLogo[]>([]);
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
   const [finalCta, setFinalCta] = useState<FinalCta>(defaultFinalCta);
   const [servicePreviews, setServicePreviews] = useState<Record<string, ServicePreview>>({ ...defaultServicePreviews });
   const [serviceContent, setServiceContent] = useState<Record<string, ServiceContent>>(defaultServiceContent);
@@ -1296,7 +1296,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       if (s) {
         if (s.content && Object.keys(s.content).length) setContent({ ...defaultContent, ...(s.content as any) });
         if (s.contact && Object.keys(s.contact).length) setContact({ ...defaultContact, ...(s.contact as any) });
-        if (Array.isArray(s.portfolio) && (s.portfolio as any[]).length) setPortfolio(s.portfolio as any);
+        if (Array.isArray(s.portfolio)) setPortfolio(s.portfolio as any);
         if (s.seo && Object.keys(s.seo).length) setSeo({ ...defaultSeo, ...(s.seo as any) });
         if (s.appearance && Object.keys(s.appearance).length) setAppearance({ ...defaultAppearance, ...(s.appearance as any) });
         if (Array.isArray(s.custom_pages)) setCustomPages(mergeLegalPages((s.custom_pages as any[]).map((p) => ({
@@ -1312,11 +1312,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (s.home_membership && Object.keys(s.home_membership).length) setHomeMembershipState({ ...defaultHomeMembership, ...(s.home_membership as any) });
         const sa = s as any;
         if (sa.home_blocks && Object.keys(sa.home_blocks).length) setHomeBlocks({ ...defaultHomeBlocks, ...sa.home_blocks });
-        if (Array.isArray(sa.home_faqs) && sa.home_faqs.length) setHomeFaqs(sa.home_faqs);
+        if (Array.isArray(sa.home_faqs)) setHomeFaqs(sa.home_faqs);
         if (sa.service_faqs && Object.keys(sa.service_faqs).length) setServiceFaqs({ ...defaultServiceFaqs, ...sa.service_faqs });
-        if (Array.isArray(sa.stats) && sa.stats.length) setStats(sa.stats);
-        if (Array.isArray(sa.trust_logos) && sa.trust_logos.length) setTrustLogos(sa.trust_logos);
-        if (Array.isArray(sa.case_studies) && sa.case_studies.length) setCaseStudies(sa.case_studies);
+        if (Array.isArray(sa.stats)) setStats(sa.stats);
+        if (Array.isArray(sa.trust_logos)) setTrustLogos(sa.trust_logos);
+        if (Array.isArray(sa.case_studies)) setCaseStudies(sa.case_studies);
         if (sa.final_cta && Object.keys(sa.final_cta).length) setFinalCta({ ...defaultFinalCta, ...sa.final_cta });
         if (sa.service_previews && Object.keys(sa.service_previews).length) {
           // Merge defaults so newly added services and empty fields get sensible copy.
@@ -1343,6 +1343,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (sa.process_flow && Object.keys(sa.process_flow).length) {
           setProcessFlow({ ...defaultProcessFlow, ...sa.process_flow, steps: Array.isArray(sa.process_flow.steps) && sa.process_flow.steps.length ? sa.process_flow.steps : defaultProcessFlow.steps });
         }
+      } else {
+        // No DB row yet — seed in-memory state with defaults so fresh installs render sample data.
+        setPortfolio(defaultPortfolio);
+        setHomeFaqs(defaultHomeFaqs);
+        setStats(defaultStats);
+        setTrustLogos(defaultTrustLogos);
+        setCaseStudies(defaultCaseStudies);
       }
       if (postsRes.data) setPosts(postsRes.data.map(fromDbPost));
       if (reviewsRes.data) setReviews(reviewsRes.data.map((r: any) => ({
