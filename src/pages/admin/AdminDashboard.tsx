@@ -1642,6 +1642,87 @@ const AdminDashboard = () => {
             </Card>
           )}
           {activePage === "about" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader icon={FileText} title="Our Story" subtitle="Long-form story section on the About page. Body supports markdown links — e.g. [contact us](#contact)." />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Eyebrow">
+                  <Input value={(content as any).aboutStoryEyebrow || ""} onChange={(e) => updateContent({ aboutStoryEyebrow: e.target.value } as any)} placeholder="Our Story" />
+                </Field>
+                <Field label="Title">
+                  <Input value={(content as any).aboutStoryTitle || ""} onChange={(e) => updateContent({ aboutStoryTitle: e.target.value } as any)} placeholder="Built to help brands rise — honestly." />
+                </Field>
+              </div>
+              <Field label="Body (markdown links supported)">
+                <LinkableTextarea
+                  rows={8}
+                  value={(content as any).aboutStoryBody || ""}
+                  onChange={(v) => updateContent({ aboutStoryBody: v } as any)}
+                  placeholder="Write the story… use [text](url) for links."
+                />
+              </Field>
+              <Field label="Side image">
+                <ImageUpload value={(content as any).aboutStoryImage || ""} onChange={(url) => updateContent({ aboutStoryImage: url } as any)} />
+                <Input className="mt-2" value={(content as any).aboutStoryImageAlt || ""} onChange={(e) => updateContent({ aboutStoryImageAlt: e.target.value } as any)} placeholder="Image alt text" />
+              </Field>
+            </Card>
+          )}
+          {activePage === "about" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader icon={Users} title="Our Team" subtitle="Team members shown on the About page." />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Eyebrow">
+                  <Input value={(content as any).aboutTeamEyebrow || ""} onChange={(e) => updateContent({ aboutTeamEyebrow: e.target.value } as any)} placeholder="Our Team" />
+                </Field>
+                <Field label="Title">
+                  <Input value={(content as any).aboutTeamTitle || ""} onChange={(e) => updateContent({ aboutTeamTitle: e.target.value } as any)} placeholder="The people behind your growth" />
+                </Field>
+              </div>
+              <Field label="Blurb">
+                <Textarea rows={2} value={(content as any).aboutTeamBlurb || ""} onChange={(e) => updateContent({ aboutTeamBlurb: e.target.value } as any)} />
+              </Field>
+              <div className="space-y-3">
+                {(((content as any).aboutTeam ?? []) as { id: string; name: string; role: string; image: string; bio: string }[]).map((m, idx) => (
+                  <div key={m.id} className="p-3 rounded-xl border border-border bg-background/40 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-bold text-muted-foreground">Member {idx + 1}</p>
+                      <Button variant="ghost" size="icon" onClick={() => {
+                        const next = [...(((content as any).aboutTeam ?? []) as any[])];
+                        next.splice(idx, 1);
+                        updateContent({ aboutTeam: next } as any);
+                      }}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      <Input value={m.name} placeholder="Name" onChange={(e) => {
+                        const next = [...(((content as any).aboutTeam ?? []) as any[])];
+                        next[idx] = { ...next[idx], name: e.target.value };
+                        updateContent({ aboutTeam: next } as any);
+                      }} />
+                      <Input value={m.role} placeholder="Role" onChange={(e) => {
+                        const next = [...(((content as any).aboutTeam ?? []) as any[])];
+                        next[idx] = { ...next[idx], role: e.target.value };
+                        updateContent({ aboutTeam: next } as any);
+                      }} />
+                    </div>
+                    <Textarea rows={2} value={m.bio} placeholder="Short bio" onChange={(e) => {
+                      const next = [...(((content as any).aboutTeam ?? []) as any[])];
+                      next[idx] = { ...next[idx], bio: e.target.value };
+                      updateContent({ aboutTeam: next } as any);
+                    }} />
+                    <ImageUpload value={m.image} onChange={(url) => {
+                      const next = [...(((content as any).aboutTeam ?? []) as any[])];
+                      next[idx] = { ...next[idx], image: url };
+                      updateContent({ aboutTeam: next } as any);
+                    }} />
+                  </div>
+                ))}
+                <Button variant="hero" size="sm" onClick={() => {
+                  const next = [...(((content as any).aboutTeam ?? []) as any[]), { id: `t_${Date.now().toString(36)}`, name: "New member", role: "Role", image: "", bio: "" }];
+                  updateContent({ aboutTeam: next } as any);
+                }}><Plus className="h-4 w-4" /> Add team member</Button>
+              </div>
+            </Card>
+          )}
+          {activePage === "about" && (
             <SectionNoteEditor noteId="about" label="Paragraph for the About page" />
           )}
           {activePage === "portfolio" && (
