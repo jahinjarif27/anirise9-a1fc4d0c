@@ -23,7 +23,6 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  Legend,
 } from "recharts";
 
 const Icon = ({ name, className }: { name?: string; className?: string }) => {
