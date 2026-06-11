@@ -59,7 +59,15 @@ export const Contact = () => {
                 </span>
                 <div>
                   <p className="text-xs text-muted-foreground">Facebook</p>
-                  <p className="font-semibold text-foreground break-all">{contact.facebook.replace(/^https?:\/\//, "")}</p>
+                  <p className="font-semibold text-foreground break-all">
+                    {(() => {
+                      try {
+                        const u = new URL(contact.facebook);
+                        const handle = u.pathname.replace(/^\/+|\/+$/g, "").split("/")[0];
+                        return handle ? `@${handle}` : contact.facebook;
+                      } catch { return contact.facebook; }
+                    })()}
+                  </p>
                 </div>
               </a>
             )}
