@@ -65,7 +65,7 @@ const HOME_BLOCKS = [
   { key: "stats", label: "Stats band" },
   { key: "servicesPreview", label: "Services preview" },
   { key: "caseStudies", label: "Case studies" },
-  { key: "processFlow", label: "Process flow (6-step)" },
+  
   { key: "homeFaq", label: "Home FAQ" },
   { key: "finalCta", label: "Final CTA" },
 ] as const;
