@@ -72,6 +72,17 @@ type SiteContent = {
   aboutStatValue?: string;
   aboutStatLabel?: string;
   aboutPillars?: { title: string; desc: string }[];
+  /** "Our Story" section on the About page. Body supports markdown links: [text](url). */
+  aboutStoryTitle?: string;
+  aboutStoryEyebrow?: string;
+  aboutStoryBody?: string;
+  aboutStoryImage?: string;
+  aboutStoryImageAlt?: string;
+  /** "Our Team" section on the About page. */
+  aboutTeamTitle?: string;
+  aboutTeamEyebrow?: string;
+  aboutTeamBlurb?: string;
+  aboutTeam?: { id: string; name: string; role: string; image: string; bio: string }[];
   portfolioTitle: string;
   portfolioBlurb: string;
   portfolioImage: string;
