@@ -2700,8 +2700,8 @@ const AdminDashboard = () => {
                       <img src={logo} alt="favicon" className="h-7 w-7 rounded-full mt-1 ring-1 ring-border" />
                       <div className="min-w-0 flex-1">
                         <p className="text-[#006621] text-xs truncate">{seo.canonicalUrl}</p>
-                        <p className="text-[#1a0dab] text-lg leading-tight truncate">{seo.metaTitle}</p>
-                        <p className="text-sm text-foreground/80 line-clamp-2">{seo.metaDescription}</p>
+                        <p className="text-[#1a0dab] text-lg leading-tight truncate">{seo.metaTitle.length > 60 ? seo.metaTitle.slice(0, 60) + "..." : seo.metaTitle}</p>
+                        <p className="text-sm text-foreground/80 line-clamp-2">{seo.metaDescription.length > 160 ? seo.metaDescription.slice(0, 160) + "..." : seo.metaDescription}</p>
                       </div>
                     </div>
                   </div>
