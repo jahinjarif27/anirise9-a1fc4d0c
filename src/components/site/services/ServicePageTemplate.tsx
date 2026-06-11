@@ -179,29 +179,43 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
     chart: c.chart.enabled && c.chart.bars.length > 0 ? (
       <section key="chart" className="py-20 bg-secondary/40">
         <div className="container">
-          <div className="bg-card rounded-2xl p-6 sm:p-8 border border-border/40 shadow-elegant">
-            <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
-              <div>
-                {c.chart.eyebrow && <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase mb-2">{c.chart.eyebrow}</p>}
-                {c.chart.title && <h3 className="text-2xl sm:text-3xl font-extrabold text-foreground">{c.chart.title}</h3>}
-              </div>
-              {c.chart.subtitle && <p className="text-sm text-muted-foreground max-w-sm">{c.chart.subtitle}</p>}
+          <div className="bg-card rounded-2xl p-6 sm:p-10 border border-border/40 shadow-elegant grid lg:grid-cols-5 gap-8 lg:gap-12 items-center">
+            {/* LEFT: copy + CTA */}
+            <div className="lg:col-span-2 space-y-5">
+              {c.chart.eyebrow && (
+                <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase">{c.chart.eyebrow}</p>
+              )}
+              {c.chart.title && (
+                <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight">{c.chart.title}</h3>
+              )}
+              {c.chart.subtitle && (
+                <p className="text-base text-muted-foreground leading-relaxed">{c.chart.subtitle}</p>
+              )}
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Every bar here ties back to a real client engagement — measured rankings, traffic, and revenue impact. See the full case-by-case breakdown of how we delivered these results in our portfolio.
+              </p>
+              <Button asChild variant="hero" size="lg" className="rounded-full">
+                <Link to="/portfolio">See our work <ArrowRight className="h-4 w-4" /></Link>
+              </Button>
             </div>
-            <div className="w-full h-[360px] sm:h-[380px]">
+            {/* RIGHT: graph */}
+            <div className="lg:col-span-3 w-full h-[320px] sm:h-[360px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={c.chart.bars} margin={{ top: 10, right: 10, left: -15, bottom: 60 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <BarChart data={c.chart.bars} margin={{ top: 10, right: 10, left: -10, bottom: 50 }} barCategoryGap="35%">
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis
                     dataKey="name"
                     stroke="hsl(var(--muted-foreground))"
                     fontSize={11}
                     interval={0}
-                    angle={-30}
+                    angle={-25}
                     textAnchor="end"
-                    height={70}
+                    height={60}
+                    tickLine={false}
+                    axisLine={false}
                     tick={{ fill: "hsl(var(--muted-foreground))" }}
                   />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} width={36} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} width={32} tickLine={false} axisLine={false} />
                   <Tooltip
                     contentStyle={{
                       background: "hsl(var(--card))",
@@ -209,10 +223,9 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
                       borderRadius: 12,
                       color: "hsl(var(--foreground))",
                     }}
-                    cursor={{ fill: "hsl(var(--accent) / 0.1)" }}
+                    cursor={{ fill: "hsl(var(--accent) / 0.08)" }}
                   />
-                  <Legend wrapperStyle={{ color: "hsl(var(--muted-foreground))", paddingTop: 8 }} />
-                  <Bar dataKey="value" name={service?.title ?? "Result"} fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="value" name={service?.title ?? "Result"} fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} maxBarSize={28} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
