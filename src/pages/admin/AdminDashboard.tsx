@@ -2564,7 +2564,7 @@ const AdminDashboard = () => {
               <div className="mt-4 grid gap-4">
                 {[
                   { id: "servicesPreview", label: "Home — Services preview" },
-                  { id: "processFlow",     label: "Home — Process flow (6-step)" },
+                  
                   { id: "whyChoose",       label: "Home — Why Choose AniRise" },
                   { id: "stats",           label: "Home — Stats band" },
                   { id: "caseStudies",     label: "Home — Case studies" },
