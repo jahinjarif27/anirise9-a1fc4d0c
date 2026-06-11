@@ -105,7 +105,7 @@ const Index = () => {
       case "servicesPreview": return homeBlocks.servicesPreview ? <ServicesPreview key={id} /> : null;
       case "about":           return <About key={id} />;
       case "caseStudies":     return homeBlocks.caseStudies ? <CaseStudies key={id} /> : null;
-      case "processFlow":     return homeBlocks.processFlow ? <ProcessSteps key={id} /> : null;
+      case "processFlow":     return null;
       case "whyChoose":       return <WhyChooseAniRise key={id} />;
       case "strategyCall":    return <StrategyCall key={id} />;
       case "homeFaq":         return homeBlocks.homeFaq ? <HomeFAQ key={id} /> : null;
