@@ -12,7 +12,7 @@ import { HomeFAQ } from "@/components/site/home/HomeFAQ";
 import { FinalCTA } from "@/components/site/home/FinalCTA";
 import { StrategyCall } from "@/components/site/home/StrategyCall";
 import { WhyChooseAniRise } from "@/components/site/home/WhyChooseAniRise";
-import { ProcessSteps } from "@/components/site/home/ProcessSteps";
+
 import { HomeLoader } from "@/components/site/HomeLoader";
 import { useAdmin } from "@/context/AdminContext";
 import { DEFAULT_HOME_ORDER, type HomeBlockId } from "@/context/AdminContext";
@@ -105,7 +105,7 @@ const Index = () => {
       case "servicesPreview": return homeBlocks.servicesPreview ? <ServicesPreview key={id} /> : null;
       case "about":           return <About key={id} />;
       case "caseStudies":     return homeBlocks.caseStudies ? <CaseStudies key={id} /> : null;
-      case "processFlow":     return homeBlocks.processFlow ? <ProcessSteps key={id} /> : null;
+      case "processFlow":     return null;
       case "whyChoose":       return <WhyChooseAniRise key={id} />;
       case "strategyCall":    return <StrategyCall key={id} />;
       case "homeFaq":         return homeBlocks.homeFaq ? <HomeFAQ key={id} /> : null;

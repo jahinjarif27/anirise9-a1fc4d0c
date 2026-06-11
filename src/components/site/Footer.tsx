@@ -92,14 +92,21 @@ export const Footer = () => {
         <div>
           <h4 className="font-semibold mb-4">{connectHeading}</h4>
           <ul className="space-y-3 text-sm text-primary-foreground/80">
-            {contact.facebook && (
-              <li>
-                <a href={contact.facebook} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 hover:text-accent transition-smooth">
-                  <span className="h-9 w-9 grid place-items-center rounded-xl bg-primary-foreground/10"><Facebook className="h-4 w-4" /></span>
-                  Facebook
-                </a>
-              </li>
-            )}
+            {contact.facebook && (() => {
+              let handle = "";
+              try {
+                const u = new URL(contact.facebook);
+                handle = u.pathname.replace(/^\/+|\/+$/g, "").split("/")[0];
+              } catch {}
+              return (
+                <li>
+                  <a href={contact.facebook} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 hover:text-accent transition-smooth">
+                    <span className="h-9 w-9 grid place-items-center rounded-xl bg-primary-foreground/10"><Facebook className="h-4 w-4" /></span>
+                    {handle ? `@${handle}` : "Facebook"}
+                  </a>
+                </li>
+              );
+            })()}
             {contact.instagram && (
               <li>
                 <a href={contact.instagram} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 hover:text-accent transition-smooth">

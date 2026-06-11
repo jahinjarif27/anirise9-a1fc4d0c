@@ -72,6 +72,17 @@ type SiteContent = {
   aboutStatValue?: string;
   aboutStatLabel?: string;
   aboutPillars?: { title: string; desc: string }[];
+  /** "Our Story" section on the About page. Body supports markdown links: [text](url). */
+  aboutStoryTitle?: string;
+  aboutStoryEyebrow?: string;
+  aboutStoryBody?: string;
+  aboutStoryImage?: string;
+  aboutStoryImageAlt?: string;
+  /** "Our Team" section on the About page. */
+  aboutTeamTitle?: string;
+  aboutTeamEyebrow?: string;
+  aboutTeamBlurb?: string;
+  aboutTeam?: { id: string; name: string; role: string; image: string; bio: string }[];
   portfolioTitle: string;
   portfolioBlurb: string;
   portfolioImage: string;
@@ -437,6 +448,18 @@ const defaultContent: SiteContent = {
     { title: "Visibility", desc: "Get discovered by the right audience at the right moment." },
     { title: "Growth", desc: "Scale traffic, leads, and revenue with proven strategies." },
     { title: "Success", desc: "A clear roadmap toward measurable, lasting business success." },
+  ],
+  aboutStoryEyebrow: "Our Story",
+  aboutStoryTitle: "Built to help brands rise — honestly.",
+  aboutStoryBody: "AniRise started with a simple idea: small and growing brands deserve the same quality of digital growth work as the biggest names. We blend SEO, web development and design into one focused process — so every campaign drives visibility, every page converts, and every report makes sense.\n\nOver the last two years we've worked with 15+ brands across Bangladesh and beyond. If you want to talk strategy, [start a conversation](#contact) — we'll reply within 24 hours.",
+  aboutStoryImage: "",
+  aboutStoryImageAlt: "AniRise team at work",
+  aboutTeamEyebrow: "Our Team",
+  aboutTeamTitle: "The people behind your growth",
+  aboutTeamBlurb: "A focused, senior team that owns your project end-to-end.",
+  aboutTeam: [
+    { id: "t1", name: "Anik Sarker", role: "Founder & SEO Lead", image: "", bio: "Leads SEO strategy and growth roadmaps for every AniRise client." },
+    { id: "t2", name: "Web Team", role: "Design & Development", image: "", bio: "Builds fast, conversion-ready websites tied to your SEO plan." },
   ],
   portfolioTitle: "Recent Work",
   portfolioBlurb: "A snapshot of projects where we've turned visibility into real business growth.",
@@ -1802,11 +1825,22 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   };
   const regenerateSitemap = () => setSeo((prev) => ({ ...prev, sitemap: buildSitemap(prev.canonicalUrl) }));
 
-  // NOTE: sitemap auto-regeneration intentionally disabled here.
-  // The live edge function (`/sitemap.xml`) regenerates from real DB data
-  // on every request, so the admin-stored `seo.sitemap` is treated as a
-  // pure manual override — never silently overwritten by this client.
-  // Use the `Regenerate` / `regenerateSitemap()` button to opt-in to a fresh preview.
+  // Auto-regenerate the admin-stored sitemap blob whenever any source of truth
+  // changes (pages, slugs, posts, portfolio, services, custom pages, case studies).
+  // The live `/sitemap.xml` edge function always rebuilds from DB, but this keeps
+  // the admin preview / saved blob in sync so it never looks stale.
+  useEffect(() => {
+    if (!isAuthed && loading) return;
+    const next = buildSitemap(seo.canonicalUrl);
+    if (next !== seo.sitemap) {
+      setSeo((prev) => ({ ...prev, sitemap: next }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    seo.pageSeo, seo.canonicalUrl, posts, portfolio, caseStudies, customPages,
+    content.servicesList,
+  ]);
+
 
   return (
     <Ctx.Provider

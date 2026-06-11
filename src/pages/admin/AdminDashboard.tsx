@@ -65,7 +65,7 @@ const HOME_BLOCKS = [
   { key: "stats", label: "Stats band" },
   { key: "servicesPreview", label: "Services preview" },
   { key: "caseStudies", label: "Case studies" },
-  { key: "processFlow", label: "Process flow (6-step)" },
+  
   { key: "homeFaq", label: "Home FAQ" },
   { key: "finalCta", label: "Final CTA" },
 ] as const;
@@ -1019,32 +1019,6 @@ const AdminDashboard = () => {
       if (blockKey === "caseStudies") return wrap("Each card opens its own case study page (/case-studies/:id) with intro, stats, chart, table & more.", <CaseStudiesEditor />);
 
 
-      if (blockKey === "processFlow") return wrap("6-step growth process bento grid on the home page (heading text + each step's icon, title and tag).", <>
-        <div className="grid sm:grid-cols-2 gap-3">
-          <Field label="Eyebrow"><Input value={processFlow.eyebrow} onChange={(e) => updateProcessFlow({ eyebrow: e.target.value })} /></Field>
-          <Field label="Title (before accent)"><Input value={processFlow.titleBefore} onChange={(e) => updateProcessFlow({ titleBefore: e.target.value })} /></Field>
-          <Field label="Title accent"><Input value={processFlow.titleAccent} onChange={(e) => updateProcessFlow({ titleAccent: e.target.value })} /></Field>
-          <div className="sm:col-span-2"><Field label="Subtitle / blurb"><Textarea rows={2} value={processFlow.blurb} onChange={(e) => updateProcessFlow({ blurb: e.target.value })} /></Field></div>
-        </div>
-        <div className="flex items-center justify-between pt-3 border-t border-border/60">
-          <p className="text-sm font-semibold">Steps</p>
-          <Button size="sm" onClick={() => { addProcessFlowStep(); toast.success("Step added"); }}><Plus className="h-4 w-4" /> Add step</Button>
-        </div>
-        <div className="space-y-3">
-          {processFlow.steps.map((s, i) => (
-            <div key={s.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
-              <p className="text-[11px] font-bold text-muted-foreground">Step {String(i + 1).padStart(2, "0")}</p>
-              <div className="grid sm:grid-cols-2 gap-2">
-                <Field label="Icon (lucide name)"><Input value={s.icon} onChange={(e) => updateProcessFlowStep(s.id, { icon: e.target.value })} placeholder="e.g. Users, Rocket, Gauge" /></Field>
-                <Field label="Chip / tag"><Input value={s.chip} onChange={(e) => updateProcessFlowStep(s.id, { chip: e.target.value })} /></Field>
-              </div>
-              <Field label="Title"><Textarea rows={2} value={s.title} onChange={(e) => updateProcessFlowStep(s.id, { title: e.target.value })} /></Field>
-              <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteProcessFlowStep(s.id)}><Trash2 className="h-4 w-4" /> Remove</Button>
-            </div>
-          ))}
-        </div>
-        <p className="text-[11px] text-muted-foreground">Tip: lucide icon names are case-sensitive (e.g. <code>Rocket</code>, <code>TrendingUp</code>). See lucide.dev/icons.</p>
-      </>);
 
       if (blockKey === "homeFaq") return wrap("Brand/general questions on the home page.", <>
         <div className="flex justify-end">
@@ -1664,6 +1638,87 @@ const AdminDashboard = () => {
                   const next = [...(((content as any).aboutPillars ?? []) as any[]), { title: "New pillar", desc: "" }];
                   updateContent({ aboutPillars: next } as any);
                 }}><Plus className="h-4 w-4" /> Add pillar</Button>
+              </div>
+            </Card>
+          )}
+          {activePage === "about" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader icon={FileText} title="Our Story" subtitle="Long-form story section on the About page. Body supports markdown links — e.g. [contact us](#contact)." />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Eyebrow">
+                  <Input value={(content as any).aboutStoryEyebrow || ""} onChange={(e) => updateContent({ aboutStoryEyebrow: e.target.value } as any)} placeholder="Our Story" />
+                </Field>
+                <Field label="Title">
+                  <Input value={(content as any).aboutStoryTitle || ""} onChange={(e) => updateContent({ aboutStoryTitle: e.target.value } as any)} placeholder="Built to help brands rise — honestly." />
+                </Field>
+              </div>
+              <Field label="Body (markdown links supported)">
+                <LinkableTextarea
+                  rows={8}
+                  value={(content as any).aboutStoryBody || ""}
+                  onChange={(v) => updateContent({ aboutStoryBody: v } as any)}
+                  placeholder="Write the story… use [text](url) for links."
+                />
+              </Field>
+              <Field label="Side image">
+                <ImageUpload value={(content as any).aboutStoryImage || ""} onChange={(url) => updateContent({ aboutStoryImage: url } as any)} />
+                <Input className="mt-2" value={(content as any).aboutStoryImageAlt || ""} onChange={(e) => updateContent({ aboutStoryImageAlt: e.target.value } as any)} placeholder="Image alt text" />
+              </Field>
+            </Card>
+          )}
+          {activePage === "about" && (
+            <Card className="p-5 sm:p-6 space-y-4">
+              <SectionHeader icon={Users} title="Our Team" subtitle="Team members shown on the About page." />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Eyebrow">
+                  <Input value={(content as any).aboutTeamEyebrow || ""} onChange={(e) => updateContent({ aboutTeamEyebrow: e.target.value } as any)} placeholder="Our Team" />
+                </Field>
+                <Field label="Title">
+                  <Input value={(content as any).aboutTeamTitle || ""} onChange={(e) => updateContent({ aboutTeamTitle: e.target.value } as any)} placeholder="The people behind your growth" />
+                </Field>
+              </div>
+              <Field label="Blurb">
+                <Textarea rows={2} value={(content as any).aboutTeamBlurb || ""} onChange={(e) => updateContent({ aboutTeamBlurb: e.target.value } as any)} />
+              </Field>
+              <div className="space-y-3">
+                {(((content as any).aboutTeam ?? []) as { id: string; name: string; role: string; image: string; bio: string }[]).map((m, idx) => (
+                  <div key={m.id} className="p-3 rounded-xl border border-border bg-background/40 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-bold text-muted-foreground">Member {idx + 1}</p>
+                      <Button variant="ghost" size="icon" onClick={() => {
+                        const next = [...(((content as any).aboutTeam ?? []) as any[])];
+                        next.splice(idx, 1);
+                        updateContent({ aboutTeam: next } as any);
+                      }}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      <Input value={m.name} placeholder="Name" onChange={(e) => {
+                        const next = [...(((content as any).aboutTeam ?? []) as any[])];
+                        next[idx] = { ...next[idx], name: e.target.value };
+                        updateContent({ aboutTeam: next } as any);
+                      }} />
+                      <Input value={m.role} placeholder="Role" onChange={(e) => {
+                        const next = [...(((content as any).aboutTeam ?? []) as any[])];
+                        next[idx] = { ...next[idx], role: e.target.value };
+                        updateContent({ aboutTeam: next } as any);
+                      }} />
+                    </div>
+                    <Textarea rows={2} value={m.bio} placeholder="Short bio" onChange={(e) => {
+                      const next = [...(((content as any).aboutTeam ?? []) as any[])];
+                      next[idx] = { ...next[idx], bio: e.target.value };
+                      updateContent({ aboutTeam: next } as any);
+                    }} />
+                    <ImageUpload value={m.image} onChange={(url) => {
+                      const next = [...(((content as any).aboutTeam ?? []) as any[])];
+                      next[idx] = { ...next[idx], image: url };
+                      updateContent({ aboutTeam: next } as any);
+                    }} />
+                  </div>
+                ))}
+                <Button variant="hero" size="sm" onClick={() => {
+                  const next = [...(((content as any).aboutTeam ?? []) as any[]), { id: `t_${Date.now().toString(36)}`, name: "New member", role: "Role", image: "", bio: "" }];
+                  updateContent({ aboutTeam: next } as any);
+                }}><Plus className="h-4 w-4" /> Add team member</Button>
               </div>
             </Card>
           )}
@@ -2590,7 +2645,7 @@ const AdminDashboard = () => {
               <div className="mt-4 grid gap-4">
                 {[
                   { id: "servicesPreview", label: "Home — Services preview" },
-                  { id: "processFlow",     label: "Home — Process flow (6-step)" },
+                  
                   { id: "whyChoose",       label: "Home — Why Choose AniRise" },
                   { id: "stats",           label: "Home — Stats band" },
                   { id: "caseStudies",     label: "Home — Case studies" },
@@ -2700,8 +2755,8 @@ const AdminDashboard = () => {
                       <img src={logo} alt="favicon" className="h-7 w-7 rounded-full mt-1 ring-1 ring-border" />
                       <div className="min-w-0 flex-1">
                         <p className="text-[#006621] text-xs truncate">{seo.canonicalUrl}</p>
-                        <p className="text-[#1a0dab] text-lg leading-tight truncate">{seo.metaTitle}</p>
-                        <p className="text-sm text-foreground/80 line-clamp-2">{seo.metaDescription}</p>
+                        <p className="text-[#1a0dab] text-lg leading-tight truncate">{seo.metaTitle.length > 60 ? seo.metaTitle.slice(0, 60) + "..." : seo.metaTitle}</p>
+                        <p className="text-sm text-foreground/80 line-clamp-2">{seo.metaDescription.length > 160 ? seo.metaDescription.slice(0, 160) + "..." : seo.metaDescription}</p>
                       </div>
                     </div>
                   </div>
