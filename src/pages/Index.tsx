@@ -12,7 +12,7 @@ import { HomeFAQ } from "@/components/site/home/HomeFAQ";
 import { FinalCTA } from "@/components/site/home/FinalCTA";
 import { StrategyCall } from "@/components/site/home/StrategyCall";
 import { WhyChooseAniRise } from "@/components/site/home/WhyChooseAniRise";
-import { ProcessSteps } from "@/components/site/home/ProcessSteps";
+
 import { HomeLoader } from "@/components/site/HomeLoader";
 import { useAdmin } from "@/context/AdminContext";
 import { DEFAULT_HOME_ORDER, type HomeBlockId } from "@/context/AdminContext";
