@@ -65,55 +65,6 @@ export const WhyChooseAniRise = () => {
           ))}
         </div>
 
-        <div className="mt-16 bg-card rounded-2xl p-6 sm:p-8 border border-border/40 shadow-elegant">
-          <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
-            <div>
-              <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase mb-2">
-                AniRise By The Numbers
-              </p>
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-foreground">
-                Performance you can measure
-              </h3>
-            </div>
-            <p className="text-sm text-muted-foreground max-w-sm">
-              A snapshot of what working with AniRise has looked like across recent client engagements.
-            </p>
-          </div>
-          <div className="w-full h-[360px] sm:h-[380px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 60 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis
-                  dataKey="name"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={11}
-                  interval={0}
-                  angle={-30}
-                  textAnchor="end"
-                  height={70}
-                  tick={{ fill: "hsl(var(--muted-foreground))" }}
-                />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} width={36} />
-                <Tooltip
-                  contentStyle={{
-                    background: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: 12,
-                    color: "hsl(var(--foreground))",
-                  }}
-                  cursor={{ fill: "hsl(var(--accent) / 0.1)" }}
-                />
-                <Legend wrapperStyle={{ color: "hsl(var(--muted-foreground))", paddingTop: 8 }} />
-                <Bar
-                  dataKey="value"
-                  name="AniRise"
-                  fill="hsl(var(--accent))"
-                  radius={[8, 8, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
       </div>
       <SectionNote id="whyChoose" />
     </section>
