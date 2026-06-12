@@ -2737,29 +2737,59 @@ const AdminDashboard = () => {
                       <p className="text-xs text-muted-foreground">Default title & description for the whole site</p>
                     </div>
                   </div>
-                  <div>
-                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Meta title <span className="text-muted-foreground font-normal">({seo.metaTitle.length}/60)</span></label>
-                    <Input value={seo.metaTitle} onChange={(e) => updateSeo({ metaTitle: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Meta description <span className="text-muted-foreground font-normal">({seo.metaDescription.length}/160)</span></label>
-                    <Textarea rows={3} value={seo.metaDescription} onChange={(e) => updateSeo({ metaDescription: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Meta keywords</label>
-                    <Input value={seo.metaKeywords} onChange={(e) => updateSeo({ metaKeywords: e.target.value })} />
-                  </div>
-                  <div className="rounded-xl border border-border p-4 bg-secondary/40">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Google preview</p>
-                    <div className="flex items-start gap-3">
-                      <img src={logo} alt="favicon" className="h-7 w-7 rounded-full mt-1 ring-1 ring-border" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[#006621] text-xs truncate">{seo.canonicalUrl}</p>
-                        <p className="text-[#1a0dab] text-lg leading-tight truncate">{seo.metaTitle.length > 60 ? seo.metaTitle.slice(0, 60) + "..." : seo.metaTitle}</p>
-                        <p className="text-sm text-foreground/80 line-clamp-2">{seo.metaDescription.length > 160 ? seo.metaDescription.slice(0, 160) + "..." : seo.metaDescription}</p>
-                      </div>
-                    </div>
-                  </div>
+                  {(() => {
+                    const titleOver = seo.metaTitle.length > 60;
+                    const descOver = seo.metaDescription.length > 160;
+                    return (
+                      <>
+                        <div>
+                          <label className="text-xs font-semibold mb-1.5 block text-foreground/80">
+                            Meta title <span className={`font-normal ${titleOver ? "text-destructive font-semibold" : "text-muted-foreground"}`}>({seo.metaTitle.length}/60)</span>
+                          </label>
+                          <Input value={seo.metaTitle} onChange={(e) => updateSeo({ metaTitle: e.target.value })} className={titleOver ? "border-destructive focus-visible:ring-destructive" : ""} />
+                          {titleOver && <p className="text-[11px] text-destructive mt-1 flex items-center gap-1">⚠ Title exceeds 60 characters — Google will truncate with "…"</p>}
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold mb-1.5 block text-foreground/80">
+                            Meta description <span className={`font-normal ${descOver ? "text-destructive font-semibold" : "text-muted-foreground"}`}>({seo.metaDescription.length}/160)</span>
+                          </label>
+                          <Textarea rows={3} value={seo.metaDescription} onChange={(e) => updateSeo({ metaDescription: e.target.value })} className={descOver ? "border-destructive focus-visible:ring-destructive" : ""} />
+                          {descOver && <p className="text-[11px] text-destructive mt-1 flex items-center gap-1">⚠ Description exceeds 160 characters — Google will truncate with "…"</p>}
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Meta keywords</label>
+                          <Input value={seo.metaKeywords} onChange={(e) => updateSeo({ metaKeywords: e.target.value })} />
+                        </div>
+                        <div className="rounded-xl border border-border p-4 bg-secondary/40">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Google preview</p>
+                          <div className="flex items-start gap-3">
+                            <img src={logo} alt="favicon" className="h-7 w-7 rounded-full mt-1 ring-1 ring-border" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[#006621] text-xs truncate">{seo.canonicalUrl}</p>
+                              <p className="text-[#1a0dab] text-lg leading-tight truncate">
+                                {titleOver ? seo.metaTitle.slice(0, 60) + "…" : seo.metaTitle}
+                              </p>
+                              <p className="text-sm text-foreground/80 line-clamp-2">
+                                {descOver ? seo.metaDescription.slice(0, 160) + "…" : seo.metaDescription}
+                              </p>
+                            </div>
+                          </div>
+                          {(titleOver || descOver) && (
+                            <div className="mt-3 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-[12px] text-destructive">
+                              <span aria-hidden>⚠</span>
+                              <span>
+                                {titleOver && descOver
+                                  ? "Both title and description are too long — Google will truncate both with '…'."
+                                  : titleOver
+                                    ? "Title is too long — Google will cut it off after ~60 characters."
+                                    : "Description is too long — Google will cut it off after ~160 characters."}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    );
+                  })()}
                 </Card>
               </TabsContent>
 
