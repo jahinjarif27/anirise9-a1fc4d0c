@@ -1,15 +1,5 @@
 import { CheckCircle2, Smile, Target, Rocket, Users, ShieldCheck } from "lucide-react";
 import { SectionNote } from "@/components/site/SectionNote";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  Legend,
-} from "recharts";
 
 const reasons = [
   {
@@ -42,14 +32,6 @@ const reasons = [
     title: "Transparent Reporting",
     desc: "Clear monthly reports, honest timelines, and full ownership of everything we build for you.",
   },
-];
-
-const chartData = [
-  { name: "Projects", value: 15 },
-  { name: "Clients", value: 12 },
-  { name: "Avg. Traffic Lift %", value: 180 },
-  { name: "Avg. ROI %", value: 220 },
-  { name: "Retention %", value: 95 },
 ];
 
 export const WhyChooseAniRise = () => {
