@@ -179,28 +179,10 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
       <section key="chart" className="py-20 bg-secondary/40">
         <div className="container">
           <div className="bg-card rounded-2xl p-6 sm:p-10 border border-border/40 shadow-elegant grid lg:grid-cols-5 gap-8 lg:gap-12 items-center">
-            {/* LEFT: copy + CTA */}
-            <div className="lg:col-span-2 space-y-5">
-              {c.chart.eyebrow && (
-                <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase">{c.chart.eyebrow}</p>
-              )}
-              {c.chart.title && (
-                <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight">{c.chart.title}</h3>
-              )}
-              {c.chart.subtitle && (
-                <p className="text-base text-muted-foreground leading-relaxed">{c.chart.subtitle}</p>
-              )}
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Every bar here ties back to a real client engagement — measured rankings, traffic, and revenue impact. See the full case-by-case breakdown of how we delivered these results in our portfolio.
-              </p>
-              <Button asChild variant="hero" size="lg" className="rounded-full">
-                <Link to="/portfolio">See our work <ArrowRight className="h-4 w-4" /></Link>
-              </Button>
-            </div>
-            {/* RIGHT: graph */}
-            <div className="lg:col-span-3 w-full h-[320px] sm:h-[360px]">
+            {/* LEFT (desktop): graph */}
+            <div className="lg:col-span-3 order-2 lg:order-1 w-full h-[320px] sm:h-[360px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={c.chart.bars} margin={{ top: 10, right: 10, left: -10, bottom: 50 }} barCategoryGap="35%">
+                <BarChart data={c.chart.bars} margin={{ top: 10, right: 10, left: -10, bottom: 50 }} barCategoryGap="20%">
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis
                     dataKey="name"
@@ -224,9 +206,27 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
                     }}
                     cursor={{ fill: "hsl(var(--accent) / 0.08)" }}
                   />
-                  <Bar dataKey="value" name={service?.title ?? "Result"} fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                  <Bar dataKey="value" name={service?.title ?? "Result"} fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} maxBarSize={44} />
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+            {/* RIGHT (desktop): copy + CTA */}
+            <div className="lg:col-span-2 order-1 lg:order-2 space-y-5">
+              {c.chart.eyebrow && (
+                <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase">{c.chart.eyebrow}</p>
+              )}
+              {c.chart.title && (
+                <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight">{c.chart.title}</h3>
+              )}
+              {c.chart.subtitle && (
+                <p className="text-base text-muted-foreground leading-relaxed">{c.chart.subtitle}</p>
+              )}
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Every bar here ties back to a real client engagement — measured rankings, traffic, and revenue impact. See the full case-by-case breakdown of how we delivered these results in our portfolio.
+              </p>
+              <Button asChild variant="hero" size="lg" className="rounded-full">
+                <Link to="/portfolio">See our work <ArrowRight className="h-4 w-4" /></Link>
+              </Button>
             </div>
           </div>
         </div>
