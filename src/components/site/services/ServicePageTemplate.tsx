@@ -221,12 +221,16 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
               {c.chart.subtitle && (
                 <p className="text-base text-muted-foreground leading-relaxed">{c.chart.subtitle}</p>
               )}
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Every bar here ties back to a real client engagement — measured rankings, traffic, and revenue impact. See the full case-by-case breakdown of how we delivered these results in our portfolio.
-              </p>
-              <Button asChild variant="hero" size="lg" className="rounded-full">
-                <Link to="/portfolio">See our work <ArrowRight className="h-4 w-4" /></Link>
-              </Button>
+              {(c.chart.paragraph ?? "Every bar here ties back to a real client engagement — measured rankings, traffic, and revenue impact. See the full case-by-case breakdown of how we delivered these results in our portfolio.") && (
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {c.chart.paragraph ?? "Every bar here ties back to a real client engagement — measured rankings, traffic, and revenue impact. See the full case-by-case breakdown of how we delivered these results in our portfolio."}
+                </p>
+              )}
+              {(c.chart.ctaLabel ?? "See our work") && (
+                <Button asChild variant="hero" size="lg" className="rounded-full">
+                  <Link to={c.chart.ctaUrl || "/portfolio"}>{c.chart.ctaLabel || "See our work"} <ArrowRight className="h-4 w-4" /></Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>
