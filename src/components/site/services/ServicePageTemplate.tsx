@@ -210,8 +210,8 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            {/* RIGHT (desktop): copy + CTA */}
-            <div className="lg:col-span-2 order-1 lg:order-2 space-y-5">
+            {/* LEFT (desktop): copy + CTA */}
+            <div className="lg:col-span-2 order-2 lg:order-1 space-y-5">
               {c.chart.eyebrow && (
                 <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase">{c.chart.eyebrow}</p>
               )}
