@@ -179,8 +179,8 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
       <section key="chart" className="py-20 bg-secondary/40">
         <div className="container">
           <div className="bg-card rounded-2xl p-6 sm:p-10 border border-border/40 shadow-elegant grid lg:grid-cols-5 gap-8 lg:gap-12 items-center">
-            {/* LEFT (desktop): graph */}
-            <div className="lg:col-span-3 order-2 lg:order-1 w-full h-[320px] sm:h-[360px]">
+            {/* RIGHT (desktop): graph */}
+            <div className="lg:col-span-3 order-1 lg:order-2 w-full h-[320px] sm:h-[360px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={c.chart.bars} margin={{ top: 10, right: 10, left: -10, bottom: 50 }} barCategoryGap="20%">
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
@@ -210,8 +210,8 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            {/* RIGHT (desktop): copy + CTA */}
-            <div className="lg:col-span-2 order-1 lg:order-2 space-y-5">
+            {/* LEFT (desktop): copy + CTA */}
+            <div className="lg:col-span-2 order-2 lg:order-1 space-y-5">
               {c.chart.eyebrow && (
                 <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase">{c.chart.eyebrow}</p>
               )}
