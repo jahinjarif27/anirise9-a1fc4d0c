@@ -12,9 +12,9 @@ export type ServiceChart = {
   eyebrow: string;
   title: string;
   subtitle: string;
-  paragraph: string;
-  ctaLabel: string;
-  ctaUrl: string;
+  paragraph?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
   bars: ServiceChartBar[];
 };
 
