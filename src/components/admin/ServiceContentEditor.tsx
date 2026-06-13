@@ -174,9 +174,33 @@ export const ServiceContentEditor = ({ slug, content, onChange }: Props) => {
       >
         <div className="grid sm:grid-cols-2 gap-3">
           <Field label="Eyebrow"><Input value={content.chart.eyebrow} onChange={(e) => onChange({ chart: { ...content.chart, eyebrow: e.target.value } })} /></Field>
-          <Field label="Title"><Input value={content.chart.title} onChange={(e) => onChange({ chart: { ...content.chart, title: e.target.value } })} /></Field>
+          <Field label="Heading / Title"><Input value={content.chart.title} onChange={(e) => onChange({ chart: { ...content.chart, title: e.target.value } })} /></Field>
         </div>
         <Field label="Subtitle"><Input value={content.chart.subtitle} onChange={(e) => onChange({ chart: { ...content.chart, subtitle: e.target.value } })} /></Field>
+        <Field label="Paragraph (shown next to chart)">
+          <Textarea
+            rows={4}
+            value={content.chart.paragraph ?? ""}
+            placeholder="Every bar here ties back to a real client engagement — measured rankings, traffic, and revenue impact. See the full case-by-case breakdown of how we delivered these results in our portfolio."
+            onChange={(e) => onChange({ chart: { ...content.chart, paragraph: e.target.value } })}
+          />
+        </Field>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <Field label="CTA button label">
+            <Input
+              value={content.chart.ctaLabel ?? ""}
+              placeholder="See our work"
+              onChange={(e) => onChange({ chart: { ...content.chart, ctaLabel: e.target.value } })}
+            />
+          </Field>
+          <Field label="CTA button URL">
+            <Input
+              value={content.chart.ctaUrl ?? ""}
+              placeholder="/portfolio"
+              onChange={(e) => onChange({ chart: { ...content.chart, ctaUrl: e.target.value } })}
+            />
+          </Field>
+        </div>
         <div className="flex items-center justify-between">
           <label className="text-xs font-semibold text-foreground/80">Chart bars</label>
           <Button size="sm" onClick={() => onChange({ chart: { ...content.chart, bars: [...content.chart.bars, { id: newId(), name: "New", value: 50 }] } })}><Plus className="h-4 w-4" /> Add bar</Button>
