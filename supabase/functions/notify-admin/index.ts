@@ -1,7 +1,7 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
 const GATEWAY_URL = 'https://connector-gateway.lovable.dev/resend';
-const ADMIN_EMAIL = 'jarifjahin27@gmail.com';
+const ADMIN_EMAIL = 'jahinjarif27@gmail.com';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
