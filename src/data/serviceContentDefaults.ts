@@ -12,8 +12,17 @@ export type ServiceChart = {
   eyebrow: string;
   title: string;
   subtitle: string;
+  paragraph: string;
+  ctaLabel: string;
+  ctaUrl: string;
   bars: ServiceChartBar[];
 };
+
+/** Default paragraph shown next to the service performance chart when no override exists. */
+export const DEFAULT_CHART_PARAGRAPH =
+  "Every bar here ties back to a real client engagement — measured rankings, traffic, and revenue impact. See the full case-by-case breakdown of how we delivered these results in our portfolio.";
+export const DEFAULT_CHART_CTA_LABEL = "See our work";
+export const DEFAULT_CHART_CTA_URL = "/portfolio";
 
 export type ServiceContent = {
   enabled: boolean;
