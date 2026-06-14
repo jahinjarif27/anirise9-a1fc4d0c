@@ -11,7 +11,7 @@ import {
   Save, X, Home, Search, Type, Copy, Phone, RefreshCw, Download, Image as ImageIcon, Bot,
   FolderOpen, FolderX, ArrowRight, Check, Code2, Link2, Monitor, Tablet, Smartphone, Layout,
   Sparkles, FileCog, ChevronRight, Layers, Globe, MapPin, FileEdit, Image as ImgIcon,
-  Inbox, PhoneCall, Mail, Clock, Star, MessageSquare,
+  Inbox, PhoneCall, Mail, Clock, Star, MessageSquare, Lock,
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -3499,6 +3499,55 @@ function SitemapUrlsEditor({
         </ul>
       )}
     </div>
+  );
+}
+
+function AdminPasswordChange() {
+  const { changeAdminPassword } = useAdmin();
+  const [oldPw, setOldPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPw.length < 6) { toast.error("New password must be at least 6 characters."); return; }
+    if (newPw !== confirmPw) { toast.error("New passwords don't match."); return; }
+    setBusy(true);
+    const r = await changeAdminPassword(oldPw, newPw);
+    setBusy(false);
+    if (!r.ok) { toast.error(r.error || "Failed to change password."); return; }
+    toast.success("Password updated. Use the new password next time you log in.");
+    setOldPw(""); setNewPw(""); setConfirmPw("");
+  };
+
+  return (
+    <Card className="p-5 sm:p-6 space-y-5">
+      <div className="flex items-center gap-3 pb-3 border-b border-border/60">
+        <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><Lock className="h-5 w-5" /></div>
+        <div>
+          <h3 className="font-bold leading-tight">Change Admin Password</h3>
+          <p className="text-xs text-muted-foreground">Old password stops working as soon as the new one is saved.</p>
+        </div>
+      </div>
+      <form onSubmit={onSubmit} className="space-y-4 max-w-md">
+        <div>
+          <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Current password</label>
+          <Input type="password" autoComplete="current-password" value={oldPw} onChange={(e) => setOldPw(e.target.value)} required />
+        </div>
+        <div>
+          <label className="text-xs font-semibold mb-1.5 block text-foreground/80">New password</label>
+          <Input type="password" autoComplete="new-password" value={newPw} onChange={(e) => setNewPw(e.target.value)} required />
+        </div>
+        <div>
+          <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Confirm new password</label>
+          <Input type="password" autoComplete="new-password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} required />
+        </div>
+        <Button type="submit" disabled={busy} variant="hero" className="rounded-full">
+          {busy ? "Updating…" : "Update password"}
+        </Button>
+      </form>
+    </Card>
   );
 }
 
