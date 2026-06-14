@@ -67,14 +67,14 @@
 
   <!-- sitemapindex root -->
   <xsl:template match="s:sitemapindex" mode="root">
-    <span class="node"><span class="caret">▼</span><span class="punct">&lt;</span><span class="tag-name">sitemapindex</span> <span class="attr">xmlns</span><span class="eq">=</span><span class="str">"http://www.sitemaps.org/schemas/sitemap/0.9"</span><span class="punct">&gt;</span></span>
+    <span class="node"><span class="caret">▼</span><span class="punct">&lt;</span><span class="tag-name">sitemapindex</span>&#160;<span class="attr">xmlns</span><span class="eq">=</span><span class="str">"http://www.sitemaps.org/schemas/sitemap/0.9"</span><span class="punct">&gt;</span></span>
     <span class="children"><xsl:apply-templates select="s:sitemap"/></span>
     <span class="node"><span class="punct">&lt;/</span><span class="tag-name">sitemapindex</span><span class="punct">&gt;</span></span>
   </xsl:template>
 
   <!-- urlset root -->
   <xsl:template match="s:urlset" mode="root">
-    <span class="node"><span class="caret">▼</span><span class="punct">&lt;</span><span class="tag-name">urlset</span> <span class="attr">xmlns</span><span class="eq">=</span><span class="str">"http://www.sitemaps.org/schemas/sitemap/0.9"</span><span class="punct">&gt;</span></span>
+    <span class="node"><span class="caret">▼</span><span class="punct">&lt;</span><span class="tag-name">urlset</span>&#160;<span class="attr">xmlns</span><span class="eq">=</span><span class="str">"http://www.sitemaps.org/schemas/sitemap/0.9"</span><span class="punct">&gt;</span></span>
     <span class="children"><xsl:apply-templates select="s:url"/></span>
     <span class="node"><span class="punct">&lt;/</span><span class="tag-name">urlset</span><span class="punct">&gt;</span></span>
   </xsl:template>
