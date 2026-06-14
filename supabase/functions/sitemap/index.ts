@@ -43,7 +43,7 @@ const cors = {
 
 const xmlHeaders = {
   ...cors,
-  'content-type': 'text/xml; charset=utf-8',
+  'content-type': 'text/plain; charset=utf-8',
   'Cache-Control': 'no-store, max-age=0, s-maxage=0',
   'X-Content-Type-Options': 'nosniff',
 };
