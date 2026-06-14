@@ -4,11 +4,10 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const SITE_URL = 'https://anirise.com.bd';
-// Use the static file in /public so Vercel can serve it with the correct
-// text/xsl content type. (Edge function responses on /sitemap.xml are forced
-// to application/xml by Vercel headers, which prevents the browser from
-// using them as a stylesheet.)
-const STYLESHEET = '/sitemap.xsl';
+// Do not attach an XSL stylesheet here. The custom domain receives a strict
+// CSP/sandbox header on the proxied XML response, which can make styled XML
+// render as a blank page in browsers. Plain XML keeps Google indexing and the
+// browser's native XML tree working while the sitemap stays fully dynamic.
 
 const BUILTIN_DEFAULT_SLUGS: Record<string, string> = {
   home: '',
@@ -63,11 +62,11 @@ function isSafeManualSitemap(xml: string): boolean {
     !/<!DOCTYPE|<!ENTITY/i.test(trimmed);
 }
 
-function attachStylesheet(xml: string): string {
+function normalizeXml(xml: string): string {
   const clean = xml.replace(/<\?xml-stylesheet[\s\S]*?\?>\s*/gi, '').trim();
   const declaration = clean.match(/^<\?xml[^?]*\?>\s*/i)?.[0] || '<?xml version="1.0" encoding="UTF-8"?>\n';
   const body = clean.startsWith(declaration) ? clean.slice(declaration.length) : clean;
-  return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}<?xml-stylesheet type="text/xsl" href="${STYLESHEET}"?>\n${body}\n`;
+  return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}${body}\n`;
 }
 
 function renderXsl(): string {
@@ -125,7 +124,6 @@ function renderXsl(): string {
 function renderUrlset(entries: Entry[], siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<?xml-stylesheet type="text/xsl" href="${STYLESHEET}"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     entries
       .map((e) =>
@@ -148,7 +146,6 @@ function renderUrlset(entries: Entry[], siteUrl: string): string {
 function renderSitemapIndex(children: Array<{ name: string; lastmod: string }>, siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<?xml-stylesheet type="text/xsl" href="${STYLESHEET}"?>\n` +
     `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     children
       .map(
@@ -189,7 +186,7 @@ Deno.serve(async (req) => {
     const manualSitemap = typeof s.seo?.sitemap === 'string' ? s.seo.sitemap.trim() : '';
     const useManual = s.seo?.autoSitemap === false && isSafeManualSitemap(manualSitemap);
     if (useManual && (!sub || sub === 'all')) {
-      return new Response(attachStylesheet(manualSitemap), { headers: xmlHeaders });
+      return new Response(normalizeXml(manualSitemap), { headers: xmlHeaders });
     }
     const customPages: any[] = Array.isArray(s.custom_pages) ? s.custom_pages : [];
     const portfolio: any[] = Array.isArray(s.portfolio) ? s.portfolio : [];
