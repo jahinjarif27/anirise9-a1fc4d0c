@@ -42,7 +42,7 @@ const cors = {
 
 const xmlHeaders = {
   ...cors,
-  'content-type': 'application/xml; charset=utf-8',
+  'content-type': 'text/xml; charset=utf-8',
   'Cache-Control': 'no-store, max-age=0, s-maxage=0',
   'X-Content-Type-Options': 'nosniff',
 };
@@ -315,7 +315,7 @@ Deno.serve(async (req) => {
     console.error('sitemap error', e);
     return new Response(`<!-- sitemap error: ${(e as Error).message} -->`, {
       status: 500,
-      headers: { ...cors, 'content-type': 'application/xml; charset=utf-8' },
+      headers: { ...cors, 'content-type': 'text/xml; charset=utf-8' },
     });
   }
 });
