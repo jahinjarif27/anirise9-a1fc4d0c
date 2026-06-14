@@ -43,7 +43,7 @@ const cors = {
 
 const xmlHeaders = {
   ...cors,
-  'content-type': 'application/xml; charset=utf-8',
+  'content-type': 'text/plain; charset=utf-8',
   'Cache-Control': 'no-store, max-age=0, s-maxage=0',
   'X-Content-Type-Options': 'nosniff',
 };
@@ -122,7 +122,6 @@ function renderXsl(): string {
 function renderUrlset(entries: Entry[], siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<?xml-stylesheet type="text/xsl" href="${siteUrl}/sitemap.xsl"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     entries
       .map((e) =>
@@ -242,7 +241,7 @@ Deno.serve(async (req) => {
 
     const [settingsRes, postsRes] = await Promise.all([
       sb.from('site_settings').select('seo, custom_pages, portfolio, case_studies, content, updated_at').eq('id', 1).maybeSingle(),
-      sb.from('blog_posts').select('slug, date, updated_at'),
+      sb.from('blog_posts').select('slug, date'),
     ]);
 
     const s: any = settingsRes.data ?? {};
@@ -310,7 +309,7 @@ Deno.serve(async (req) => {
         if (ps.status === 'draft' || ps.robots === 'noindex') continue;
         blogEntries.push({
           path: `/${blogParent}/${p.slug}`,
-          lastmod: (p.updated_at ? String(p.updated_at).slice(0, 10) : null) || p.date || settingsDate,
+          lastmod: p.date || settingsDate,
           changefreq: ps.changefreq || 'monthly',
           priority: ps.priority || '0.7',
         });
