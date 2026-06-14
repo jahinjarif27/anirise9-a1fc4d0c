@@ -75,7 +75,7 @@ export const BottomNav = () => {
             <Home className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">HOME</span>
           </button>
-          <button onClick={() => go("/services")} className={itemCls("/services")}>
+          <button onClick={() => go(servicesHref)} className={itemCls(servicesHref)}>
             <LayoutGrid className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">SERVICES</span>
           </button>
