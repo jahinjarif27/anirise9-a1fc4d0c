@@ -3366,104 +3366,49 @@ const AdminDashboard = () => {
 };
 
 // ---------- Sitemap URLs editor (local state — survives parent re-renders cleanly) ----------
-type SitemapRow = { loc: string; pr: string; on: boolean };
+type SitemapRow = { loc: string; pr: string; cf: string; lm: string; on: boolean };
+
+const CHANGEFREQ_OPTIONS = ["always", "hourly", "daily", "weekly", "monthly", "yearly", "never"] as const;
+const todayISO = () => new Date().toISOString().slice(0, 10);
 
 function parseSitemapXml(xml: string): SitemapRow[] {
   if (!xml) return [];
   return Array.from(xml.matchAll(/<url>([\s\S]*?)<\/url>/g)).map((m) => {
     const loc = (m[1].match(/<loc>([\s\S]*?)<\/loc>/) || [])[1] || "";
     const pr = (m[1].match(/<priority>([\s\S]*?)<\/priority>/) || [])[1] || "0.8";
-    return { loc: loc.trim(), pr: pr.trim() || "0.8", on: true };
+    const cf = (m[1].match(/<changefreq>([\s\S]*?)<\/changefreq>/) || [])[1] || "monthly";
+    const lm = (m[1].match(/<lastmod>([\s\S]*?)<\/lastmod>/) || [])[1] || todayISO();
+    return { loc: loc.trim(), pr: pr.trim() || "0.8", cf: cf.trim() || "monthly", lm: lm.trim() || todayISO(), on: true };
   });
 }
 
 function buildSitemapXml(rows: SitemapRow[]): string {
   const inner = rows
     .filter((r) => r.on && r.loc.trim())
-    .map((r) => `  <url><loc>${r.loc.trim()}</loc><priority>${r.pr}</priority></url>`)
+    .map((r) =>
+      `  <url><loc>${r.loc.trim()}</loc><lastmod>${(r.lm || todayISO()).trim()}</lastmod><changefreq>${(r.cf || "monthly").trim()}</changefreq><priority>${r.pr}</priority></url>`,
+    )
     .join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${inner}\n</urlset>`;
 }
-
-function SitemapUrlsEditor({
-  sitemap,
-  canonicalUrl,
-  onChange,
-  onSave,
-}: {
-  sitemap: string;
-  canonicalUrl: string;
-  onChange: (xml: string) => void;
-  onSave: () => void | Promise<void>;
-}) {
-  const [rows, setRows] = useState<SitemapRow[]>(() => parseSitemapXml(sitemap));
-  const lastEmittedRef = useRef<string>(sitemap);
-
-  // Re-hydrate from parent only when the incoming XML is a real external change
-  // (Regenerate, initial load) — not when it echoes back our own emit.
-  useEffect(() => {
-    if (sitemap === lastEmittedRef.current) return;
-    setRows(parseSitemapXml(sitemap));
-    lastEmittedRef.current = sitemap;
-  }, [sitemap]);
-
-  const commit = (next: SitemapRow[]) => {
-    setRows(next);
-    const xml = buildSitemapXml(next);
-    lastEmittedRef.current = xml;
-    onChange(xml);
-  };
-
-  const base = (canonicalUrl || "").replace(/\/+$/, "");
-
-  return (
-    <div className="rounded-xl border border-border overflow-hidden">
-      <div className="px-4 py-2.5 bg-secondary/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between gap-2 flex-wrap">
-        <span>URL entries ({rows.length})</span>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="h-8"
-            onClick={() => {
-              commit([...rows, { loc: `${base}/new-page`, pr: "0.5", on: true }]);
-              toast.success("URL added");
-            }}
-          >
-            <Plus className="h-3.5 w-3.5" /> Add URL
-          </Button>
-          <Button type="button" size="sm" variant="hero" className="h-8" onClick={onSave}>
-            <Save className="h-3.5 w-3.5" /> Save
-          </Button>
-        </div>
-      </div>
-      {rows.length === 0 ? (
-        <div className="p-4 text-xs text-muted-foreground">No URLs yet — click "Add URL" to create one.</div>
-      ) : (
-        <ul className="divide-y divide-border">
-          {rows.map((u, i) => (
-            <li key={i} className="p-3 flex flex-wrap items-center gap-2">
-              <Switch
-                checked={u.on}
-                onCheckedChange={(v) => commit(rows.map((r, j) => (j === i ? { ...r, on: v } : r)))}
-              />
-              <Input
-                className="h-9 flex-1 min-w-[180px] font-mono text-xs"
-                value={u.loc}
-                onChange={(e) => commit(rows.map((r, j) => (j === i ? { ...r, loc: e.target.value } : r)))}
-              />
+...
               <Select
-                value={u.pr}
-                onValueChange={(v) => commit(rows.map((r, j) => (j === i ? { ...r, pr: v } : r)))}
+                value={u.cf}
+                onValueChange={(v) => commit(rows.map((r, j) => (j === i ? { ...r, cf: v } : r)))}
               >
                 <SelectTrigger className="h-9 w-[130px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {["1.0", "0.9", "0.8", "0.7", "0.6", "0.5", "0.3", "0.1"].map((p) => (
-                    <SelectItem key={p} value={p}>Priority {p}</SelectItem>
+                  {CHANGEFREQ_OPTIONS.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <Input
+                type="date"
+                className="h-9 w-[150px] text-xs"
+                value={u.lm}
+                onChange={(e) => commit(rows.map((r, j) => (j === i ? { ...r, lm: e.target.value } : r)))}
+              />
               <Button
                 type="button"
                 variant="ghost"
