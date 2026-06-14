@@ -74,14 +74,7 @@ async function verifyPrimaryPassword(
   }
   return password === envPassword;
 }
-    const claims = JSON.parse(new TextDecoder().decode(b64urlDecode(payload)));
-    if (claims.role !== 'admin') return false;
-    if (typeof claims.exp !== 'number' || claims.exp * 1000 < Date.now()) return false;
-    return true;
-  } catch {
-    return false;
-  }
-}
+
 
 // ---------- Op handlers ----------
 type Op = (sb: ReturnType<typeof createClient>, payload: any) => Promise<unknown>;
