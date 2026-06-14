@@ -18,7 +18,7 @@ const ComingSoonService = lazy(() => import("./services/ComingSoon.tsx"));
 const StrategyCallPage = lazy(() => import("./StrategyCallPage.tsx"));
 const CaseStudyDetail = lazy(() => import("./CaseStudyDetail.tsx"));
 const ProjectDetail = lazy(() => import("./ProjectDetail.tsx"));
-const SitemapViewer = lazy(() => import("./SitemapViewer.tsx"));
+
 
 import { Services } from "@/components/site/Services";
 import { Portfolio } from "@/components/site/Portfolio";
@@ -93,7 +93,6 @@ export const AppRoutes = () => {
           />
         ))}
         <Route path="/p/:slug" element={<CustomPageView />} />
-        <Route path="/sitemap" element={<SitemapViewer />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/:slug" element={<DynamicSlugResolver />} />
         <Route path="/:section/:id" element={<DynamicDetailResolver />} />
