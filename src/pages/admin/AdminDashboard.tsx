@@ -2985,7 +2985,7 @@ const AdminDashboard = () => {
                         <h3 className="font-bold leading-tight">Sitemap.xml</h3>
                         <div className="flex items-center gap-2 mt-1">
                           <Switch checked={seo.autoSitemap} onCheckedChange={(v) => updateSeo({ autoSitemap: v })} />
-                          <span className="text-xs text-muted-foreground">Auto-sync on publish</span>
+                          <span className="text-xs text-muted-foreground">Auto-sync with live site (recommended)</span>
                         </div>
                       </div>
                     </div>
@@ -2994,66 +2994,53 @@ const AdminDashboard = () => {
                       <Button variant="outline" size="sm" onClick={() => downloadFile("sitemap.xml", seo.sitemap, "application/xml")}><Download className="h-4 w-4" /> Download</Button>
                     </div>
                   </div>
-                  <SitemapUrlsEditor
-                    sitemap={seo.sitemap}
-                    canonicalUrl={seo.canonicalUrl}
-                    onChange={(xml) => updateSeo({ sitemap: xml, autoSitemap: false })}
-                  />
-                  <div>
-                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
-                    <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value, autoSitemap: false })} />
-                  </div>
-                  <div className="flex flex-wrap justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={async () => {
-                        const url = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`;
-                        const tId = toast.loading("Fetching live sitemap…");
-                        try {
-                          const res = await fetch(url, { cache: "no-store" });
-                          const xml = await res.text();
-                          const count = (xml.match(/<url>/g) || []).length;
-                          toast.success(`Live sitemap OK — ${count} URLs`, { id: tId });
-                          console.log("[live sitemap]", xml);
-                        } catch (e: any) {
-                          toast.error(`Live sitemap fetch failed: ${e?.message || e}`, { id: tId });
-                        }
-                      }}
-                    >
-                      <RefreshCw className="h-4 w-4" /> Verify live sitemap
-                    </Button>
-                    <Button
-                      variant="hero"
-                      size="sm"
-                      onClick={async () => {
-                        updateSeo({ sitemap: seo.sitemap, autoSitemap: false });
-                        const tId = toast.loading("Saving sitemap…");
-                        const r = await saveAllNow();
-                        if (!r.ok) {
-                          toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
-                          return;
-                        }
-                        // Warm/bust the edge cache so the next /sitemap.xml fetch is fresh.
-                        try {
-                          await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, { cache: "no-store" });
-                        } catch {}
-                        toast.success("Sitemap saved — live URL refreshed", { id: tId });
-                      }}
-                    >
-                      <Save className="h-4 w-4" /> Save sitemap
-                    </Button>
-                  </div>
+
+                  {seo.autoSitemap ? (
+                    <LiveSitemapPreview />
+                  ) : (
+                    <>
+                      <SitemapUrlsEditor
+                        sitemap={seo.sitemap}
+                        canonicalUrl={seo.canonicalUrl}
+                        onChange={(xml) => updateSeo({ sitemap: xml, autoSitemap: false })}
+                      />
+                      <div>
+                        <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
+                        <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value, autoSitemap: false })} />
+                      </div>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <Button
+                          variant="hero"
+                          size="sm"
+                          onClick={async () => {
+                            updateSeo({ sitemap: seo.sitemap, autoSitemap: false });
+                            const tId = toast.loading("Saving sitemap…");
+                            const r = await saveAllNow();
+                            if (!r.ok) {
+                              toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
+                              return;
+                            }
+                            try {
+                              await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, { cache: "no-store" });
+                            } catch {}
+                            toast.success("Sitemap saved — live URL refreshed", { id: tId });
+                          }}
+                        >
+                          <Save className="h-4 w-4" /> Save sitemap
+                        </Button>
+                      </div>
+                    </>
+                  )}
+
                   <div className="rounded-xl bg-secondary/40 border border-border/60 p-4 text-xs text-muted-foreground leading-relaxed">
-                    <p className="font-bold text-foreground mb-1.5 text-sm">How to use this sitemap</p>
+                    <p className="font-bold text-foreground mb-1.5 text-sm">How this works</p>
                     <p>
-                      Your sitemap auto-updates whenever you add or remove a page or blog post — no manual work needed.
-                      The <span className="font-semibold text-foreground">Priority</span> value (1.0 = highest, 0.1 = lowest) hints to Google which URLs matter most on your site; keep your homepage at 1.0 and core service pages above 0.8.
-                      Change priorities here and click <span className="font-semibold text-foreground">Save sitemap</span>. Submit the sitemap URL once in Google Search Console — Google then re-reads it automatically.
+                      With <span className="font-semibold text-foreground">Auto-sync</span> on, the live <span className="font-mono">/sitemap.xml</span> is generated on every request from your pages, blog posts, portfolio and custom pages — exactly what you see in the preview below. Turn it off only if you want to hand-edit the XML.
                     </p>
                   </div>
                 </Card>
               </TabsContent>
+
 
               <TabsContent value="robots" className="space-y-4 mt-0">
                 <Card className="p-5 sm:p-6 space-y-5">
