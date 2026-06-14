@@ -1843,7 +1843,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   return (
     <Ctx.Provider
       value={{
-        isAuthed, login, logout, loading,
+        isAuthed, login, changeAdminPassword, logout, loading,
         posts, addPost, updatePost, deletePost,
         content, updateContent,
         contact, updateContact,
