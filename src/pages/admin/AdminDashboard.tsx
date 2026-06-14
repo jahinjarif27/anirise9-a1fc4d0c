@@ -1977,30 +1977,6 @@ const AdminDashboard = () => {
           );
         })()}
 
-
-        {/* Phase 5 — live sitemap */}
-        <Card className="p-5 sm:p-6 space-y-3">
-          <SectionHeader icon={Globe} title="Live sitemap" subtitle="Auto-updates from admin changes. Submit the XML to Google Search Console." />
-          <div className="grid sm:grid-cols-2 gap-2">
-            <a
-              href="/sitemap.xml"
-              target="_blank" rel="noopener noreferrer"
-              className="rounded-lg border border-border px-3 py-2 text-xs font-mono text-foreground hover:bg-muted/40 break-all"
-            >
-              <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-sans">Raw XML (for Google)</span>
-              /sitemap.xml
-            </a>
-            <a
-              href="/sitemap"
-              target="_blank" rel="noopener noreferrer"
-              className="rounded-lg border border-border px-3 py-2 text-xs font-mono text-foreground hover:bg-muted/40 break-all"
-            >
-              <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-sans">Styled view (matches preview)</span>
-              /sitemap
-            </a>
-          </div>
-        </Card>
-
         <SeoBlock pageKey="strategy-call" seo={seo} updatePageSeo={updatePageSeo} />
       </div>
     );
