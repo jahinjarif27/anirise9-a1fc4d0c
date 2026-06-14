@@ -10,7 +10,7 @@ import { useServices } from "@/lib/useServices";
 
 const SECTION_LABELS: Record<string, string> = {
   hero: "Home", services: "Services", portfolio: "Portfolio",
-  blog: "Blog", testimonials: "Testimonials", contact: "Contact",
+  blog: "Blog", about: "About", contact: "Contact",
 };
 
 export const BottomNav = () => {
