@@ -459,6 +459,20 @@ const AdminDashboard = () => {
     return true;
   };
 
+  const saveSitemapNow = async () => {
+    updateSeo({ sitemap: seo.sitemap, autoSitemap: false });
+    const tId = toast.loading("Saving sitemap…");
+    const r = await saveAllNow();
+    if (!r.ok) {
+      toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
+      return;
+    }
+    try {
+      await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, { cache: "no-store" });
+    } catch {}
+    toast.success("Sitemap saved — live URL refreshed", { id: tId });
+  };
+
   const downloadFile = (filename: string, content: string, type: string) => {
     const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
@@ -3012,6 +3026,7 @@ const AdminDashboard = () => {
                     sitemap={seo.sitemap}
                     canonicalUrl={seo.canonicalUrl}
                     onChange={(xml) => updateSeo({ sitemap: xml, autoSitemap: false })}
+                    onSave={saveSitemapNow}
                   />
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
@@ -3030,19 +3045,7 @@ const AdminDashboard = () => {
                     <Button
                       variant="hero"
                       size="sm"
-                      onClick={async () => {
-                        updateSeo({ sitemap: seo.sitemap, autoSitemap: false });
-                        const tId = toast.loading("Saving sitemap…");
-                        const r = await saveAllNow();
-                        if (!r.ok) {
-                          toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
-                          return;
-                        }
-                        try {
-                          await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, { cache: "no-store" });
-                        } catch {}
-                        toast.success("Sitemap saved — live URL refreshed", { id: tId });
-                      }}
+                      onClick={saveSitemapNow}
                     >
                       <Save className="h-4 w-4" /> Save sitemap
                     </Button>
@@ -3418,10 +3421,12 @@ function SitemapUrlsEditor({
   sitemap,
   canonicalUrl,
   onChange,
+  onSave,
 }: {
   sitemap: string;
   canonicalUrl: string;
   onChange: (xml: string) => void;
+  onSave: () => void | Promise<void>;
 }) {
   const [rows, setRows] = useState<SitemapRow[]>(() => parseSitemapXml(sitemap));
   const lastEmittedRef = useRef<string>(sitemap);
@@ -3445,20 +3450,25 @@ function SitemapUrlsEditor({
 
   return (
     <div className="rounded-xl border border-border overflow-hidden">
-      <div className="px-4 py-2.5 bg-secondary/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+      <div className="px-4 py-2.5 bg-secondary/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between gap-2 flex-wrap">
         <span>URL entries ({rows.length})</span>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          className="h-7"
-          onClick={() => {
-            commit([...rows, { loc: `${base}/new-page`, pr: "0.5", on: true }]);
-            toast.success("URL added");
-          }}
-        >
-          <Plus className="h-3.5 w-3.5" /> Add URL
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="h-8"
+            onClick={() => {
+              commit([...rows, { loc: `${base}/new-page`, pr: "0.5", on: true }]);
+              toast.success("URL added");
+            }}
+          >
+            <Plus className="h-3.5 w-3.5" /> Add URL
+          </Button>
+          <Button type="button" size="sm" variant="hero" className="h-8" onClick={onSave}>
+            <Save className="h-3.5 w-3.5" /> Save
+          </Button>
+        </div>
       </div>
       {rows.length === 0 ? (
         <div className="p-4 text-xs text-muted-foreground">No URLs yet — click "Add URL" to create one.</div>
