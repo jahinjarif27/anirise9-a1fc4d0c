@@ -2996,8 +2996,6 @@ const AdminDashboard = () => {
                     </div>
                   </div>
 
-                  {seo.autoSitemap && <LiveSitemapPreview />}
-
                   <SitemapUrlsEditor
                     sitemap={seo.sitemap}
                     canonicalUrl={seo.canonicalUrl}
@@ -3027,12 +3025,6 @@ const AdminDashboard = () => {
                     </Button>
                   </div>
 
-                  <div className="rounded-xl bg-secondary/40 border border-border/60 p-4 text-xs text-muted-foreground leading-relaxed">
-                    <p className="font-bold text-foreground mb-1.5 text-sm">How this works</p>
-                    <p>
-                      With <span className="font-semibold text-foreground">Auto-sync</span> on, the live <span className="font-mono">/sitemap.xml</span> is generated on every request from your pages, blog posts, portfolio and custom pages — exactly what you see in the preview below. Turn it off only if you want to hand-edit the XML.
-                    </p>
-                  </div>
                 </Card>
               </TabsContent>
 
