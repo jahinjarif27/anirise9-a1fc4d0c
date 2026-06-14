@@ -2725,6 +2725,7 @@ const AdminDashboard = () => {
                   <TabsTrigger value="redirects" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Link2 className="h-3.5 w-3.5" /> Redirects</TabsTrigger>
                   <TabsTrigger value="canonical" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Globe className="h-3.5 w-3.5" /> Canonical</TabsTrigger>
                   <TabsTrigger value="appearance" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Type className="h-3.5 w-3.5" /> Appearance</TabsTrigger>
+                  <TabsTrigger value="security" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Lock className="h-3.5 w-3.5" /> Security</TabsTrigger>
                 </TabsList>
               </Card>
 
@@ -3377,6 +3378,10 @@ const AdminDashboard = () => {
                     <p style={{ fontFamily: `'${appearance.bodyFont}', sans-serif` }} className="text-foreground/80">AniRise drives Visibility, fuels Growth, Success.</p>
                   </div>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="security" className="space-y-4 mt-0">
+                <AdminPasswordChange />
               </TabsContent>
             </Tabs>
           </TabsContent>
