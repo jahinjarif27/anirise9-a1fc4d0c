@@ -1821,13 +1821,14 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   // the admin preview / saved blob in sync so it never looks stale.
   useEffect(() => {
     if (!isAuthed && loading) return;
+    if (!seo.autoSitemap) return;
     const next = buildSitemap(seo.canonicalUrl);
     if (next !== seo.sitemap) {
       setSeo((prev) => ({ ...prev, sitemap: next }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    seo.pageSeo, seo.canonicalUrl, posts, portfolio, caseStudies, customPages,
+    seo.autoSitemap, seo.pageSeo, seo.canonicalUrl, posts, portfolio, caseStudies, customPages,
     content.servicesList,
   ]);
 

@@ -2996,11 +2996,11 @@ const AdminDashboard = () => {
                   <SitemapUrlsEditor
                     sitemap={seo.sitemap}
                     canonicalUrl={seo.canonicalUrl}
-                    onChange={(xml) => updateSeo({ sitemap: xml })}
+                    onChange={(xml) => updateSeo({ sitemap: xml, autoSitemap: false })}
                   />
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
-                    <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value })} />
+                    <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value, autoSitemap: false })} />
                   </div>
                   <div className="flex flex-wrap justify-end gap-2">
                     <Button
@@ -3026,7 +3026,7 @@ const AdminDashboard = () => {
                       variant="hero"
                       size="sm"
                       onClick={async () => {
-                        updateSeo({ sitemap: seo.sitemap });
+                        updateSeo({ sitemap: seo.sitemap, autoSitemap: false });
                         const tId = toast.loading("Saving sitemap…");
                         const r = await saveAllNow();
                         if (!r.ok) {
