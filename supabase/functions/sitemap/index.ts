@@ -4,10 +4,8 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const SITE_URL = 'https://anirise.com.bd';
-// Do not attach an XSL stylesheet here. The custom domain receives a strict
-// CSP/sandbox header on the proxied XML response, which can make styled XML
-// render as a blank page in browsers. Plain XML keeps Google indexing and the
-// browser's native XML tree working while the sitemap stays fully dynamic.
+// Browsers get a clean HTML table view because XSL processing can be blocked
+// by sandboxed XML responses. Crawlers and XML clients still get real XML.
 
 const BUILTIN_DEFAULT_SLUGS: Record<string, string> = {
   home: '',
@@ -124,7 +122,6 @@ function renderXsl(): string {
 function renderUrlset(entries: Entry[], siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     entries
       .map((e) =>
@@ -142,6 +139,39 @@ function renderUrlset(entries: Entry[], siteUrl: string): string {
       .join('\n') +
     `\n</urlset>\n`
   );
+}
+
+function renderHtmlUrlset(entries: Entry[], siteUrl: string): string {
+  const rows = entries
+    .map((e, index) => {
+      const loc = siteUrl + e.path;
+      return `<tr><td class="num">${index + 1}</td><td><a href="${esc(loc)}">${esc(loc)}</a></td><td class="muted">${esc(e.lastmod || '')}</td><td class="muted">${esc(e.changefreq || '')}</td><td class="muted">${esc(e.priority || '')}</td></tr>`;
+    })
+    .join('');
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <title>AniRise XML Sitemap</title>
+  <style>*{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;line-height:1.5}header{background:#0f172a;color:#f8fafc;padding:28px 24px;border-bottom:4px solid #6366f1}.wrap{max-width:1120px;margin:0 auto}h1{margin:0;font-size:24px;font-weight:750}.summary{margin-top:6px;color:#cbd5e1;font-size:13px}main{max-width:1120px;margin:0 auto;padding:24px}.panel{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,.06)}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:13px 16px;border-bottom:1px solid #eef2f7;vertical-align:middle}th{background:#f8fafc;color:#334155;font-size:12px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}tr:last-child td{border-bottom:0}a{color:#2563eb;text-decoration:none;overflow-wrap:anywhere}a:hover{text-decoration:underline}.muted{color:#64748b}.num{width:64px;color:#64748b}.empty{padding:24px;color:#64748b}@media(max-width:720px){main{padding:14px}th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){display:none}.num{width:42px}th,td{padding:11px 10px}}</style>
+</head>
+<body>
+  <header><div class="wrap"><h1>XML Sitemap</h1><div class="summary">${entries.length} live indexable URLs for AniRise</div></div></header>
+  <main><div class="panel">${entries.length ? `<table><thead><tr><th class="num">#</th><th>URL</th><th>Last modified</th><th>Change frequency</th><th>Priority</th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty">No sitemap URLs found.</div>'}</div></main>
+</body>
+</html>`;
+}
+
+function wantsHtml(req: Request, url: URL): boolean {
+  if (url.searchParams.get('format') === 'xml') return false;
+  if (url.searchParams.get('view') === 'html') return true;
+  const accept = req.headers.get('accept') || '';
+  const ua = req.headers.get('user-agent') || '';
+  const crawler = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|screaming frog|sitebulb|ahrefsbot|semrushbot/i.test(ua);
+  return accept.includes('text/html') && !crawler;
 }
 
 function renderSitemapIndex(children: Array<{ name: string; lastmod: string }>, siteUrl: string): string {
