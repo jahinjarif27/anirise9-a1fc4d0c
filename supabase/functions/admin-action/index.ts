@@ -43,6 +43,46 @@ async function verifyToken(secret: string, token: string): Promise<boolean> {
   }
 }
 
+// PBKDF2 SHA-256 — must match supabase/functions/admin-login/index.ts
+async function pbkdf2(password: string, saltB64: string): Promise<string> {
+  const salt = Uint8Array.from(atob(saltB64), (c) => c.charCodeAt(0));
+  const baseKey = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits'],
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations: 100_000, hash: 'SHA-256' },
+    baseKey,
+    256,
+  );
+  return Array.from(new Uint8Array(bits)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function verifyPrimaryPassword(
+  sb: ReturnType<typeof createClient>,
+  password: string,
+  envPassword: string,
+): Promise<boolean> {
+  const { data } = await sb.from('site_settings').select('admin_auth').eq('id', 1).maybeSingle();
+  const auth: any = (data as any)?.admin_auth ?? {};
+  if (auth && typeof auth.hash === 'string' && typeof auth.salt === 'string' && auth.hash && auth.salt) {
+    const calc = await pbkdf2(password, auth.salt);
+    return timingSafeEqual(calc, auth.hash);
+  }
+  return password === envPassword;
+}
+    const claims = JSON.parse(new TextDecoder().decode(b64urlDecode(payload)));
+    if (claims.role !== 'admin') return false;
+    if (typeof claims.exp !== 'number' || claims.exp * 1000 < Date.now()) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // ---------- Op handlers ----------
 type Op = (sb: ReturnType<typeof createClient>, payload: any) => Promise<unknown>;
 
