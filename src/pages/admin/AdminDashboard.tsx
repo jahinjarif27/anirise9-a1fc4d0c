@@ -3366,21 +3366,28 @@ const AdminDashboard = () => {
 };
 
 // ---------- Sitemap URLs editor (local state — survives parent re-renders cleanly) ----------
-type SitemapRow = { loc: string; pr: string; on: boolean };
+type SitemapRow = { loc: string; pr: string; cf: string; lm: string; on: boolean };
+
+const CHANGEFREQ_OPTIONS = ["always", "hourly", "daily", "weekly", "monthly", "yearly", "never"] as const;
+const todayISO = () => new Date().toISOString().slice(0, 10);
 
 function parseSitemapXml(xml: string): SitemapRow[] {
   if (!xml) return [];
   return Array.from(xml.matchAll(/<url>([\s\S]*?)<\/url>/g)).map((m) => {
     const loc = (m[1].match(/<loc>([\s\S]*?)<\/loc>/) || [])[1] || "";
     const pr = (m[1].match(/<priority>([\s\S]*?)<\/priority>/) || [])[1] || "0.8";
-    return { loc: loc.trim(), pr: pr.trim() || "0.8", on: true };
+    const cf = (m[1].match(/<changefreq>([\s\S]*?)<\/changefreq>/) || [])[1] || "monthly";
+    const lm = (m[1].match(/<lastmod>([\s\S]*?)<\/lastmod>/) || [])[1] || todayISO();
+    return { loc: loc.trim(), pr: pr.trim() || "0.8", cf: cf.trim() || "monthly", lm: lm.trim() || todayISO(), on: true };
   });
 }
 
 function buildSitemapXml(rows: SitemapRow[]): string {
   const inner = rows
     .filter((r) => r.on && r.loc.trim())
-    .map((r) => `  <url><loc>${r.loc.trim()}</loc><priority>${r.pr}</priority></url>`)
+    .map((r) =>
+      `  <url><loc>${r.loc.trim()}</loc><lastmod>${(r.lm || todayISO()).trim()}</lastmod><changefreq>${(r.cf || "monthly").trim()}</changefreq><priority>${r.pr}</priority></url>`,
+    )
     .join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${inner}\n</urlset>`;
 }
@@ -3399,8 +3406,6 @@ function SitemapUrlsEditor({
   const [rows, setRows] = useState<SitemapRow[]>(() => parseSitemapXml(sitemap));
   const lastEmittedRef = useRef<string>(sitemap);
 
-  // Re-hydrate from parent only when the incoming XML is a real external change
-  // (Regenerate, initial load) — not when it echoes back our own emit.
   useEffect(() => {
     if (sitemap === lastEmittedRef.current) return;
     setRows(parseSitemapXml(sitemap));
@@ -3427,7 +3432,7 @@ function SitemapUrlsEditor({
             variant="outline"
             className="h-8"
             onClick={() => {
-              commit([...rows, { loc: `${base}/new-page`, pr: "0.5", on: true }]);
+              commit([...rows, { loc: `${base}/new-page`, pr: "0.5", cf: "monthly", lm: todayISO(), on: true }]);
               toast.success("URL added");
             }}
           >
@@ -3464,6 +3469,23 @@ function SitemapUrlsEditor({
                   ))}
                 </SelectContent>
               </Select>
+              <Select
+                value={u.cf}
+                onValueChange={(v) => commit(rows.map((r, j) => (j === i ? { ...r, cf: v } : r)))}
+              >
+                <SelectTrigger className="h-9 w-[130px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {CHANGEFREQ_OPTIONS.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                type="date"
+                className="h-9 w-[150px] text-xs"
+                value={u.lm}
+                onChange={(e) => commit(rows.map((r, j) => (j === i ? { ...r, lm: e.target.value } : r)))}
+              />
               <Button
                 type="button"
                 variant="ghost"
