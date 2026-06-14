@@ -1,7 +1,6 @@
 {
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/sitemap" },
-    { "source": "/sitemap", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/sitemap?view=html" },
     { "source": "/robots.txt", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/robots" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
