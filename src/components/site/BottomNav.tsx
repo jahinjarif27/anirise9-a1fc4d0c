@@ -14,7 +14,7 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 export const BottomNav = () => {
-  const { contact, customPages } = useAdmin();
+  const { contact, customPages, seo } = useAdmin();
   const services = useServices();
   const [servicesOpen, setServicesOpen] = useState(false);
   const [visible, setVisible] = useState(false);
