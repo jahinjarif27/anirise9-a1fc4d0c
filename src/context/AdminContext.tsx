@@ -1447,31 +1447,21 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   // Live document.head effects (unchanged)
   // ---------------------------------------------------------------
   useEffect(() => {
-    document.title = seo.metaTitle;
-    const setMeta = (selector: string, attr: string, name: string, contentVal: string) => {
-      let el = document.head.querySelector<HTMLMetaElement>(selector);
+    // Sitewide fallback only — per-page useSEO() owns title/description/canonical/og:*
+    // for each route. We intentionally do NOT write canonical, og:*, twitter:*, title
+    // or description here, because doing so would clobber the per-page values that
+    // route components set via useSEO (which caused every page's canonical to point
+    // at the homepage URL).
+    if (seo.metaKeywords) {
+      let el = document.head.querySelector<HTMLMetaElement>('meta[name="keywords"]');
       if (!el) {
         el = document.createElement("meta");
-        el.setAttribute(attr, name);
+        el.setAttribute("name", "keywords");
         document.head.appendChild(el);
       }
-      el.setAttribute("content", contentVal);
-    };
-    setMeta('meta[name="description"]', "name", "description", seo.metaDescription);
-    setMeta('meta[name="keywords"]', "name", "keywords", seo.metaKeywords);
-    // Open Graph / Twitter intentionally disabled site-wide.
-    // Strip anything other code may have injected.
-    document.head
-      .querySelectorAll('meta[property^="og:"], meta[name^="twitter:"]')
-      .forEach((n) => n.remove());
-    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.setAttribute("rel", "canonical");
-      document.head.appendChild(canonical);
+      el.setAttribute("content", seo.metaKeywords);
     }
-    canonical.setAttribute("href", seo.canonicalUrl);
-  }, [seo]);
+  }, [seo.metaKeywords]);
 
   useEffect(() => {
     const ID = "anirise-jsonld";
