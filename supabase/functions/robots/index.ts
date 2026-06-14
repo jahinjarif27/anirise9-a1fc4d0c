@@ -5,6 +5,15 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const FALLBACK = `User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /admin/*
+
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
 
 Sitemap: https://anirise.com.bd/sitemap.xml
 `;
