@@ -241,7 +241,7 @@ Deno.serve(async (req) => {
 
     const [settingsRes, postsRes] = await Promise.all([
       sb.from('site_settings').select('seo, custom_pages, portfolio, case_studies, content, updated_at').eq('id', 1).maybeSingle(),
-      sb.from('blog_posts').select('slug, date'),
+      sb.from('blog_posts').select('slug, date, updated_at'),
     ]);
 
     const s: any = settingsRes.data ?? {};
