@@ -335,23 +335,13 @@ Deno.serve(async (req) => {
     };
 
     if (sub && map[sub]) {
-      if (wantsHtml(req, url)) {
-        return new Response(renderHtmlUrlset(map[sub], siteUrl), {
-          headers: { ...cors, 'content-type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, max-age=0, s-maxage=0' },
-        });
-      }
       return new Response(renderUrlset(map[sub], siteUrl), { headers: xmlHeaders });
     }
 
-    // Root sitemap must match the admin preview exactly: a full urlset, not a
-    // sitemap index with only 5 child links. Sub-sitemaps remain available for
-    // diagnostics/admin refreshes, but Google/Chrome see the complete list at
-    // /sitemap.xml.
-    if (wantsHtml(req, url)) {
-      return new Response(renderHtmlUrlset(map.all, siteUrl), {
-        headers: { ...cors, 'content-type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, max-age=0, s-maxage=0' },
-      });
-    }
+    // Always return plain XML at /sitemap.xml. Vercel auto-applies a sandbox
+    // CSP to .xml responses which breaks both inline HTML and cross-origin
+    // XSL stylesheets, so the most reliable cross-browser view is the
+    // browser's native XML tree viewer. Crawlers (Google/Bing) need XML too.
     return new Response(renderUrlset(map.all, siteUrl), { headers: xmlHeaders });
   } catch (e) {
     console.error('sitemap error', e);
