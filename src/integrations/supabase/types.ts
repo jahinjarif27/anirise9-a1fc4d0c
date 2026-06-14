@@ -154,6 +154,7 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          admin_auth: Json
           appearance: Json
           case_studies: Json
           contact: Json
@@ -178,6 +179,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          admin_auth?: Json
           appearance?: Json
           case_studies?: Json
           contact?: Json
@@ -202,6 +204,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          admin_auth?: Json
           appearance?: Json
           case_studies?: Json
           contact?: Json
