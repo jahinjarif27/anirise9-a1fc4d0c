@@ -1,21 +1,10 @@
-// Live sitemap edge function — Dribbble-style sitemap index with sub-sitemaps.
-// Public endpoint (verify_jwt = false). Reads site_settings + blog_posts and
-// emits an up-to-date sitemap — no rebuild needed when admin changes slugs.
-//
-// Layout (matches dribbble.com/sitemap.xml shape):
-//   /sitemap.xml              → <sitemapindex> listing child sitemaps
-//   /sitemap.xml?sub=pages    → <urlset> for built-in pages + legal
-//   /sitemap.xml?sub=services → <urlset> for service pages
-//   /sitemap.xml?sub=blog     → <urlset> for blog posts
-//   /sitemap.xml?sub=portfolio→ <urlset> for portfolio + case studies
-//   /sitemap.xml?sub=custom   → <urlset> for admin-created custom pages
-//
-// All XML is rendered through /sitemap.xsl for a clean in-browser view.
+// Live sitemap edge function. Reads admin settings + blog posts on every request,
+// so admin sitemap edits and page/slug/blog changes are reflected without rebuilds.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const SITE_URL = 'https://anirise.com.bd';
-const STYLESHEET = '/sitemap.xsl';
+const STYLESHEET = '?xsl=1';
 
 const BUILTIN_DEFAULT_SLUGS: Record<string, string> = {
   home: '',
@@ -53,11 +42,83 @@ const cors = {
 
 const xmlHeaders = {
   ...cors,
-  'Content-Type': 'application/xml; charset=utf-8',
+  'content-type': 'application/xml; charset=utf-8',
   'Cache-Control': 'no-store, max-age=0, s-maxage=0',
+  'X-Content-Type-Options': 'nosniff',
 };
 
-function renderUrlset(entries: Entry[]): string {
+function normalizeSiteUrl(value?: string): string {
+  const base = (value || SITE_URL).trim().replace(/\/+$/, '');
+  return /^https?:\/\//i.test(base) ? base : SITE_URL;
+}
+
+function isSafeManualSitemap(xml: string): boolean {
+  const trimmed = xml.trim();
+  return trimmed.length > 0 &&
+    /<(urlset|sitemapindex)\b/i.test(trimmed) &&
+    !/<!DOCTYPE|<!ENTITY/i.test(trimmed);
+}
+
+function attachStylesheet(xml: string): string {
+  const clean = xml.replace(/<\?xml-stylesheet[\s\S]*?\?>\s*/gi, '').trim();
+  const declaration = clean.match(/^<\?xml[^?]*\?>\s*/i)?.[0] || '<?xml version="1.0" encoding="UTF-8"?>\n';
+  const body = clean.startsWith(declaration) ? clean.slice(declaration.length) : clean;
+  return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}<?xml-stylesheet type="text/xsl" href="${STYLESHEET}"?>\n${body}\n`;
+}
+
+function renderXsl(): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:s="http://www.sitemaps.org/schemas/sitemap/0.9"
+  exclude-result-prefixes="s">
+  <xsl:output method="html" encoding="UTF-8" indent="yes" doctype-system="about:legacy-compat"/>
+  <xsl:template match="/">
+    <html lang="en">
+      <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title>AniRise XML Sitemap</title>
+        <style>
+          *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;line-height:1.5}header{background:#0f172a;color:#f8fafc;padding:28px 24px;border-bottom:4px solid #6366f1}.wrap{max-width:1120px;margin:0 auto}h1{margin:0;font-size:24px;letter-spacing:0;font-weight:750}.summary{margin-top:6px;color:#cbd5e1;font-size:13px}main{max-width:1120px;margin:0 auto;padding:24px}.panel{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,.06)}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:13px 16px;border-bottom:1px solid #eef2f7;vertical-align:middle}th{background:#f8fafc;color:#334155;font-size:12px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}tr:last-child td{border-bottom:0}a{color:#2563eb;text-decoration:none;overflow-wrap:anywhere}a:hover{text-decoration:underline}.muted{color:#64748b}.num{width:64px;color:#64748b}.empty{padding:24px;color:#64748b}@media(max-width:720px){main{padding:14px}th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){display:none}.num{width:42px}th,td{padding:11px 10px}}
+        </style>
+      </head>
+      <body>
+        <header><div class="wrap"><h1>XML Sitemap</h1><div class="summary">Live indexable URLs for AniRise</div></div></header>
+        <main>
+          <div class="panel">
+            <xsl:choose>
+              <xsl:when test="s:urlset/s:url">
+                <table>
+                  <thead><tr><th class="num">#</th><th>URL</th><th>Last modified</th><th>Change frequency</th><th>Priority</th></tr></thead>
+                  <tbody>
+                    <xsl:for-each select="s:urlset/s:url">
+                      <tr><td class="num"><xsl:value-of select="position()"/></td><td><a href="{s:loc}"><xsl:value-of select="s:loc"/></a></td><td class="muted"><xsl:value-of select="s:lastmod"/></td><td class="muted"><xsl:value-of select="s:changefreq"/></td><td class="muted"><xsl:value-of select="s:priority"/></td></tr>
+                    </xsl:for-each>
+                  </tbody>
+                </table>
+              </xsl:when>
+              <xsl:when test="s:sitemapindex/s:sitemap">
+                <table>
+                  <thead><tr><th class="num">#</th><th>Sitemap</th><th>Last modified</th></tr></thead>
+                  <tbody>
+                    <xsl:for-each select="s:sitemapindex/s:sitemap">
+                      <tr><td class="num"><xsl:value-of select="position()"/></td><td><a href="{s:loc}"><xsl:value-of select="s:loc"/></a></td><td class="muted"><xsl:value-of select="s:lastmod"/></td></tr>
+                    </xsl:for-each>
+                  </tbody>
+                </table>
+              </xsl:when>
+              <xsl:otherwise><div class="empty">No sitemap URLs found.</div></xsl:otherwise>
+            </xsl:choose>
+          </div>
+        </main>
+      </body>
+    </html>
+  </xsl:template>
+</xsl:stylesheet>`;
+}
+
+function renderUrlset(entries: Entry[], siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<?xml-stylesheet type="text/xsl" href="${STYLESHEET}"?>\n` +
@@ -66,7 +127,7 @@ function renderUrlset(entries: Entry[]): string {
       .map((e) =>
         [
           `  <url>`,
-          `    <loc>${esc(SITE_URL + e.path)}</loc>`,
+          `    <loc>${esc(siteUrl + e.path)}</loc>`,
           e.lastmod ? `    <lastmod>${esc(e.lastmod)}</lastmod>` : null,
           e.changefreq ? `    <changefreq>${esc(e.changefreq)}</changefreq>` : null,
           e.priority ? `    <priority>${esc(e.priority)}</priority>` : null,
@@ -80,7 +141,7 @@ function renderUrlset(entries: Entry[]): string {
   );
 }
 
-function renderSitemapIndex(children: Array<{ name: string; lastmod: string }>): string {
+function renderSitemapIndex(children: Array<{ name: string; lastmod: string }>, siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<?xml-stylesheet type="text/xsl" href="${STYLESHEET}"?>\n` +
@@ -89,7 +150,7 @@ function renderSitemapIndex(children: Array<{ name: string; lastmod: string }>):
       .map(
         (c) =>
           `  <sitemap>\n` +
-          `    <loc>${esc(SITE_URL + '/sitemap.xml?sub=' + c.name)}</loc>\n` +
+          `    <loc>${esc(siteUrl + '/sitemap.xml?sub=' + c.name)}</loc>\n` +
           `    <lastmod>${esc(c.lastmod)}</lastmod>\n` +
           `  </sitemap>`,
       )
@@ -102,6 +163,11 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   try {
     const url = new URL(req.url);
+    if (url.searchParams.get('xsl') === '1') {
+      return new Response(renderXsl(), {
+        headers: { ...cors, 'content-type': 'application/xslt+xml; charset=utf-8', 'Cache-Control': 'no-store, max-age=0, s-maxage=0' },
+      });
+    }
     const sub = url.searchParams.get('sub');
 
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
@@ -115,6 +181,12 @@ Deno.serve(async (req) => {
 
     const s: any = settingsRes.data ?? {};
     const pageSeo: Record<string, any> = (s.seo?.pageSeo ?? {}) as any;
+    const siteUrl = normalizeSiteUrl(s.seo?.canonicalUrl);
+    const manualSitemap = typeof s.seo?.sitemap === 'string' ? s.seo.sitemap.trim() : '';
+    const useManual = s.seo?.autoSitemap === false && isSafeManualSitemap(manualSitemap);
+    if (useManual && (!sub || sub === 'all')) {
+      return new Response(attachStylesheet(manualSitemap), { headers: xmlHeaders });
+    }
     const customPages: any[] = Array.isArray(s.custom_pages) ? s.custom_pages : [];
     const portfolio: any[] = Array.isArray(s.portfolio) ? s.portfolio : [];
     const caseStudies: any[] = Array.isArray(s.case_studies) ? s.case_studies : [];
@@ -226,10 +298,11 @@ Deno.serve(async (req) => {
       blog: blogEntries,
       portfolio: portfolioEntries,
       custom: customEntries,
+      all: [...pagesEntries, ...servicesEntries, ...blogEntries, ...portfolioEntries, ...customEntries],
     };
 
     if (sub && map[sub]) {
-      return new Response(renderUrlset(map[sub]), { headers: xmlHeaders });
+      return new Response(renderUrlset(map[sub], siteUrl), { headers: xmlHeaders });
     }
 
     // Root → sitemap index. Skip empty sub-sitemaps for a clean index.
@@ -237,12 +310,12 @@ Deno.serve(async (req) => {
     for (const name of ['pages', 'services', 'blog', 'portfolio', 'custom']) {
       if (map[name].length > 0) children.push({ name, lastmod: settingsDate });
     }
-    return new Response(renderSitemapIndex(children), { headers: xmlHeaders });
+    return new Response(renderSitemapIndex(children, siteUrl), { headers: xmlHeaders });
   } catch (e) {
     console.error('sitemap error', e);
     return new Response(`<!-- sitemap error: ${(e as Error).message} -->`, {
       status: 500,
-      headers: { ...cors, 'Content-Type': 'application/xml; charset=utf-8' },
+      headers: { ...cors, 'content-type': 'application/xml; charset=utf-8' },
     });
   }
 });
