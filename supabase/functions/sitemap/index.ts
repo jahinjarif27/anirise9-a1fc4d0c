@@ -4,8 +4,8 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const SITE_URL = 'https://anirise.com.bd';
-// Browsers get a clean HTML table view because XSL processing can be blocked
-// by sandboxed XML responses. Crawlers and XML clients still get real XML.
+// /sitemap.xml must always be XML. The styled browser view lives at /sitemap,
+// which Vercel rewrites with view=html so admin preview can match safely.
 
 const BUILTIN_DEFAULT_SLUGS: Record<string, string> = {
   home: '',
@@ -202,11 +202,7 @@ ul{list-style:none;margin:0;padding:0;max-height:none}
 
 function wantsHtml(req: Request, url: URL): boolean {
   if (url.searchParams.get('format') === 'xml') return false;
-  if (url.searchParams.get('view') === 'html') return true;
-  const accept = req.headers.get('accept') || '';
-  const ua = req.headers.get('user-agent') || '';
-  const crawler = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|screaming frog|sitebulb|ahrefsbot|semrushbot/i.test(ua);
-  return accept.includes('text/html') && !crawler;
+  return url.searchParams.get('view') === 'html';
 }
 
 function renderSitemapIndex(children: Array<{ name: string; lastmod: string }>, siteUrl: string): string {
