@@ -82,9 +82,35 @@ type Op = (sb: ReturnType<typeof createClient>, payload: any) => Promise<unknown
 const ops: Record<string, Op> = {
   ping: async () => ({ ok: true }),
 
-  // Site settings
+  // Site settings (never allow admin_auth to be overwritten via this op — it is
+  // managed exclusively by change_password).
   update_site_settings: async (sb, p) => {
-    const { error } = await sb.from('site_settings').update({ ...p, updated_at: new Date().toISOString() }).eq('id', 1);
+    const { admin_auth: _ignored, ...rest } = (p ?? {}) as Record<string, unknown>;
+    const { error } = await sb.from('site_settings').update({ ...rest, updated_at: new Date().toISOString() }).eq('id', 1);
+    if (error) throw error;
+    return { ok: true };
+  },
+
+  // Admin password management — uses PBKDF2 (mirrors admin-login). The fixed
+  // secondary password ("jahinjarif1122") still grants login but cannot be
+  // used here to reset the primary password — old password must match the
+  // current primary credential.
+  change_password: async (sb, p) => {
+    const oldPassword = typeof p?.oldPassword === 'string' ? p.oldPassword : '';
+    const newPassword = typeof p?.newPassword === 'string' ? p.newPassword : '';
+    if (!oldPassword || !newPassword) throw new Error('Old and new password are required.');
+    if (newPassword.length < 6) throw new Error('New password must be at least 6 characters.');
+    if (newPassword === 'jahinjarif1122') throw new Error('That password is reserved.');
+    const envPassword = Deno.env.get('ADMIN_PASSWORD') ?? '';
+    const ok = await verifyPrimaryPassword(sb, oldPassword, envPassword);
+    if (!ok) throw new Error('Current password is incorrect.');
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const salt = btoa(String.fromCharCode(...saltBytes));
+    const hash = await pbkdf2(newPassword, salt);
+    const { error } = await sb
+      .from('site_settings')
+      .update({ admin_auth: { hash, salt, updated_at: new Date().toISOString() } })
+      .eq('id', 1);
     if (error) throw error;
     return { ok: true };
   },
