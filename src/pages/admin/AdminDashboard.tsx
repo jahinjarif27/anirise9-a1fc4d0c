@@ -3021,6 +3021,15 @@ const AdminDashboard = () => {
                       </div>
                       <div className="flex flex-wrap justify-end gap-2">
                         <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            window.open(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, "_blank", "noopener,noreferrer");
+                          }}
+                        >
+                          <Eye className="h-4 w-4" /> Review
+                        </Button>
+                        <Button
                           variant="hero"
                           size="sm"
                           onClick={async () => {

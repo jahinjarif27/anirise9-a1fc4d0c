@@ -25,7 +25,8 @@ const BUDGET_OPTIONS = [
   "Below $500",
   "$500 - $1000",
   "$1000 - $3000",
-  "$3000+",
+  "$3000 - $5000",
+  "$5000+",
 ];
 
 export const StrategyCall = () => {
