@@ -124,6 +124,7 @@ function renderXsl(): string {
 function renderUrlset(entries: Entry[], siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<?xml-stylesheet type="text/xsl" href="/sitemap.xml?xsl=1"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     entries
       .map((e) =>
