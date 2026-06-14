@@ -142,25 +142,60 @@ function renderUrlset(entries: Entry[], siteUrl: string): string {
 }
 
 function renderHtmlUrlset(entries: Entry[], siteUrl: string): string {
-  const rows = entries
-    .map((e, index) => {
+  const xmlUrl = `${siteUrl}/sitemap.xml`;
+  const items = entries
+    .map((e, i) => {
       const loc = siteUrl + e.path;
-      return `<tr><td class="num">${index + 1}</td><td><a href="${esc(loc)}">${esc(loc)}</a></td><td class="muted">${esc(e.lastmod || '')}</td><td class="muted">${esc(e.changefreq || '')}</td><td class="muted">${esc(e.priority || '')}</td></tr>`;
+      const safeLoc = esc(loc);
+      const badges: string[] = [];
+      if (e.priority) badges.push(`<span class="badge badge-pri">P ${esc(e.priority)}</span>`);
+      if (e.changefreq) badges.push(`<span class="badge badge-cf">${esc(e.changefreq)}</span>`);
+      if (e.lastmod) badges.push(`<span class="lm">${esc(e.lastmod)}</span>`);
+      return `<li class="row"><span class="num">${i + 1}</span><a class="loc" href="${safeLoc}" target="_blank" rel="noreferrer">${safeLoc}</a><div class="meta">${badges.join('')}</div></li>`;
     })
     .join('');
 
   return `<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex, follow">
-  <title>AniRise XML Sitemap</title>
-  <style>*{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;line-height:1.5}header{background:#0f172a;color:#f8fafc;padding:28px 24px;border-bottom:4px solid #6366f1}.wrap{max-width:1120px;margin:0 auto}h1{margin:0;font-size:24px;font-weight:750}.summary{margin-top:6px;color:#cbd5e1;font-size:13px}main{max-width:1120px;margin:0 auto;padding:24px}.panel{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,.06)}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:13px 16px;border-bottom:1px solid #eef2f7;vertical-align:middle}th{background:#f8fafc;color:#334155;font-size:12px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}tr:last-child td{border-bottom:0}a{color:#2563eb;text-decoration:none;overflow-wrap:anywhere}a:hover{text-decoration:underline}.muted{color:#64748b}.num{width:64px;color:#64748b}.empty{padding:24px;color:#64748b}@media(max-width:720px){main{padding:14px}th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){display:none}.num{width:42px}th,td{padding:11px 10px}}</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, follow">
+<title>Live sitemap · AniRise</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;background:#f8fafc;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;line-height:1.5}
+header{background:linear-gradient(135deg,#0f172a,#1e293b);color:#f8fafc;padding:32px 24px;border-bottom:4px solid #6366f1}
+.wrap{max-width:1080px;margin:0 auto}
+h1{margin:0;font-size:22px;font-weight:750;letter-spacing:-.01em}
+.sub{margin-top:6px;color:#cbd5e1;font-size:12.5px}
+.sub a{color:#a5b4fc;text-decoration:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.sub a:hover{text-decoration:underline}
+main{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:#64748b;margin-bottom:10px}
+.count{font-weight:600;color:#334155}
+.panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,.05)}
+ul{list-style:none;margin:0;padding:0;max-height:none}
+.row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #eef2f7;flex-wrap:wrap}
+.row:last-child{border-bottom:0}
+.num{font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#94a3b8;width:24px;flex-shrink:0}
+.loc{flex:1;min-width:220px;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#2563eb;text-decoration:none;overflow-wrap:anywhere}
+.loc:hover{text-decoration:underline}
+.meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:600;line-height:1.4}
+.badge-pri{background:#f1f5f9;color:#334155}
+.badge-cf{background:#fff;color:#475569;border:1px solid #e2e8f0}
+.lm{font-size:10.5px;color:#94a3b8;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.empty{padding:24px;color:#64748b;font-size:13px}
+@media(max-width:560px){.num{width:20px}.row{padding:11px 12px}}
+</style>
 </head>
 <body>
-  <header><div class="wrap"><h1>XML Sitemap</h1><div class="summary">${entries.length} live indexable URLs for AniRise</div></div></header>
-  <main><div class="panel">${entries.length ? `<table><thead><tr><th class="num">#</th><th>URL</th><th>Last modified</th><th>Change frequency</th><th>Priority</th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty">No sitemap URLs found.</div>'}</div></main>
+<header><div class="wrap"><h1>Live sitemap</h1><div class="sub">Auto-generated from your admin. Raw XML: <a href="${esc(xmlUrl)}">${esc(xmlUrl)}</a></div></div></header>
+<main>
+<div class="bar"><div>Live URLs from <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">/sitemap.xml</span></div><div class="count">${entries.length} URLs</div></div>
+<div class="panel">${entries.length ? `<ul>${items}</ul>` : '<div class="empty">No URLs in live sitemap yet.</div>'}</div>
+</main>
 </body>
 </html>`;
 }
