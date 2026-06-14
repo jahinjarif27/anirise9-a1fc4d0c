@@ -18,7 +18,7 @@ const ComingSoonService = lazy(() => import("./services/ComingSoon.tsx"));
 const StrategyCallPage = lazy(() => import("./StrategyCallPage.tsx"));
 const CaseStudyDetail = lazy(() => import("./CaseStudyDetail.tsx"));
 const ProjectDetail = lazy(() => import("./ProjectDetail.tsx"));
-const SitemapViewer = lazy(() => import("./SitemapViewer.tsx"));
+
 
 import { Services } from "@/components/site/Services";
 import { Portfolio } from "@/components/site/Portfolio";
