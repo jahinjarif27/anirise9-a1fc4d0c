@@ -459,6 +459,20 @@ const AdminDashboard = () => {
     return true;
   };
 
+  const saveSitemapNow = async () => {
+    updateSeo({ sitemap: seo.sitemap, autoSitemap: false });
+    const tId = toast.loading("Saving sitemap…");
+    const r = await saveAllNow();
+    if (!r.ok) {
+      toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
+      return;
+    }
+    try {
+      await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, { cache: "no-store" });
+    } catch {}
+    toast.success("Sitemap saved — live URL refreshed", { id: tId });
+  };
+
   const downloadFile = (filename: string, content: string, type: string) => {
     const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
