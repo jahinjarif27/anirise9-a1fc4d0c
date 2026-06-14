@@ -1089,6 +1089,7 @@ function mergeLegalPages(pages: CustomPage[]): CustomPage[] {
 type AdminCtx = {
   isAuthed: boolean;
   login: (pw: string) => Promise<boolean>;
+  changeAdminPassword: (oldPassword: string, newPassword: string) => Promise<{ ok: boolean; error?: string }>;
   logout: () => void;
   loading: boolean;
   posts: BlogPost[];
@@ -1535,6 +1536,12 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     setIsAuthed(false);
   };
 
+  const changeAdminPassword = async (oldPassword: string, newPassword: string) => {
+    const r = await adminCall("change_password", { oldPassword, newPassword });
+    return { ok: r.ok, error: r.error };
+  };
+
+
   // ---------------------------------------------------------------
   // Blog (admin-action backed)
   // ---------------------------------------------------------------
@@ -1836,7 +1843,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   return (
     <Ctx.Provider
       value={{
-        isAuthed, login, logout, loading,
+        isAuthed, login, changeAdminPassword, logout, loading,
         posts, addPost, updatePost, deletePost,
         content, updateContent,
         contact, updateContact,

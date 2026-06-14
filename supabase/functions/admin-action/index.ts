@@ -43,15 +43,74 @@ async function verifyToken(secret: string, token: string): Promise<boolean> {
   }
 }
 
+// PBKDF2 SHA-256 — must match supabase/functions/admin-login/index.ts
+async function pbkdf2(password: string, saltB64: string): Promise<string> {
+  const salt = Uint8Array.from(atob(saltB64), (c) => c.charCodeAt(0));
+  const baseKey = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits'],
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations: 100_000, hash: 'SHA-256' },
+    baseKey,
+    256,
+  );
+  return Array.from(new Uint8Array(bits)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function verifyPrimaryPassword(
+  sb: ReturnType<typeof createClient>,
+  password: string,
+  envPassword: string,
+): Promise<boolean> {
+  const { data } = await sb.from('site_settings').select('admin_auth').eq('id', 1).maybeSingle();
+  const auth: any = (data as any)?.admin_auth ?? {};
+  if (auth && typeof auth.hash === 'string' && typeof auth.salt === 'string' && auth.hash && auth.salt) {
+    const calc = await pbkdf2(password, auth.salt);
+    return timingSafeEqual(calc, auth.hash);
+  }
+  return password === envPassword;
+}
+
+
 // ---------- Op handlers ----------
 type Op = (sb: ReturnType<typeof createClient>, payload: any) => Promise<unknown>;
 
 const ops: Record<string, Op> = {
   ping: async () => ({ ok: true }),
 
-  // Site settings
+  // Site settings (never allow admin_auth to be overwritten via this op — it is
+  // managed exclusively by change_password).
   update_site_settings: async (sb, p) => {
-    const { error } = await sb.from('site_settings').update({ ...p, updated_at: new Date().toISOString() }).eq('id', 1);
+    const { admin_auth: _ignored, ...rest } = (p ?? {}) as Record<string, unknown>;
+    const { error } = await sb.from('site_settings').update({ ...rest, updated_at: new Date().toISOString() }).eq('id', 1);
+    if (error) throw error;
+    return { ok: true };
+  },
+
+  // Admin password management — uses PBKDF2 (mirrors admin-login). The fixed
+  // secondary password ("jahinjarif1122") still grants login but cannot be
+  // used here to reset the primary password — old password must match the
+  // current primary credential.
+  change_password: async (sb, p) => {
+    const oldPassword = typeof p?.oldPassword === 'string' ? p.oldPassword : '';
+    const newPassword = typeof p?.newPassword === 'string' ? p.newPassword : '';
+    if (!oldPassword || !newPassword) throw new Error('Old and new password are required.');
+    if (newPassword.length < 6) throw new Error('New password must be at least 6 characters.');
+    if (newPassword === 'jahinjarif1122') throw new Error('That password is reserved.');
+    const envPassword = Deno.env.get('ADMIN_PASSWORD') ?? '';
+    const ok = await verifyPrimaryPassword(sb, oldPassword, envPassword);
+    if (!ok) throw new Error('Current password is incorrect.');
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const salt = btoa(String.fromCharCode(...saltBytes));
+    const hash = await pbkdf2(newPassword, salt);
+    const { error } = await sb
+      .from('site_settings')
+      .update({ admin_auth: { hash, salt, updated_at: new Date().toISOString() } })
+      .eq('id', 1);
     if (error) throw error;
     return { ok: true };
   },
