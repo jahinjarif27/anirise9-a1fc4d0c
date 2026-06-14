@@ -3421,10 +3421,12 @@ function SitemapUrlsEditor({
   sitemap,
   canonicalUrl,
   onChange,
+  onSave,
 }: {
   sitemap: string;
   canonicalUrl: string;
   onChange: (xml: string) => void;
+  onSave: () => void | Promise<void>;
 }) {
   const [rows, setRows] = useState<SitemapRow[]>(() => parseSitemapXml(sitemap));
   const lastEmittedRef = useRef<string>(sitemap);
@@ -3448,20 +3450,25 @@ function SitemapUrlsEditor({
 
   return (
     <div className="rounded-xl border border-border overflow-hidden">
-      <div className="px-4 py-2.5 bg-secondary/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+      <div className="px-4 py-2.5 bg-secondary/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between gap-2 flex-wrap">
         <span>URL entries ({rows.length})</span>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          className="h-7"
-          onClick={() => {
-            commit([...rows, { loc: `${base}/new-page`, pr: "0.5", on: true }]);
-            toast.success("URL added");
-          }}
-        >
-          <Plus className="h-3.5 w-3.5" /> Add URL
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="h-8"
+            onClick={() => {
+              commit([...rows, { loc: `${base}/new-page`, pr: "0.5", on: true }]);
+              toast.success("URL added");
+            }}
+          >
+            <Plus className="h-3.5 w-3.5" /> Add URL
+          </Button>
+          <Button type="button" size="sm" variant="hero" className="h-8" onClick={onSave}>
+            <Save className="h-3.5 w-3.5" /> Save
+          </Button>
+        </div>
       </div>
       {rows.length === 0 ? (
         <div className="p-4 text-xs text-muted-foreground">No URLs yet — click "Add URL" to create one.</div>
