@@ -4,7 +4,11 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const SITE_URL = 'https://anirise.com.bd';
-const STYLESHEET = '?xsl=1';
+// Use the static file in /public so Vercel can serve it with the correct
+// text/xsl content type. (Edge function responses on /sitemap.xml are forced
+// to application/xml by Vercel headers, which prevents the browser from
+// using them as a stylesheet.)
+const STYLESHEET = '/sitemap.xsl';
 
 const BUILTIN_DEFAULT_SLUGS: Record<string, string> = {
   home: '',
