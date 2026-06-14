@@ -34,11 +34,23 @@ export const BottomNav = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const sectionKeys = ["hero", "services", "portfolio", "blog", "testimonials", "contact"];
+  const sectionKeys = ["hero", "services", "portfolio", "blog", "about", "contact"];
+  const NAV_TO_SEO_KEY: Record<string, string> = {
+    hero: "home", services: "services", portfolio: "portfolio",
+    blog: "blog", about: "about", contact: "contact",
+  };
+  const slugFor = (k: string) => {
+    if (k === "hero") return "/";
+    const seoKey = NAV_TO_SEO_KEY[k] ?? k;
+    const customSlug = seo.pageSeo?.[seoKey]?.slug?.trim();
+    const slug = customSlug && customSlug.length > 0 ? customSlug.replace(/^\/+/, "") : k;
+    return `/${slug}`;
+  };
+  const servicesHref = slugFor("services");
   const allLinks = [
     ...sectionKeys.map((k) => ({
       label: SECTION_LABELS[k],
-      href: k === "hero" ? "/" : k === "blog" ? "/blog" : `/${k}`,
+      href: slugFor(k),
     })),
     ...customPages
       .filter((p) => p.published && Array.isArray(p.navLocation) && p.navLocation.length > 0)
