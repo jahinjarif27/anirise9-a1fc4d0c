@@ -93,7 +93,6 @@ export const AppRoutes = () => {
           />
         ))}
         <Route path="/p/:slug" element={<CustomPageView />} />
-        <Route path="/sitemap" element={<SitemapViewer />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/:slug" element={<DynamicSlugResolver />} />
         <Route path="/:section/:id" element={<DynamicDetailResolver />} />
