@@ -169,8 +169,9 @@ header{background:linear-gradient(135deg,#0f172a,#1e293b);color:#f8fafc;padding:
 .wrap{max-width:1080px;margin:0 auto}
 h1{margin:0;font-size:22px;font-weight:750;letter-spacing:-.01em}
 .sub{margin-top:6px;color:#cbd5e1;font-size:12.5px}
-.sub a{color:#a5b4fc;text-decoration:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-.sub a:hover{text-decoration:underline}
+.sub a{color:#a5b4fc;text-decoration:none!important;border-bottom:0!important;background-image:none!important;box-shadow:none!important;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.sub a:hover{text-decoration:none!important}
+.sub a::before,.sub a::after,.loc::before,.loc::after{content:none!important;display:none!important}
 main{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:#64748b;margin-bottom:10px}
 .count{font-weight:600;color:#334155}
@@ -179,8 +180,8 @@ ul{list-style:none;margin:0;padding:0;max-height:none}
 .row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #eef2f7;flex-wrap:wrap}
 .row:last-child{border-bottom:0}
 .num{font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#94a3b8;width:24px;flex-shrink:0}
-.loc{flex:1;min-width:220px;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#2563eb;text-decoration:none;overflow-wrap:anywhere}
-.loc:hover{text-decoration:underline}
+.loc{flex:1;min-width:220px;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#2563eb;text-decoration:none!important;border-bottom:0!important;background-image:none!important;box-shadow:none!important;overflow-wrap:anywhere;text-underline-offset:0;text-decoration-thickness:0}
+.loc:hover,.loc:focus,.loc:visited{text-decoration:none!important;border-bottom:0!important;background-image:none!important;box-shadow:none!important}
 .meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:600;line-height:1.4}
 .badge-pri{background:#f1f5f9;color:#334155}
