@@ -3026,6 +3026,7 @@ const AdminDashboard = () => {
                     sitemap={seo.sitemap}
                     canonicalUrl={seo.canonicalUrl}
                     onChange={(xml) => updateSeo({ sitemap: xml, autoSitemap: false })}
+                    onSave={saveSitemapNow}
                   />
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
@@ -3044,19 +3045,7 @@ const AdminDashboard = () => {
                     <Button
                       variant="hero"
                       size="sm"
-                      onClick={async () => {
-                        updateSeo({ sitemap: seo.sitemap, autoSitemap: false });
-                        const tId = toast.loading("Saving sitemap…");
-                        const r = await saveAllNow();
-                        if (!r.ok) {
-                          toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
-                          return;
-                        }
-                        try {
-                          await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, { cache: "no-store" });
-                        } catch {}
-                        toast.success("Sitemap saved — live URL refreshed", { id: tId });
-                      }}
+                      onClick={saveSitemapNow}
                     >
                       <Save className="h-4 w-4" /> Save sitemap
                     </Button>
