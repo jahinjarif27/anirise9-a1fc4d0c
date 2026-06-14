@@ -309,7 +309,7 @@ Deno.serve(async (req) => {
         if (ps.status === 'draft' || ps.robots === 'noindex') continue;
         blogEntries.push({
           path: `/${blogParent}/${p.slug}`,
-          lastmod: p.date || settingsDate,
+          lastmod: (p.updated_at ? String(p.updated_at).slice(0, 10) : null) || p.date || settingsDate,
           changefreq: ps.changefreq || 'monthly',
           priority: ps.priority || '0.7',
         });
