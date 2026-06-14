@@ -88,7 +88,7 @@ export const BottomNav = () => {
               <img src={logo} alt="AniRise" className="h-full w-full object-cover" />
             </button>
           </div>
-          <button onClick={() => go("/portfolio")} className={itemCls("/portfolio")}>
+          <button onClick={() => go(slugFor("portfolio"))} className={itemCls(slugFor("portfolio"))}>
             <Briefcase className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">PORTFOLIO</span>
           </button>
