@@ -306,12 +306,11 @@ Deno.serve(async (req) => {
       return new Response(renderUrlset(map[sub], siteUrl), { headers: xmlHeaders });
     }
 
-    // Root → sitemap index. Skip empty sub-sitemaps for a clean index.
-    const children: Array<{ name: string; lastmod: string }> = [];
-    for (const name of ['pages', 'services', 'blog', 'portfolio', 'custom']) {
-      if (map[name].length > 0) children.push({ name, lastmod: settingsDate });
-    }
-    return new Response(renderSitemapIndex(children, siteUrl), { headers: xmlHeaders });
+    // Root sitemap must match the admin preview exactly: a full urlset, not a
+    // sitemap index with only 5 child links. Sub-sitemaps remain available for
+    // diagnostics/admin refreshes, but Google/Chrome see the complete list at
+    // /sitemap.xml.
+    return new Response(renderUrlset(map.all, siteUrl), { headers: xmlHeaders });
   } catch (e) {
     console.error('sitemap error', e);
     return new Response(`<!-- sitemap error: ${(e as Error).message} -->`, {
