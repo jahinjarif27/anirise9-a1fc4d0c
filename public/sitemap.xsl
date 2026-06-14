@@ -10,100 +10,73 @@
       <head>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <title>XML Sitemap</title>
+        <title>AniRise XML Sitemap</title>
         <style>
-          :root { color-scheme: dark; }
-          html, body {
-            margin: 0;
-            padding: 0;
-            background: #1b1b1b;
-            color: #d4d4d4;
-            font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-            font-size: 13px;
-            line-height: 1.5;
+          *{box-sizing:border-box}
+          body{margin:0;background:#f8fafc;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;line-height:1.5}
+          header{background:#0f172a;color:#f8fafc;padding:28px 24px;border-bottom:4px solid #6366f1}
+          .wrap{max-width:1120px;margin:0 auto}
+          h1{margin:0;font-size:24px;font-weight:750}
+          .summary{margin-top:6px;color:#cbd5e1;font-size:13px}
+          main{max-width:1120px;margin:0 auto;padding:24px}
+          .panel{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,.06)}
+          table{width:100%;border-collapse:collapse;font-size:14px}
+          th,td{text-align:left;padding:13px 16px;border-bottom:1px solid #eef2f7;vertical-align:middle}
+          th{background:#f8fafc;color:#334155;font-size:12px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+          tr:last-child td{border-bottom:0}
+          a{color:#2563eb;text-decoration:none;overflow-wrap:anywhere}
+          a:hover{text-decoration:underline}
+          .muted{color:#64748b}
+          .num{width:64px;color:#64748b}
+          .empty{padding:24px;color:#64748b}
+          @media(max-width:720px){
+            main{padding:14px}
+            th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){display:none}
+            .num{width:42px}
+            th,td{padding:11px 10px}
           }
-          .notice {
-            background: #1b1b1b;
-            color: #d4d4d4;
-            padding: 10px 16px;
-            border-bottom: 1px solid #2a2a2a;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 13px;
-          }
-          .notice a { color: #4eaaff; text-decoration: none; }
-          .notice a:hover { text-decoration: underline; }
-          .tree {
-            padding: 12px 18px 40px;
-            white-space: pre;
-            overflow-x: auto;
-          }
-          .node { display: block; }
-          .children { padding-left: 20px; display: block; }
-          .caret {
-            color: #d4d4d4;
-            display: inline-block;
-            width: 12px;
-            user-select: none;
-          }
-          .tag      { color: #5db0d7; }
-          .tag-name { color: #5db0d7; }
-          .attr     { color: #9cdcfe; }
-          .eq       { color: #d4d4d4; }
-          .str      { color: #ce9178; }
-          .text     { color: #d4d4d4; }
-          a { color: #ce9178; text-decoration: none; }
-          a:hover { text-decoration: underline; }
-          .punct { color: #808080; }
         </style>
       </head>
       <body>
-        <div class="notice">
-          This XML file does not appear to have any style information associated with it. The document tree is shown below.
-        </div>
-        <div class="tree"><xsl:apply-templates select="*" mode="root"/></div>
+        <header><div class="wrap"><h1>XML Sitemap</h1><div class="summary">Live indexable URLs for AniRise</div></div></header>
+        <main>
+          <div class="panel">
+            <xsl:choose>
+              <xsl:when test="s:urlset/s:url">
+                <table>
+                  <thead><tr><th class="num">#</th><th>URL</th><th>Last modified</th><th>Change frequency</th><th>Priority</th></tr></thead>
+                  <tbody>
+                    <xsl:for-each select="s:urlset/s:url">
+                      <tr>
+                        <td class="num"><xsl:value-of select="position()"/></td>
+                        <td><a href="{s:loc}"><xsl:value-of select="s:loc"/></a></td>
+                        <td class="muted"><xsl:value-of select="s:lastmod"/></td>
+                        <td class="muted"><xsl:value-of select="s:changefreq"/></td>
+                        <td class="muted"><xsl:value-of select="s:priority"/></td>
+                      </tr>
+                    </xsl:for-each>
+                  </tbody>
+                </table>
+              </xsl:when>
+              <xsl:when test="s:sitemapindex/s:sitemap">
+                <table>
+                  <thead><tr><th class="num">#</th><th>Sitemap</th><th>Last modified</th></tr></thead>
+                  <tbody>
+                    <xsl:for-each select="s:sitemapindex/s:sitemap">
+                      <tr>
+                        <td class="num"><xsl:value-of select="position()"/></td>
+                        <td><a href="{s:loc}"><xsl:value-of select="s:loc"/></a></td>
+                        <td class="muted"><xsl:value-of select="s:lastmod"/></td>
+                      </tr>
+                    </xsl:for-each>
+                  </tbody>
+                </table>
+              </xsl:when>
+              <xsl:otherwise><div class="empty">No sitemap URLs found.</div></xsl:otherwise>
+            </xsl:choose>
+          </div>
+        </main>
       </body>
     </html>
-  </xsl:template>
-
-  <!-- sitemapindex root -->
-  <xsl:template match="s:sitemapindex" mode="root">
-    <span class="node"><span class="caret">▼</span><span class="punct">&lt;</span><span class="tag-name">sitemapindex</span>&#160;<span class="attr">xmlns</span><span class="eq">=</span><span class="str">"http://www.sitemaps.org/schemas/sitemap/0.9"</span><span class="punct">&gt;</span></span>
-    <span class="children"><xsl:apply-templates select="s:sitemap"/></span>
-    <span class="node"><span class="punct">&lt;/</span><span class="tag-name">sitemapindex</span><span class="punct">&gt;</span></span>
-  </xsl:template>
-
-  <!-- urlset root -->
-  <xsl:template match="s:urlset" mode="root">
-    <span class="node"><span class="caret">▼</span><span class="punct">&lt;</span><span class="tag-name">urlset</span>&#160;<span class="attr">xmlns</span><span class="eq">=</span><span class="str">"http://www.sitemaps.org/schemas/sitemap/0.9"</span><span class="punct">&gt;</span></span>
-    <span class="children"><xsl:apply-templates select="s:url"/></span>
-    <span class="node"><span class="punct">&lt;/</span><span class="tag-name">urlset</span><span class="punct">&gt;</span></span>
-  </xsl:template>
-
-  <xsl:template match="s:sitemap">
-    <span class="node"><span class="caret">▼</span><span class="punct">&lt;</span><span class="tag-name">sitemap</span><span class="punct">&gt;</span></span>
-    <span class="children">
-      <span class="node"><span class="punct">&lt;</span><span class="tag-name">loc</span><span class="punct">&gt;</span><a href="{s:loc}"><xsl:value-of select="s:loc"/></a><span class="punct">&lt;/</span><span class="tag-name">loc</span><span class="punct">&gt;</span></span>
-      <xsl:if test="s:lastmod">
-        <span class="node"><span class="punct">&lt;</span><span class="tag-name">lastmod</span><span class="punct">&gt;</span><span class="text"><xsl:value-of select="s:lastmod"/></span><span class="punct">&lt;/</span><span class="tag-name">lastmod</span><span class="punct">&gt;</span></span>
-      </xsl:if>
-    </span>
-    <span class="node"><span class="punct">&lt;/</span><span class="tag-name">sitemap</span><span class="punct">&gt;</span></span>
-  </xsl:template>
-
-  <xsl:template match="s:url">
-    <span class="node"><span class="caret">▼</span><span class="punct">&lt;</span><span class="tag-name">url</span><span class="punct">&gt;</span></span>
-    <span class="children">
-      <span class="node"><span class="punct">&lt;</span><span class="tag-name">loc</span><span class="punct">&gt;</span><a href="{s:loc}"><xsl:value-of select="s:loc"/></a><span class="punct">&lt;/</span><span class="tag-name">loc</span><span class="punct">&gt;</span></span>
-      <xsl:if test="s:lastmod">
-        <span class="node"><span class="punct">&lt;</span><span class="tag-name">lastmod</span><span class="punct">&gt;</span><span class="text"><xsl:value-of select="s:lastmod"/></span><span class="punct">&lt;/</span><span class="tag-name">lastmod</span><span class="punct">&gt;</span></span>
-      </xsl:if>
-      <xsl:if test="s:changefreq">
-        <span class="node"><span class="punct">&lt;</span><span class="tag-name">changefreq</span><span class="punct">&gt;</span><span class="text"><xsl:value-of select="s:changefreq"/></span><span class="punct">&lt;/</span><span class="tag-name">changefreq</span><span class="punct">&gt;</span></span>
-      </xsl:if>
-      <xsl:if test="s:priority">
-        <span class="node"><span class="punct">&lt;</span><span class="tag-name">priority</span><span class="punct">&gt;</span><span class="text"><xsl:value-of select="s:priority"/></span><span class="punct">&lt;/</span><span class="tag-name">priority</span><span class="punct">&gt;</span></span>
-      </xsl:if>
-    </span>
-    <span class="node"><span class="punct">&lt;/</span><span class="tag-name">url</span><span class="punct">&gt;</span></span>
   </xsl:template>
 </xsl:stylesheet>
