@@ -1966,17 +1966,46 @@ const AdminDashboard = () => {
 
         {/* Phase 5 — live sitemap */}
         <Card className="p-5 sm:p-6 space-y-3">
-          <SectionHeader icon={Globe} title="Live sitemap" subtitle="Auto-updates from admin changes. Submit the XML to Google Search Console." />
-          <div className="grid gap-2">
-            <a
-              href="/sitemap.xml"
-              target="_blank" rel="noopener noreferrer"
-              className="rounded-lg border border-border px-3 py-2 text-xs font-mono text-foreground hover:bg-muted/40 break-all"
-            >
-              <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-sans">Raw XML (for Google)</span>
-              /sitemap.xml
-            </a>
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <SectionHeader icon={Globe} title="Live sitemap" subtitle="Auto-updates from admin changes. Submit the XML to Google Search Console." />
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  try {
+                    const r = await fetch(`/sitemap.xml?t=${Date.now()}`, { cache: "no-store" });
+                    const xml = await r.text();
+                    await navigator.clipboard.writeText(xml);
+                    toast.success("Copied");
+                  } catch { toast.error("Copy failed"); }
+                }}
+              >
+                <Copy className="h-4 w-4" /> Copy
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  try {
+                    const r = await fetch(`/sitemap.xml?t=${Date.now()}`, { cache: "no-store" });
+                    const xml = await r.text();
+                    downloadFile("sitemap.xml", xml, "application/xml");
+                  } catch { toast.error("Download failed"); }
+                }}
+              >
+                <Download className="h-4 w-4" /> Download
+              </Button>
+            </div>
           </div>
+          <a
+            href="/sitemap.xml"
+            target="_blank" rel="noopener noreferrer"
+            className="block rounded-lg border border-border px-3 py-2 text-xs font-mono text-foreground hover:bg-muted/40 break-all"
+          >
+            <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1 font-sans">Raw XML (for Google)</span>
+            /sitemap.xml
+          </a>
         </Card>
 
         <SeoBlock pageKey="strategy-call" seo={seo} updatePageSeo={updatePageSeo} />

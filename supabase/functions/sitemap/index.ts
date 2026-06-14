@@ -241,7 +241,7 @@ Deno.serve(async (req) => {
 
     const [settingsRes, postsRes] = await Promise.all([
       sb.from('site_settings').select('seo, custom_pages, portfolio, case_studies, content, updated_at').eq('id', 1).maybeSingle(),
-      sb.from('blog_posts').select('slug, date'),
+      sb.from('blog_posts').select('slug, date, updated_at'),
     ]);
 
     const s: any = settingsRes.data ?? {};
@@ -309,7 +309,7 @@ Deno.serve(async (req) => {
         if (ps.status === 'draft' || ps.robots === 'noindex') continue;
         blogEntries.push({
           path: `/${blogParent}/${p.slug}`,
-          lastmod: p.date || settingsDate,
+          lastmod: (p.updated_at ? String(p.updated_at).slice(0, 10) : null) || p.date || settingsDate,
           changefreq: ps.changefreq || 'monthly',
           priority: ps.priority || '0.7',
         });

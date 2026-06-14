@@ -31,6 +31,7 @@ export type Database = {
           read_time: string
           slug: string
           title: string
+          updated_at: string
         }
         Insert: {
           author?: string
@@ -48,6 +49,7 @@ export type Database = {
           read_time?: string
           slug: string
           title: string
+          updated_at?: string
         }
         Update: {
           author?: string
@@ -65,6 +67,7 @@ export type Database = {
           read_time?: string
           slug?: string
           title?: string
+          updated_at?: string
         }
         Relationships: []
       }
