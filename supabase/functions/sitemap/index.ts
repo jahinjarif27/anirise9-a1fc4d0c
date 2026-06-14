@@ -369,15 +369,20 @@ Deno.serve(async (req) => {
       all: [...pagesEntries, ...servicesEntries, ...blogEntries, ...portfolioEntries, ...customEntries],
     };
 
+    const htmlMode = wantsHtml(req, url);
+    const htmlHeaders = { ...cors, 'content-type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, max-age=0, s-maxage=0' };
+
     if (sub && map[sub]) {
-      return new Response(renderUrlset(map[sub], siteUrl), { headers: xmlHeaders });
+      return htmlMode
+        ? new Response(renderHtmlUrlset(map[sub], siteUrl), { headers: htmlHeaders })
+        : new Response(renderUrlset(map[sub], siteUrl), { headers: xmlHeaders });
     }
 
-    // Always return plain XML at /sitemap.xml. Vercel auto-applies a sandbox
-    // CSP to .xml responses which breaks both inline HTML and cross-origin
-    // XSL stylesheets, so the most reliable cross-browser view is the
-    // browser's native XML tree viewer. Crawlers (Google/Bing) need XML too.
-    return new Response(renderUrlset(map.all, siteUrl), { headers: xmlHeaders });
+    // /sitemap.xml stays plain XML for crawlers. /sitemap (rewritten with
+    // view=html) renders a styled HTML viewer that matches the admin preview.
+    return htmlMode
+      ? new Response(renderHtmlUrlset(map.all, siteUrl), { headers: htmlHeaders })
+      : new Response(renderUrlset(map.all, siteUrl), { headers: xmlHeaders });
   } catch (e) {
     console.error('sitemap error', e);
     return new Response(`<!-- sitemap error: ${(e as Error).message} -->`, {
