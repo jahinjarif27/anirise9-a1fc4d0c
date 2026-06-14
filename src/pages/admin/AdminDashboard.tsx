@@ -3006,51 +3006,47 @@ const AdminDashboard = () => {
                     </div>
                   </div>
 
-                  {seo.autoSitemap ? (
-                    <LiveSitemapPreview />
-                  ) : (
-                    <>
-                      <SitemapUrlsEditor
-                        sitemap={seo.sitemap}
-                        canonicalUrl={seo.canonicalUrl}
-                        onChange={(xml) => updateSeo({ sitemap: xml, autoSitemap: false })}
-                      />
-                      <div>
-                        <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
-                        <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value, autoSitemap: false })} />
-                      </div>
-                      <div className="flex flex-wrap justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            window.open(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, "_blank", "noopener,noreferrer");
-                          }}
-                        >
-                          <Eye className="h-4 w-4" /> Review
-                        </Button>
-                        <Button
-                          variant="hero"
-                          size="sm"
-                          onClick={async () => {
-                            updateSeo({ sitemap: seo.sitemap, autoSitemap: false });
-                            const tId = toast.loading("Saving sitemap…");
-                            const r = await saveAllNow();
-                            if (!r.ok) {
-                              toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
-                              return;
-                            }
-                            try {
-                              await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, { cache: "no-store" });
-                            } catch {}
-                            toast.success("Sitemap saved — live URL refreshed", { id: tId });
-                          }}
-                        >
-                          <Save className="h-4 w-4" /> Save sitemap
-                        </Button>
-                      </div>
-                    </>
-                  )}
+                  {seo.autoSitemap && <LiveSitemapPreview />}
+
+                  <SitemapUrlsEditor
+                    sitemap={seo.sitemap}
+                    canonicalUrl={seo.canonicalUrl}
+                    onChange={(xml) => updateSeo({ sitemap: xml, autoSitemap: false })}
+                  />
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
+                    <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value, autoSitemap: false })} />
+                  </div>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        window.open(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, "_blank", "noopener,noreferrer");
+                      }}
+                    >
+                      <Eye className="h-4 w-4" /> Review
+                    </Button>
+                    <Button
+                      variant="hero"
+                      size="sm"
+                      onClick={async () => {
+                        updateSeo({ sitemap: seo.sitemap, autoSitemap: false });
+                        const tId = toast.loading("Saving sitemap…");
+                        const r = await saveAllNow();
+                        if (!r.ok) {
+                          toast.error(`Save failed: ${r.error || "unknown"}`, { id: tId });
+                          return;
+                        }
+                        try {
+                          await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?t=${Date.now()}`, { cache: "no-store" });
+                        } catch {}
+                        toast.success("Sitemap saved — live URL refreshed", { id: tId });
+                      }}
+                    >
+                      <Save className="h-4 w-4" /> Save sitemap
+                    </Button>
+                  </div>
 
                   <div className="rounded-xl bg-secondary/40 border border-border/60 p-4 text-xs text-muted-foreground leading-relaxed">
                     <p className="font-bold text-foreground mb-1.5 text-sm">How this works</p>
