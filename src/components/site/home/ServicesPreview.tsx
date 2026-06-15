@@ -114,7 +114,7 @@ export const ServicesPreview = () => {
           </div>
         </div>
 
-        <SectionNote id="servicesPreview" tone="onLight" />
+        <SectionNote id="servicesPreview" tone="light" />
       </section>
     );
   }
@@ -202,7 +202,7 @@ export const ServicesPreview = () => {
           </div>
         </div>
 
-        <SectionNote id="servicesPreview" tone="onLight" />
+        <SectionNote id="servicesPreview" tone="light" />
       </section>
     );
   }
