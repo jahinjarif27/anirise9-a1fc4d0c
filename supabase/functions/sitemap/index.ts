@@ -222,7 +222,7 @@ function wantsHtml(req: Request, url: URL): boolean {
 function renderSitemapIndex(children: Array<{ name: string; lastmod: string }>, siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<?xml-stylesheet type="text/xsl" href="/sitemap.xsl?v=2"?>\n` +
+    `<?xml-stylesheet type="text/css" href="/sitemap.xml?style=css&amp;v=3"?>\n` +
     `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     children
       .map(
