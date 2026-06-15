@@ -1532,6 +1532,31 @@ const AdminDashboard = () => {
                   />
                 </div>
               )}
+              {activePage === "services" && (
+                <div className="p-3 rounded-lg border border-border bg-background/40 space-y-2">
+                  <p className="text-sm font-medium text-foreground">Home preview layout</p>
+                  <p className="text-xs text-muted-foreground">Choose how the services preview appears on the home page. Switch anytime — both designs stay available.</p>
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    {([
+                      { v: "marquee", label: "Auto-scroll carousel", desc: "Original animated marquee" },
+                      { v: "grid", label: "Static 3 × 2 grid", desc: "Clean, no animation" },
+                    ] as const).map((opt) => {
+                      const active = (c.servicesLayout || "marquee") === opt.v;
+                      return (
+                        <button
+                          key={opt.v}
+                          type="button"
+                          onClick={() => updateContent({ servicesLayout: opt.v } as any)}
+                          className={`text-left p-3 rounded-md border transition-colors ${active ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border bg-background hover:border-primary/40"}`}
+                        >
+                          <p className="text-sm font-semibold text-foreground">{opt.label}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{opt.desc}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               {cfg.image && (
                 <ImageUpload
                   label={cfg.image.label}
