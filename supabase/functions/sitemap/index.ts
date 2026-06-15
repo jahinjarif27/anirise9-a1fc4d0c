@@ -67,10 +67,15 @@ function normalizeXml(xml: string): string {
   const clean = xml.replace(/<\?xml-stylesheet[\s\S]*?\?>\s*/gi, '').trim();
   const declaration = clean.match(/^<\?xml[^?]*\?>\s*/i)?.[0] || '<?xml version="1.0" encoding="UTF-8"?>\n';
   const body = clean.startsWith(declaration) ? clean.slice(declaration.length) : clean;
-  // Always inject our stylesheet so raw /sitemap.xml renders nicely in browsers
-  // (crawlers like Googlebot ignore xml-stylesheet PIs).
-  const stylesheet = '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl?v=2"?>\n';
+  // Use CSS (not XSL) so browsers render visible text reliably while crawlers
+  // still receive a valid XML sitemap.
+  const stylesheet = '<?xml-stylesheet type="text/css" href="/sitemap.xml?style=css&amp;v=3"?>\n';
   return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}${stylesheet}${body}\n`;
+}
+
+function renderCss(): string {
+  return `@namespace s url("http://www.sitemaps.org/schemas/sitemap/0.9");
+*{box-sizing:border-box} s|urlset,s|sitemapindex{display:block;min-height:100vh;margin:0;background:#f8fafc;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;line-height:1.5;counter-reset:item;padding:146px 16px 48px} s|urlset::before,s|sitemapindex::before{content:"Live sitemap\\A Auto-generated from your admin";white-space:pre;display:block;position:fixed;top:0;left:0;right:0;background:#162033;color:#f8fafc;border-bottom:4px solid #6366f1;padding:32px 24px;font-size:22px;font-weight:750;z-index:2} s|urlset::after{content:"Live URLs from /sitemap.xml";display:block;position:fixed;top:126px;left:16px;color:#64748b;font-size:12px;z-index:2} s|url,s|sitemap{display:flex;align-items:center;gap:12px;max-width:1080px;margin:0 auto;background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-bottom:1px solid #eef2f7;padding:12px 16px;flex-wrap:wrap} s|url:first-of-type,s|sitemap:first-of-type{border-top:1px solid #e2e8f0;border-radius:14px 14px 0 0} s|url:last-of-type,s|sitemap:last-of-type{border-radius:0 0 14px 14px} s|url::before,s|sitemap::before{counter-increment:item;content:counter(item);width:24px;flex-shrink:0;color:#94a3b8;font:11px ui-monospace,SFMono-Regular,Menlo,monospace} s|loc{display:block;flex:1;min-width:220px;color:#2563eb;font:12.5px ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere} s|priority{display:inline-flex;align-items:center;background:#f1f5f9;color:#334155;border-radius:999px;padding:2px 8px;font-size:10.5px;font-weight:700} s|priority::before{content:"P "} s|changefreq{display:inline-flex;align-items:center;background:#fff;color:#475569;border:1px solid #e2e8f0;border-radius:999px;padding:2px 8px;font-size:10.5px;font-weight:700} s|lastmod{display:inline-flex;color:#94a3b8;font:10.5px ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:560px){s|urlset,s|sitemapindex{padding-left:10px;padding-right:10px}s|url,s|sitemap{padding:11px 12px}s|url::before,s|sitemap::before{width:20px}}`;
 }
 
 
