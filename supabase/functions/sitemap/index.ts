@@ -255,6 +255,25 @@ Deno.serve(async (req) => {
     const manualSitemap = typeof s.seo?.sitemap === 'string' ? s.seo.sitemap.trim() : '';
     const useManual = s.seo?.autoSitemap === false && isSafeManualSitemap(manualSitemap);
     if (useManual && (!sub || sub === 'all')) {
+      const htmlMode = wantsHtml(req, url);
+      if (htmlMode) {
+        // Parse manual XML to entries for the styled HTML viewer.
+        const parsed: Entry[] = [];
+        for (const m of manualSitemap.matchAll(/<url>([\s\S]*?)<\/url>/gi)) {
+          const block = m[1];
+          const loc = (block.match(/<loc>([\s\S]*?)<\/loc>/i) || [])[1]?.trim() || '';
+          if (!loc) continue;
+          const lastmod = (block.match(/<lastmod>([\s\S]*?)<\/lastmod>/i) || [])[1]?.trim();
+          const changefreq = (block.match(/<changefreq>([\s\S]*?)<\/changefreq>/i) || [])[1]?.trim();
+          const priority = (block.match(/<priority>([\s\S]*?)<\/priority>/i) || [])[1]?.trim();
+          // Strip site origin so renderHtmlUrlset re-prefixes consistently
+          const path = loc.startsWith(siteUrl) ? loc.slice(siteUrl.length) || '/' : loc;
+          parsed.push({ path: path.startsWith('/') ? path : `/${path}`, lastmod, changefreq, priority });
+        }
+        return new Response(renderHtmlUrlset(parsed, siteUrl), {
+          headers: { ...cors, 'content-type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, max-age=0, s-maxage=0' },
+        });
+      }
       return new Response(normalizeXml(manualSitemap), { headers: xmlHeaders });
     }
     const customPages: any[] = Array.isArray(s.custom_pages) ? s.custom_pages : [];
