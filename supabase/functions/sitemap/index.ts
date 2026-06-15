@@ -134,7 +134,7 @@ function renderXsl(): string {
 function renderUrlset(entries: Entry[], siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<?xml-stylesheet type="text/xsl" href="/sitemap.xsl?v=2"?>\n` +
+    `<?xml-stylesheet type="text/css" href="/sitemap.xml?style=css&amp;v=3"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     entries
       .map((e) =>
@@ -241,6 +241,11 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   try {
     const url = new URL(req.url);
+    if (url.searchParams.get('style') === 'css') {
+      return new Response(renderCss(), {
+        headers: { ...cors, 'content-type': 'text/css; charset=utf-8', 'Cache-Control': 'no-store, max-age=0, s-maxage=0', 'X-Content-Type-Options': 'nosniff' },
+      });
+    }
     if (url.searchParams.get('xsl') === '1') {
       return new Response(renderXsl(), {
         headers: { ...cors, 'content-type': 'application/xslt+xml; charset=utf-8', 'Cache-Control': 'no-store, max-age=0, s-maxage=0' },
