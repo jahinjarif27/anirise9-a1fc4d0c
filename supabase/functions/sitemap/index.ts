@@ -64,8 +64,12 @@ function normalizeXml(xml: string): string {
   const clean = xml.replace(/<\?xml-stylesheet[\s\S]*?\?>\s*/gi, '').trim();
   const declaration = clean.match(/^<\?xml[^?]*\?>\s*/i)?.[0] || '<?xml version="1.0" encoding="UTF-8"?>\n';
   const body = clean.startsWith(declaration) ? clean.slice(declaration.length) : clean;
-  return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}${body}\n`;
+  // Always inject our stylesheet so raw /sitemap.xml renders nicely in browsers
+  // (crawlers like Googlebot ignore xml-stylesheet PIs).
+  const stylesheet = '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>\n';
+  return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}${stylesheet}${body}\n`;
 }
+
 
 function renderXsl(): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -122,6 +126,7 @@ function renderXsl(): string {
 function renderUrlset(entries: Entry[], siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     entries
       .map((e) =>
@@ -250,6 +255,25 @@ Deno.serve(async (req) => {
     const manualSitemap = typeof s.seo?.sitemap === 'string' ? s.seo.sitemap.trim() : '';
     const useManual = s.seo?.autoSitemap === false && isSafeManualSitemap(manualSitemap);
     if (useManual && (!sub || sub === 'all')) {
+      const htmlMode = wantsHtml(req, url);
+      if (htmlMode) {
+        // Parse manual XML to entries for the styled HTML viewer.
+        const parsed: Entry[] = [];
+        for (const m of manualSitemap.matchAll(/<url>([\s\S]*?)<\/url>/gi)) {
+          const block = m[1];
+          const loc = (block.match(/<loc>([\s\S]*?)<\/loc>/i) || [])[1]?.trim() || '';
+          if (!loc) continue;
+          const lastmod = (block.match(/<lastmod>([\s\S]*?)<\/lastmod>/i) || [])[1]?.trim();
+          const changefreq = (block.match(/<changefreq>([\s\S]*?)<\/changefreq>/i) || [])[1]?.trim();
+          const priority = (block.match(/<priority>([\s\S]*?)<\/priority>/i) || [])[1]?.trim();
+          // Strip site origin so renderHtmlUrlset re-prefixes consistently
+          const path = loc.startsWith(siteUrl) ? loc.slice(siteUrl.length) || '/' : loc;
+          parsed.push({ path: path.startsWith('/') ? path : `/${path}`, lastmod, changefreq, priority });
+        }
+        return new Response(renderHtmlUrlset(parsed, siteUrl), {
+          headers: { ...cors, 'content-type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, max-age=0, s-maxage=0' },
+        });
+      }
       return new Response(normalizeXml(manualSitemap), { headers: xmlHeaders });
     }
     const customPages: any[] = Array.isArray(s.custom_pages) ? s.custom_pages : [];
