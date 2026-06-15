@@ -4,14 +4,14 @@ import { useServices } from "@/lib/useServices";
 import { useAdmin } from "@/context/AdminContext";
 import { SectionNote } from "@/components/site/SectionNote";
 
-// Rotating accent tints for icon tiles (split layout)
+// Rotating gradient tints for icon tiles (split layout)
 const SPLIT_TINTS = [
-  "bg-accent text-accent-foreground",
-  "bg-primary text-primary-foreground",
-  "bg-foreground text-background",
-  "bg-accent/80 text-accent-foreground",
-  "bg-primary/80 text-primary-foreground",
-  "bg-foreground/85 text-background",
+  "bg-gradient-to-br from-accent to-accent/70 text-accent-foreground ring-accent/30",
+  "bg-gradient-to-br from-primary to-primary/70 text-primary-foreground ring-primary/30",
+  "bg-gradient-to-br from-foreground to-foreground/70 text-background ring-foreground/20",
+  "bg-gradient-to-br from-accent/90 via-primary/70 to-primary text-primary-foreground ring-primary/30",
+  "bg-gradient-to-br from-primary via-accent/70 to-accent text-accent-foreground ring-accent/30",
+  "bg-gradient-to-br from-foreground/90 via-primary/70 to-accent text-background ring-foreground/20",
 ];
 
 export const ServicesPreview = () => {
