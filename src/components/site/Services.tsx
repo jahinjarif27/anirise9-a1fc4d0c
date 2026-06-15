@@ -108,7 +108,7 @@ export const Services = () => {
               A closer look at what each service includes and how it moves the needle for your business.
             </p>
           </div>
-          <div className="space-y-20 lg:space-y-28">
+          <div className="space-y-16 lg:space-y-20">
             {services.map((service, i) => (
               <ZigzagRow key={service.slug} service={service} index={i} />
             ))}
