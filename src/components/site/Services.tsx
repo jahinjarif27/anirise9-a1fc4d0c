@@ -37,36 +37,36 @@ const ZigzagRow = ({ service, index }: { service: Service; index: number }) => {
   const Icon = service.icon;
 
   return (
-    <div className={`grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-14 items-center ${reverse ? "md:[&>*:first-child]:order-2" : ""}`}>
+    <div className={`grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-12 items-center ${reverse ? "md:[&>*:first-child]:order-2" : ""}`}>
       <div className="relative">
-        <div className="aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-primary shadow-elegant grid place-items-center p-6">
+        <div className="aspect-[16/10] lg:aspect-[5/4] max-w-[520px] mx-auto rounded-2xl overflow-hidden bg-gradient-primary shadow-card grid place-items-center p-3 sm:p-4">
           {image ? (
             <img
               src={image}
               alt={imageAlt}
               loading="lazy"
-              className="w-full h-full object-cover rounded-2xl"
+              className="w-full h-full object-contain rounded-xl"
             />
           ) : (
-            <Icon className="h-20 w-20 text-primary-foreground/80" />
+            <Icon className="h-16 w-16 text-primary-foreground/80" />
           )}
         </div>
-        <div className="hidden md:flex absolute -bottom-5 right-5 items-center gap-2 bg-card rounded-xl shadow-elegant px-4 py-2 border border-border/60">
-          <Icon className="h-4 w-4 text-accent" />
-          <span className="text-xs font-bold tracking-wide">{service.title}</span>
+        <div className="hidden md:flex absolute -bottom-4 right-4 items-center gap-2 bg-card rounded-lg shadow-elegant px-3 py-1.5 border border-border/60">
+          <Icon className="h-3.5 w-3.5 text-accent" />
+          <span className="text-[11px] font-bold tracking-wide">{service.title}</span>
         </div>
       </div>
 
-      <div>
+      <div className="max-w-xl">
         {showHeading && (
-          <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight mb-5">
+          <h3 className="text-2xl sm:text-3xl lg:text-[2rem] font-extrabold text-foreground leading-tight mb-4">
             {heading}
           </h3>
         )}
-        <MarkdownContent content={desc} className="prose-lg sm:prose-xl text-lg sm:text-xl leading-relaxed" />
+        <MarkdownContent content={desc} className="prose-base sm:prose-lg text-base sm:text-[17px] leading-relaxed" />
         <Link
           to={`/services/${service.publicSlug}`}
-          className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:gap-2 transition-all"
+          className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:gap-2 transition-all"
         >
           Explore {service.title} <ArrowRight className="h-4 w-4" />
         </Link>
