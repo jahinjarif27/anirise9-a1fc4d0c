@@ -138,7 +138,7 @@ function renderXsl(): string {
 function renderUrlset(entries: Entry[], siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<?xml-stylesheet type="text/css" href="/sitemap-style.css?v=3"?>\n` +
+    sitemapStylesheetPi() +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     entries
       .map((e) =>
@@ -226,7 +226,7 @@ function wantsHtml(req: Request, url: URL): boolean {
 function renderSitemapIndex(children: Array<{ name: string; lastmod: string }>, siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<?xml-stylesheet type="text/css" href="/sitemap-style.css?v=3"?>\n` +
+    sitemapStylesheetPi() +
     `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     children
       .map(
