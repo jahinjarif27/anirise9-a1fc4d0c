@@ -3401,7 +3401,7 @@ function buildSitemapXml(rows: SitemapRow[]): string {
       `  <url><loc>${r.loc.trim()}</loc><lastmod>${(r.lm || todayISO()).trim()}</lastmod><changefreq>${(r.cf || "monthly").trim()}</changefreq><priority>${r.pr}</priority></url>`,
     )
     .join("\n");
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${inner}\n</urlset>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${inner}\n</urlset>`;
 }
 
 function SitemapUrlsEditor({
