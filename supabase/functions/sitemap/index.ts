@@ -64,8 +64,12 @@ function normalizeXml(xml: string): string {
   const clean = xml.replace(/<\?xml-stylesheet[\s\S]*?\?>\s*/gi, '').trim();
   const declaration = clean.match(/^<\?xml[^?]*\?>\s*/i)?.[0] || '<?xml version="1.0" encoding="UTF-8"?>\n';
   const body = clean.startsWith(declaration) ? clean.slice(declaration.length) : clean;
-  return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}${body}\n`;
+  // Always inject our stylesheet so raw /sitemap.xml renders nicely in browsers
+  // (crawlers like Googlebot ignore xml-stylesheet PIs).
+  const stylesheet = '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>\n';
+  return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}${stylesheet}${body}\n`;
 }
+
 
 function renderXsl(): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
