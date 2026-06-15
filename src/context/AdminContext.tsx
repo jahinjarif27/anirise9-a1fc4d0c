@@ -64,8 +64,8 @@ type SiteContent = {
   servicesBlurb: string;
   servicesImage: string;
   servicesImageAlt: string;
-  /** Home → Services preview layout. "marquee" = original auto-scroll carousel, "grid" = static 3×2 grid. */
-  servicesLayout?: "marquee" | "grid";
+  /** Home → Services preview layout. "marquee" = original auto-scroll carousel, "grid" = clean 3×2 grid with dividers, "split" = list with centered icons (image-2 style). */
+  servicesLayout?: "marquee" | "grid" | "split";
   aboutHeadline: string;
   aboutBlurb: string;
   aboutImage: string;

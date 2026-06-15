@@ -1536,10 +1536,11 @@ const AdminDashboard = () => {
                 <div className="p-3 rounded-lg border border-border bg-background/40 space-y-2">
                   <p className="text-sm font-medium text-foreground">Home preview layout</p>
                   <p className="text-xs text-muted-foreground">Choose how the services preview appears on the home page. Switch anytime — both designs stay available.</p>
-                  <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
                     {([
                       { v: "marquee", label: "Auto-scroll carousel", desc: "Original animated marquee" },
-                      { v: "grid", label: "Static 3 × 2 grid", desc: "Clean, no animation" },
+                      { v: "grid", label: "Clean 3 × 2 grid", desc: "Light cards with dividers" },
+                      { v: "split", label: "Icon-centered list", desc: "Two columns, centered icon tiles" },
                     ] as const).map((opt) => {
                       const active = (c.servicesLayout || "marquee") === opt.v;
                       return (
