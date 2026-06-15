@@ -67,14 +67,7 @@ function normalizeXml(xml: string): string {
   const clean = xml.replace(/<\?xml-stylesheet[\s\S]*?\?>\s*/gi, '').trim();
   const declaration = clean.match(/^<\?xml[^?]*\?>\s*/i)?.[0] || '<?xml version="1.0" encoding="UTF-8"?>\n';
   const body = clean.startsWith(declaration) ? clean.slice(declaration.length) : clean;
-  // Use CSS (not XSL) so browsers render visible text reliably while crawlers
-  // still receive a valid XML sitemap.
-  const stylesheet = sitemapStylesheetPi();
-  return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}${stylesheet}${body}\n`;
-}
-
-function sitemapStylesheetPi(): string {
-  return `<?xml-stylesheet type="text/css" href="data:text/css;charset=utf-8,${encodeURIComponent(renderCss())}"?>\n`;
+  return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}${body}\n`;
 }
 
 function renderCss(): string {
@@ -138,7 +131,6 @@ function renderXsl(): string {
 function renderUrlset(entries: Entry[], siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    sitemapStylesheetPi() +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     entries
       .map((e) =>
@@ -226,7 +218,6 @@ function wantsHtml(req: Request, url: URL): boolean {
 function renderSitemapIndex(children: Array<{ name: string; lastmod: string }>, siteUrl: string): string {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    sitemapStylesheetPi() +
     `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     children
       .map(
