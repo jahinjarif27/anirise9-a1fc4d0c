@@ -41,11 +41,14 @@ const cors = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const sitemapCsp = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+
 const xmlHeaders = {
   ...cors,
   'content-type': 'application/xml; charset=utf-8',
   'Cache-Control': 'no-store, max-age=0, s-maxage=0',
   'X-Content-Type-Options': 'nosniff',
+  'Content-Security-Policy': sitemapCsp,
 };
 
 function normalizeSiteUrl(value?: string): string {
