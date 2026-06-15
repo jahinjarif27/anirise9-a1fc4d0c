@@ -41,7 +41,7 @@ const cors = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const sitemapCsp = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+const sitemapCsp = "default-src 'self'; style-src 'self' 'unsafe-inline' data:; script-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 
 const xmlHeaders = {
   ...cors,
@@ -69,8 +69,12 @@ function normalizeXml(xml: string): string {
   const body = clean.startsWith(declaration) ? clean.slice(declaration.length) : clean;
   // Use CSS (not XSL) so browsers render visible text reliably while crawlers
   // still receive a valid XML sitemap.
-  const stylesheet = '<?xml-stylesheet type="text/css" href="/sitemap-style.css?v=3"?>\n';
+  const stylesheet = sitemapStylesheetPi();
   return `${declaration}${declaration.endsWith('\n') ? '' : '\n'}${stylesheet}${body}\n`;
+}
+
+function sitemapStylesheetPi(): string {
+  return `<?xml-stylesheet type="text/css" href="data:text/css;charset=utf-8,${encodeURIComponent(renderCss())}"?>\n`;
 }
 
 function renderCss(): string {
