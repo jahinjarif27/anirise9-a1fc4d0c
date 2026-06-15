@@ -64,6 +64,8 @@ type SiteContent = {
   servicesBlurb: string;
   servicesImage: string;
   servicesImageAlt: string;
+  /** Home → Services preview layout. "marquee" = original auto-scroll carousel, "grid" = static 3×2 grid. */
+  servicesLayout?: "marquee" | "grid";
   aboutHeadline: string;
   aboutBlurb: string;
   aboutImage: string;
@@ -437,6 +439,7 @@ const defaultContent: SiteContent = {
   servicesBlurb: "From visibility to growth — every service is built around helping your business succeed online.",
   servicesImage: "",
   servicesImageAlt: "",
+  servicesLayout: "marquee",
   aboutHeadline: "Visibility · Growth · Success",
   aboutBlurb: "AniRise is a digital agency helping brands rise online with SEO, web development, and marketing.",
   aboutImage: logoImg,
