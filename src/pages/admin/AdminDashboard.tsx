@@ -3011,22 +3011,10 @@ const AdminDashboard = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        // Open the styled HTML viewer (not raw XML, which browsers render
-                        // with a built-in tree viewer that shows ugly +/− markers next to
-                        // every node). `view=html` triggers renderHtmlUrlset in the edge fn.
-                        window.open(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?view=html&t=${Date.now()}`, "_blank", "noopener,noreferrer");
+                        window.open(`https://anirise.com.bd/sitemap.xml?t=${Date.now()}`, "_blank", "noopener,noreferrer");
                       }}
                     >
                       <Eye className="h-4 w-4" /> Review
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        window.open(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/sitemap?format=xml&t=${Date.now()}`, "_blank", "noopener,noreferrer");
-                      }}
-                    >
-                      <Code2 className="h-4 w-4" /> View XML
                     </Button>
                     <Button
                       variant="hero"
