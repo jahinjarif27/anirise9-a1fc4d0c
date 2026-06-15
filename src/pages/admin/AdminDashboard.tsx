@@ -3007,14 +3007,14 @@ const AdminDashboard = () => {
                     <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value, autoSitemap: false })} />
                   </div>
                   <div className="flex flex-wrap justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        window.open(`https://anirise.com.bd/sitemap.xml?t=${Date.now()}`, "_blank", "noopener,noreferrer");
-                      }}
-                    >
-                      <Eye className="h-4 w-4" /> Review
+                    <Button asChild variant="outline" size="sm">
+                      <a
+                        href={`https://anirise.com.bd/sitemap.xml?t=${Date.now()}`}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        <Eye className="h-4 w-4" /> Review
+                      </a>
                     </Button>
                     <Button
                       variant="hero"
