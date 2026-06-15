@@ -119,84 +119,95 @@ export const ServicesPreview = () => {
     );
   }
 
-  // ---------- Split layout (image-2 style: two columns, centered colored icon tiles) ----------
+  // ---------- Split layout (image-2 style: centered icon-led list) ----------
   if (layout === "split") {
     const splitServices = services.slice(0, 6);
-    // arrange in 3 rows of [left, right]
     const rows: typeof splitServices[] = [];
     for (let i = 0; i < splitServices.length; i += 2) {
       rows.push(splitServices.slice(i, i + 2));
     }
 
+    const renderItem = (
+      s: (typeof splitServices)[number],
+      tintIdx: number,
+      side: "left" | "right",
+    ) => {
+      const sp = servicePreviews?.[s.slug];
+      const title = sp?.title?.trim() || s.title;
+      const desc = sp?.desc?.trim() || s.desc;
+      const tint = SPLIT_TINTS[tintIdx % SPLIT_TINTS.length];
+      // On lg+: left side aligns text to the right with icon on the right; right side mirrors.
+      // On smaller screens everything is centered.
+      const sideClasses =
+        side === "left"
+          ? "lg:flex-row-reverse lg:text-right"
+          : "lg:flex-row lg:text-left";
+
+      return (
+        <Link
+          to={`/services/${s.publicSlug}`}
+          className={`group flex flex-col items-center text-center gap-5 ${sideClasses} lg:items-center`}
+        >
+          {/* Icon tile */}
+          <div className="relative shrink-0">
+            <div
+              aria-hidden
+              className={`absolute inset-0 rounded-2xl ${tint.split(" ").filter(c => c.startsWith("bg-") || c.startsWith("from-") || c.startsWith("via-") || c.startsWith("to-")).join(" ")} blur-xl opacity-40 group-hover:opacity-70 transition-opacity`}
+            />
+            <div
+              className={`relative h-16 w-16 sm:h-[72px] sm:w-[72px] rounded-2xl ${tint} grid place-items-center shadow-elegant ring-1 ring-inset group-hover:scale-105 group-hover:-rotate-3 transition-smooth`}
+            >
+              <s.icon className="h-8 w-8 sm:h-9 sm:w-9" strokeWidth={1.6} />
+            </div>
+          </div>
+
+          {/* Text */}
+          <div className="min-w-0 max-w-xs">
+            <h3 className="text-lg sm:text-xl font-extrabold tracking-tight text-foreground mb-1 group-hover:text-accent transition-colors">
+              {title}
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+              {desc}
+            </p>
+            <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.18em] text-accent opacity-0 group-hover:opacity-100 transition-opacity">
+              Learn more <ArrowRight className="h-3 w-3" />
+            </span>
+          </div>
+        </Link>
+      );
+    };
+
     return (
       <section className="py-20 lg:py-24 bg-background relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-accent/5 blur-3xl pointer-events-none" aria-hidden />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-full bg-gradient-to-b from-transparent via-border/60 to-transparent hidden lg:block" aria-hidden />
 
         {LightHeader}
 
         <div className="container relative max-w-5xl">
-          <div className="space-y-10 lg:space-y-14">
+          <div className="space-y-12 lg:space-y-16">
             {rows.map((pair, rIdx) => (
               <div
                 key={rIdx}
-                className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-6 md:gap-10"
+                className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-center gap-10 lg:gap-12 justify-items-center"
               >
-                {/* Left service — text right-aligned, icon to its right */}
-                {pair[0] ? (() => {
-                  const s = pair[0];
-                  const sp = servicePreviews?.[s.slug];
-                  const title = sp?.title?.trim() || s.title;
-                  const desc = sp?.desc?.trim() || s.desc;
-                  const tint = SPLIT_TINTS[(rIdx * 2) % SPLIT_TINTS.length];
-                  return (
-                    <>
-                      <Link
-                        to={`/services/${s.publicSlug}`}
-                        className="group flex md:flex-row-reverse flex-row items-center gap-5 md:text-right"
-                      >
-                        <div className={`shrink-0 h-16 w-16 rounded-xl ${tint} grid place-items-center shadow-elegant group-hover:scale-105 transition-smooth`}>
-                          <s.icon className="h-8 w-8" strokeWidth={1.75} />
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="text-lg font-extrabold tracking-tight text-foreground mb-1 group-hover:text-accent transition-colors">
-                            {title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                            {desc}
-                          </p>
-                        </div>
-                      </Link>
-                      <div className="hidden md:block w-px h-20 bg-border/60 mx-auto" aria-hidden />
-                    </>
-                  );
-                })() : <><div /><div className="hidden md:block" /></>}
+                {pair[0] ? (
+                  renderItem(pair[0], rIdx * 2, "left")
+                ) : (
+                  <div className="hidden lg:block" />
+                )}
 
-                {/* Right service — text left-aligned, icon to its left */}
-                {pair[1] && (() => {
-                  const s = pair[1];
-                  const sp = servicePreviews?.[s.slug];
-                  const title = sp?.title?.trim() || s.title;
-                  const desc = sp?.desc?.trim() || s.desc;
-                  const tint = SPLIT_TINTS[(rIdx * 2 + 1) % SPLIT_TINTS.length];
-                  return (
-                    <Link
-                      to={`/services/${s.publicSlug}`}
-                      className="group flex items-center gap-5 text-left"
-                    >
-                      <div className={`shrink-0 h-16 w-16 rounded-xl ${tint} grid place-items-center shadow-elegant group-hover:scale-105 transition-smooth`}>
-                        <s.icon className="h-8 w-8" strokeWidth={1.75} />
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="text-lg font-extrabold tracking-tight text-foreground mb-1 group-hover:text-accent transition-colors">
-                          {title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                          {desc}
-                        </p>
-                      </div>
-                    </Link>
-                  );
-                })()}
+                {/* Center divider — vertical on lg, horizontal on smaller */}
+                <div className="hidden lg:block w-px h-20 bg-gradient-to-b from-transparent via-border to-transparent" aria-hidden />
+                {pair[1] && (
+                  <div className="lg:hidden w-24 h-px bg-gradient-to-r from-transparent via-border to-transparent" aria-hidden />
+                )}
+
+                {pair[1] ? (
+                  renderItem(pair[1], rIdx * 2 + 1, "right")
+                ) : (
+                  <div className="hidden lg:block" />
+                )}
               </div>
             ))}
           </div>
@@ -206,6 +217,7 @@ export const ServicesPreview = () => {
       </section>
     );
   }
+
 
   // ---------- Marquee layout (original) ----------
   const loop = [...services, ...services];
