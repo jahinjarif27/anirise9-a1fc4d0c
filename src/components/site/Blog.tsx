@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
+import { getPageSlug } from "@/lib/pageConfig";
 
 export const Blog = () => {
-  const { posts, content } = useAdmin();
+  const { posts, content, seo } = useAdmin();
   const featured = posts.slice(0, 3);
+  const blogSlug = getPageSlug("blog", seo.pageSeo);
 
   return (
     <section id="blog" className="py-24 bg-secondary/40">
@@ -19,7 +21,7 @@ export const Blog = () => {
               {content.blogBlurb}
             </p>
           </div>
-          <Link to="/blog" className="inline-flex items-center gap-2 text-accent font-semibold hover:gap-3 transition-all">
+          <Link to={`/${blogSlug}`} className="inline-flex items-center gap-2 text-accent font-semibold hover:gap-3 transition-all">
             View all posts <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -27,7 +29,7 @@ export const Blog = () => {
           {featured.map((p) => (
             <Link
               key={p.id}
-              to={`/blog/${p.slug}`}
+              to={`/${blogSlug}/${seo.pageSeo?.[`blog/${p.slug}`]?.slug?.trim() || p.slug}`}
               className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-smooth border border-border/40 hover:-translate-y-1"
             >
               <div className="aspect-[16/10] overflow-hidden">
