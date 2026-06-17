@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => {
             if (id.includes("react-router")) return "router";
             if (id.includes("recharts") || id.includes("d3-") || id.includes("victory-vendor")) return "charts";
             if (id.includes("@radix-ui")) return "radix";
-            if (id.includes("lucide-react")) return "icons";
+            // lucide-react intentionally NOT manually chunked — let Rollup tree-shake per route.
             if (id.includes("@tanstack")) return "query";
             if (id.includes("react-dom")) return "react-dom";
             if (id.includes("framer-motion")) return "motion";
