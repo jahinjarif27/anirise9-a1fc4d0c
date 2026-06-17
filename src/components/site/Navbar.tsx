@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAdmin } from "@/context/AdminContext";
 import { useServices } from "@/lib/useServices";
+import { getPageSlug } from "@/lib/pageConfig";
 
 const SECTION_LABELS: Record<string, string> = {
   hero: "Home", services: "Services", portfolio: "Portfolio",
@@ -20,6 +21,8 @@ const SECTION_LABELS: Record<string, string> = {
 export const Navbar = () => {
   const { contact, content, customPages, login, seo } = useAdmin();
   const services = useServices();
+  const servicesSlug = getPageSlug("services", seo.pageSeo);
+  const strategyCallPath = `/${getPageSlug("strategy-call", seo.pageSeo)}`;
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
   // Built-in section nav — use admin-set slug + filter draft pages.
@@ -120,7 +123,7 @@ export const Navbar = () => {
             </div>
           )}
           <a
-            href="/strategy-call"
+            href={strategyCallPath}
             className="inline-flex items-center rounded-full bg-background text-primary font-bold px-4 sm:px-5 py-1.5 text-xs sm:text-sm hover:opacity-90 shrink-0"
           >
             Book A Call
@@ -155,7 +158,7 @@ export const Navbar = () => {
                   <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
                     <div className="min-w-[260px] bg-background border border-border rounded-2xl shadow-elegant p-2">
                       {services.map((s) => (
-                        <a key={s.slug} href={`/services/${s.publicSlug}`} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors">
+                          <a key={s.slug} href={`/${servicesSlug}/${s.publicSlug}`} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors">
                           <span className="h-9 w-9 rounded-lg bg-accent/10 text-accent grid place-items-center shrink-0">
                             <s.icon className="h-4 w-4" />
                           </span>
@@ -227,7 +230,7 @@ export const Navbar = () => {
                                 {services.map((s) => (
                                   <li key={s.slug}>
                                     <a
-                                      href={`/services/${s.publicSlug}`}
+                                      href={`/${servicesSlug}/${s.publicSlug}`}
                                       onClick={() => setOpen(false)}
                                       className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-medium text-foreground/80 hover:text-accent hover:bg-secondary/50"
                                     >
@@ -247,7 +250,7 @@ export const Navbar = () => {
                   </ul>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-3">
                     <Button asChild size="lg" className="sm:flex-1 rounded-full bg-gradient-accent text-accent-foreground hover:opacity-90 min-h-14 h-14 text-base font-bold">
-                      <a href="/strategy-call" onClick={() => setOpen(false)} className="flex items-center justify-center w-full h-full">Book A Strategy Call</a>
+                      <a href={strategyCallPath} onClick={() => setOpen(false)} className="flex items-center justify-center w-full h-full">Book A Strategy Call</a>
                     </Button>
                     <div className="flex items-center gap-2">
                       {contact.facebook && (
