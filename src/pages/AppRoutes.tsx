@@ -75,7 +75,7 @@ const DynamicDetailResolver = () => {
 
 export const AppRoutes = () => {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<HomeLoader />}>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/blog" element={<BlogPage />} />
