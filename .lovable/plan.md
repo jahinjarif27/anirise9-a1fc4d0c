@@ -1,71 +1,64 @@
-## Problem recap
+# Prerendering Setup — vite-plugin-prerender approach
 
-Ei project ekta **Vite + React SPA** — server theke khali `index.html` (empty `<div id="root">`) ashe, sob content + links browser e JS run hoye render hoy. Eta dui ta SEO impact dey:
+Build time e sob sitemap URL er jonno actual rendered HTML generate korbo. Bots (Seobility/Bing/Facebook/Googlebot) full content, H1, links, meta tags sob paabe.
 
-1. **Crawler dekhe "JS-rendered" links** — Googlebot JS execute kore (so indexing kaj kortese, GA te visit ashbe), but Bing/Facebook/LinkedIn/old SEO scanners JS execute kore na → tara khali page dekhe.
-2. **301 redirect kaj kore na** — `vercel.json` e `rewrite` rule ache (status 200, same URL), `redirect` na. Eta SPA er jonno mandatory, but old URL → new URL er jonno alada `redirects` block dorkar.
+## Approach
 
-## Fix plan
+Custom Puppeteer-based prerender script (more reliable than abandoned vite plugins). Runs ke `vite build` er por automatically.
 
-### Part 1: Prerendering (crawler-visible HTML)
+## Steps
 
-`vite-plugin-prerender-spa` install kore build-time e known routes er real HTML generate korbo. Mane `npm run build` er por `dist/` te:
-
+### 1. Install dependencies
 ```
-dist/index.html              ← homepage er real HTML
-dist/services/index.html     ← services page er real HTML
-dist/blog/index.html
-dist/blog/{slug}/index.html  ← dynamic, Supabase theke fetch
-dist/portfolio/{id}/index.html
-... etc
+bun add -d puppeteer fast-glob
 ```
 
-Vercel ei static HTML serve korbe → crawler real content + links dekhe. User experience SPA i thakbe (hydration).
+### 2. Create `scripts/prerender.mjs`
+- Spawn `vite preview` on port 4321
+- Read sitemap.xml → list of 25 URLs
+- For each URL: Puppeteer launches, navigates, waits for `window.__PRERENDER_READY__ = true` flag (5s timeout fallback)
+- Saves rendered HTML to `dist/<route>/index.html`
+- Kill preview server, exit
 
-**Coverage:**
-- Static routes: `/`, `/services`, `/portfolio`, `/about`, `/contact`, `/testimonials`, `/case-studies`, `/blog`, `/services/website-seo`, `/services/ecommerce-seo`, `/services/graphics-design`, `/strategy-call`
-- Dynamic routes: build time e Supabase theke blog posts, projects, case studies, custom pages fetch kore prerender korbo
-- Admin (`/admin`) prerender hobe na (gated)
+### 3. Add ready flag in `src/main.tsx`
+- After React mounts + AdminContext loads initial data, set `window.__PRERENDER_READY__ = true`
+- Use `requestIdleCallback` to fire after first paint
 
-### Part 2: Sitemap update
-
-Current `/sitemap.xml` ekta edge function theke ashe. Verify korbo sob prerendered route sitemap e ache. Missing thakle add korbo.
-
-### Part 3: 301 Redirects
-
-Tomar theke list lagbe — kon kon **purono URL → notun URL** 301 korte hobe? Example format:
+### 4. Update `package.json` build script
 ```
-/old-services       → /services
-/old-blog-post-slug → /blog/new-slug
+"build": "vite build && node scripts/prerender.mjs"
 ```
 
-List dile `vercel.json` er `redirects` array e add kore dibo (`permanent: true` = 301). List na thakle ei part skip korbo — tomar paath theke specific URLs lagbe.
+### 5. Switch `createRoot` → `hydrateRoot` in `src/main.tsx`
+- Detects if DOM is already prerendered → hydrates instead of replacing
+- Prevents content flash, preserves SEO HTML
 
-### Part 4: Internal linking audit
+### 6. Vercel config
+- `vercel.json` already has SPA rewrite. Add cache headers for prerendered HTML
+- Verify `PUPPETEER_SKIP_DOWNLOAD` is NOT set (Puppeteer needs to download Chromium during install on Vercel)
+- Build time will increase by ~60-90 seconds
 
-Sob `<Link>` / `<a>` tag check korbo — confirm korbo sob proper `href="/path"` use kortese (JS `onClick` navigation na). Prerendering er pore crawler ei links follow korte parbe.
+## Routes to prerender (25)
+Pull from `sitemap.xml` dynamically — automatically covers:
+- Home, About, Services, Portfolio, Blog, Contact, Testimonials, Strategy Call
+- 6 service pages
+- 3 blog posts (dynamic from DB)
+- 3 portfolio items
+- 2 case studies
+- 3 legal pages
 
-## Technical details
+## Risk mitigation
+- **Build failure on Vercel**: If Puppeteer install fails, fallback config will skip prerender and ship SPA (build still succeeds). Console warning instead of hard failure.
+- **Dynamic admin content**: Prerender uses live Supabase data fetched at build time. If admin changes content, only reflects after next deploy. Acceptable trade-off — Google still re-crawls live for fresh content.
+- **Hydration mismatches**: If client renders different content than prerender (e.g. time-based), React will warn and re-render. Functional but suboptimal. Will check after first deploy.
 
-**Install:** `vite-plugin-prerender-spa` (puppeteer based, build-time)
+## What you get after deploy
+- Seobility/Bing/all bots → see full H1, internal links, meta tags, body text
+- Word count > 0 on all pages
+- File size 30-80 KB per page (vs 1.8 KB now)
+- Google can index all 25 pages without JS rendering
+- Per-route canonical/og:title/og:description baked into HTML
 
-**vite.config.ts e add:**
-- Plugin config with routes list
-- Dynamic route fetcher (Supabase client call at build time using anon key)
-- Headless chrome render → static HTML write
-
-**Build flow:** `vite build` → React app build → puppeteer launch → each route visit → wait for content → save HTML → done.
-
-**Vercel impact:** Build time barbe (~1-2 min extra). Output size barbe (route prati ~50-100KB HTML). Runtime e free — pure static serve.
-
-**Files to edit:**
-- `vite.config.ts` — add prerender plugin
-- `package.json` — add devDependency
-- `vercel.json` — add `redirects` block (after tumi URL list dao)
-- Possibly minor tweaks in route components jodi prerender e hydration mismatch hoy
-
-## Confirmation needed before implementing
-
-1. **Prerendering implement korbo?** (Recommend kori — ei i real fix)
-2. **301 redirect er purono → notun URL list dao** (na hoye Part 3 skip)
-3. Build time 1-2 min barbe — okay?
+## What doesn't change
+- Client-side behavior, admin panel, interactivity — sob same
+- Sitemap, robots.txt, middleware redirects — sob same
