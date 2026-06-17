@@ -56,7 +56,7 @@ const STATIC_PAGES = [
   { key: "about",         slug: "about",         h1: "About AniRise",
     title: "About AniRise — SEO & Digital Growth Agency in Bangladesh",
     description: "Learn about AniRise — our mission, team, and approach to SEO, web development, and digital marketing." },
-  { key: "services",      slug: "our-services",  h1: "Our Services",
+  { key: "services",      slug: "services",      h1: "Our Services",
     title: "Our Services — SEO, Web Development, Graphics & Marketing | AniRise",
     description: "Explore AniRise services: SEO, ecommerce SEO, website development, graphics design, social media marketing, and Google Ads." },
   { key: "portfolio",     slug: "portfolio",     h1: "Our Portfolio",
