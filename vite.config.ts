@@ -36,11 +36,16 @@ export default defineConfig(({ mode }) => {
             if (id.includes("lucide-react")) return "icons";
             if (id.includes("@tanstack")) return "query";
             if (id.includes("react-dom")) return "react-dom";
-            if (id.includes("/react/") || id.includes("\\react\\")) return "react";
             if (id.includes("framer-motion")) return "motion";
             if (id.includes("@supabase")) return "supabase";
             if (id.includes("dompurify") || id.includes("marked") || id.includes("html2canvas")) return "content";
-            return "vendor";
+            if (id.includes("jspdf") || id.includes("canvg")) return "pdf";
+            if (id.includes("react-syntax-highlighter") || id.includes("refractor") || id.includes("prismjs") || id.includes("highlight.js")) return "syntax";
+            if (id.includes("date-fns")) return "date-fns";
+            if (id.includes("embla-carousel")) return "embla";
+            // Per-package split for everything else — keeps the entry shell lean.
+            const m = id.match(/node_modules\/(?:\.pnpm\/)?(@[^/]+\/[^/@]+|[^/@][^/]+)/);
+            if (m) return `pkg-${m[1].replace(/[@/]/g, "_")}`;
           },
         },
       },
