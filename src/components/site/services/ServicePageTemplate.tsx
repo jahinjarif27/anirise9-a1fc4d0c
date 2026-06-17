@@ -7,6 +7,7 @@ import { ServiceLayout } from "@/pages/services/ServiceLayout";
 import { ServiceFAQ } from "@/components/site/ServiceFAQ";
 import { SectionNote } from "@/components/site/SectionNote";
 import { useAdmin } from "@/context/AdminContext";
+import { getPagePath } from "@/lib/pageConfig";
 import {
   defaultServiceContent,
   ServiceContent,
@@ -47,8 +48,9 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
 };
 
 export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) => {
-  const { serviceContent } = useAdmin();
+  const { serviceContent, seo } = useAdmin();
   const services = useServices();
+  const portfolioPath = getPagePath("portfolio", seo.pageSeo);
   const match = services.find((s) => s.publicSlug === incomingSlug);
   if (!match) return <NotFound />;
   const slug = match.slug;
@@ -225,7 +227,7 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
               )}
               {(c.chart.ctaLabel ?? "See our work") && (
                 <Button asChild variant="hero" size="lg" className="rounded-full">
-                  <Link to={c.chart.ctaUrl || "/portfolio"}>{c.chart.ctaLabel || "See our work"} <ArrowRight className="h-4 w-4" /></Link>
+                  <Link to={c.chart.ctaUrl || portfolioPath}>{c.chart.ctaLabel || "See our work"} <ArrowRight className="h-4 w-4" /></Link>
                 </Button>
               )}
             </div>
