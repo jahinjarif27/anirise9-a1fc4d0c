@@ -278,9 +278,10 @@ function writeRoute(routePath, html) {
   // Blog posts
   for (const post of posts) {
     if (!post?.slug) continue;
-    const blogParent = clean(pageSeo.blog?.slug) || "blog";
+    const cfg = pageSeo[`blog/${post.slug}`] || {};
+    const publicSlug = clean(cfg.slug) || post.slug;
     const title = post.title || post.slug;
-    emit(`/${blogParent}/${post.slug}`, {
+    emit(`/${parents.blog}/${publicSlug}`, {
       cfgKey: `blog/${post.slug}`,
       title: `${title} | AniRise Blog`,
       description: post.excerpt || `Read "${title}" on the AniRise blog.`,
@@ -293,9 +294,8 @@ function writeRoute(routePath, html) {
   for (const item of portfolio) {
     if (!item?.id) continue;
     const tail = clean(item.slug) || item.id;
-    const portfolioParent = clean(pageSeo.portfolio?.slug) || "portfolio";
     const title = item.title || tail;
-    emit(`/${portfolioParent}/${tail}`, {
+    emit(`/${parents.portfolio}/${tail}`, {
       cfgKey: `proj:${item.id}`,
       title: `${title} — Project | AniRise Portfolio`,
       description: item.summary || item.description || `${title} — project case from AniRise.`,
@@ -307,8 +307,10 @@ function writeRoute(routePath, html) {
   // Case studies
   for (const cs of caseStudies) {
     if (!cs?.id) continue;
+    const cfg = pageSeo[`case:${cs.id}`] || {};
+    const tail = clean(cfg.slug) || cs.id;
     const title = cs.title || cs.id;
-    emit(`/case-studies/${cs.id}`, {
+    emit(`/${parents["case-studies"]}/${tail}`, {
       cfgKey: `case:${cs.id}`,
       title: `${title} — Case Study | AniRise`,
       description: cs.summary || cs.description || `${title} — case study by AniRise.`,
