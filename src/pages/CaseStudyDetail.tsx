@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { ArrowLeft, TrendingUp, Calendar, Building2, Briefcase } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
@@ -6,6 +6,7 @@ import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO, fromPageSeo } from "@/hooks/useSEO";
 import { SectionNote } from "@/components/site/SectionNote";
+import { getPageSlug } from "@/lib/pageConfig";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   ResponsiveContainer,
@@ -21,15 +22,20 @@ import {
 
 const CaseStudyDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const { caseStudies, seo, loading } = useAdmin();
-  const cs = caseStudies.find((c) => c.id === id);
+  const cs = caseStudies.find((c) => (seo.pageSeo?.[`case:${c.id}`]?.slug?.trim() || c.id) === id);
   const override: any = (cs && seo.pageSeo?.[`case:${cs.id}`]) || {};
   const isDraft = override.status === "draft";
+  const caseStudiesSlug = getPageSlug("case-studies", seo.pageSeo);
+  const publicTail = cs ? (override.slug?.trim() || cs.id) : (id || "");
+  const expectedPath = `/${caseStudiesSlug}/${publicTail}`;
+  const wrongPath = !!cs && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
 
   useSEO({
     title: override.metaTitle || (cs ? `${cs.title} — Case Study | AniRise` : "Case Study | AniRise"),
     description: override.metaDescription || cs?.description || "AniRise case study.",
-    path: `/case-studies/${id}`,
+    path: expectedPath,
     canonical: override.canonicalAuto === false ? override.canonicalUrl : undefined,
     robots: override.robots === "noindex" || isDraft ? "noindex, nofollow" : undefined,
     og: {
@@ -45,7 +51,7 @@ const CaseStudyDetail = () => {
   });
 
   if (loading) return null;
-  if (!cs || isDraft) {
+  if (!cs || wrongPath || isDraft) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
