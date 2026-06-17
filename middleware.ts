@@ -20,6 +20,12 @@ const BUILTIN_DEFAULT_SLUGS: Record<string, string> = {
 };
 
 const ASSET_PATH = /\.[a-z0-9]{2,8}$/i;
+const STATIC_REDIRECTS: Record<string, string> = {
+  "/our": "/new-path",
+  "/services": "/our-services",
+  "/services/website-development": "/services/web-dev",
+  "/blog/seo-checklist-2026": "/blog/seo-cheaklist-2026",
+};
 
 function cleanPath(pathname: string) {
   return pathname.length > 1 ? pathname.replace(/\/+$/, "") : "/";
@@ -37,7 +43,14 @@ function redirectTo(request: Request, target: string) {
   const source = new URL(request.url);
   const destination = /^https?:\/\//i.test(target) ? new URL(target) : new URL(target.startsWith("/") ? target : `/${target}`, request.url);
   if (!destination.search && source.search) destination.search = source.search;
-  return new Response(null, { status: 301, headers: { Location: destination.toString() } });
+  return new Response(null, {
+    status: 301,
+    headers: {
+      Location: destination.toString(),
+      "Cache-Control": "public, max-age=0, must-revalidate",
+      "X-Redirect-By": "anirise-middleware",
+    },
+  });
 }
 
 async function loadSettings() {
@@ -54,6 +67,7 @@ export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = cleanPath(url.pathname);
   if (pathname.startsWith("/admin") || pathname.startsWith("/assets") || ASSET_PATH.test(pathname)) return next();
+  if (STATIC_REDIRECTS[pathname]) return redirectTo(request, STATIC_REDIRECTS[pathname]);
   if (url.pathname !== pathname) return redirectTo(request, pathname);
 
   const settings = await loadSettings();
