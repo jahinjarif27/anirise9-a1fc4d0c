@@ -379,7 +379,6 @@ const AdminDashboard = () => {
     seo, updateSeo, appearance, updateAppearance, fontChoices, saveAllNow,
     contact, updateContact, regenerateSitemap, buildSitemap,
     portfolio, addPortfolioItem, updatePortfolioItem, deletePortfolioItem,
-    addRedirect, updateRedirect, deleteRedirect,
     addSchema, updateSchema, deleteSchema,
     customPages, addCustomPage, updateCustomPage, deleteCustomPage,
     homeSections, addHomeSection, updateHomeSection, deleteHomeSection,
@@ -563,7 +562,6 @@ const AdminDashboard = () => {
     wrap("Keywords", seo.metaKeywords);
     wrap("Canonical URL", seo.canonicalUrl);
     wrap("Active schemas", seo.schemas.filter((s) => s.enabled).map((s) => s.type).join(", "));
-    wrap("Active redirects", seo.redirects.filter((r) => r.enabled).length.toString());
 
     y += 10;
     doc.setFont("helvetica", "bold");
@@ -2749,7 +2747,6 @@ const AdminDashboard = () => {
                   <TabsTrigger value="schema" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Code2 className="h-3.5 w-3.5" /> Schema</TabsTrigger>
                   <TabsTrigger value="sitemap" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><FileText className="h-3.5 w-3.5" /> Sitemap</TabsTrigger>
                   <TabsTrigger value="robots" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Bot className="h-3.5 w-3.5" /> Robots</TabsTrigger>
-                  <TabsTrigger value="redirects" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Link2 className="h-3.5 w-3.5" /> Redirects</TabsTrigger>
                   <TabsTrigger value="canonical" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Globe className="h-3.5 w-3.5" /> Canonical</TabsTrigger>
                   <TabsTrigger value="appearance" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Type className="h-3.5 w-3.5" /> Appearance</TabsTrigger>
                   <TabsTrigger value="security" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Lock className="h-3.5 w-3.5" /> Security</TabsTrigger>
@@ -3190,55 +3187,6 @@ const AdminDashboard = () => {
                   </div>
                 </Card>
               </TabsContent>
-
-
-
-
-              <TabsContent value="redirects" className="space-y-4 mt-0">
-                <Card className="p-5 sm:p-6 space-y-5">
-                  <div className="flex items-start justify-between gap-3 flex-wrap pb-3 border-b border-border/60">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><Link2 className="h-5 w-5" /></div>
-                      <div>
-                        <h3 className="font-bold leading-tight">301 Redirects</h3>
-                        <p className="text-xs text-muted-foreground">Old URLs resolve as permanent redirects on the live site</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" onClick={() => persistNow("Redirects saved — live server rules updated")}>
-                        <Save className="h-4 w-4" /> Save redirects
-                      </Button>
-                      <Button variant="hero" size="sm" onClick={() => addRedirect({ from: "/old-path", to: "/new-path", code: 301, enabled: true })}>
-                        <Plus className="h-4 w-4" /> Add redirect
-                      </Button>
-                    </div>
-                  </div>
-                  {seo.redirects.length === 0 ? (
-                    <div className="text-center py-8 text-sm text-muted-foreground border border-dashed border-border rounded-xl">
-                      No redirects yet. Add one to get started.
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {seo.redirects.map((r) => (
-                        <div key={r.id} className="rounded-xl border border-border bg-secondary/20 p-3 space-y-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Switch checked={r.enabled} onCheckedChange={(v) => updateRedirect(r.id, { enabled: v })} />
-                            <Badge variant={r.enabled ? "default" : "outline"}>301</Badge>
-                            <Button variant="ghost" size="sm" className="ml-auto" onClick={() => { deleteRedirect(r.id); toast.success("Removed"); }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                          </div>
-                          <div className="grid sm:grid-cols-[1fr_auto_1fr] gap-2 items-center">
-                            <Input className="h-9 font-mono text-xs" placeholder="/from" value={r.from} onChange={(e) => updateRedirect(r.id, { from: e.target.value })} />
-                            <ArrowRight className="h-4 w-4 text-muted-foreground hidden sm:block" />
-                            <Input className="h-9 font-mono text-xs" placeholder="/to" value={r.to} onChange={(e) => updateRedirect(r.id, { to: e.target.value })} />
-                          </div>
-                          <p className="text-[10px] text-muted-foreground">Always saved as HTTP 301. Use the save button above after editing.</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </Card>
-              </TabsContent>
-
               <TabsContent value="canonical" className="space-y-4 mt-0">
                 <Card className="p-5 sm:p-6 space-y-5">
                   <div className="flex items-center gap-3 pb-3 border-b border-border/60">

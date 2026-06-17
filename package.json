@@ -47,6 +47,7 @@
     "@supabase/supabase-js": "^2.105.4",
     "@tanstack/react-query": "^5.83.0",
     "@uiw/react-md-editor": "^4.1.0",
+    "@vercel/functions": "^3.7.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
