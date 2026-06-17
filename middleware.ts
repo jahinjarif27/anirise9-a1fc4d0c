@@ -87,16 +87,6 @@ function pageSlug(key: string, pageSeo: Record<string, any>) {
   return cleanSlug(pageSeo[key]?.slug) || BUILTIN_DEFAULT_SLUGS[key] || key;
 }
 
-async function loadSettings() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content`, {
-    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-    cache: "no-store",
-  });
-  if (!res.ok) return null;
-  const rows = (await res.json()) as any[];
-  return rows?.[0] ?? null;
-}
-
 export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = cleanPath(url.pathname);
