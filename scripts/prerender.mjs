@@ -231,7 +231,7 @@ function writeRoute(routePath, html) {
 
   function emit(routePath, base) {
     const cfg = base.cfgKey ? (pageSeo[base.cfgKey] || {}) : {};
-    if (cfg.status === "draft" || cfg.robots === "noindex") return;
+    const isNoindex = cfg.status === "draft" || cfg.robots === "noindex";
     const seo = applySeoOverride(base, cfg);
     const canonical = `${BASE_URL}${routePath === "/" ? "" : routePath}` || BASE_URL + "/";
     let html = rewriteHead(template, {
@@ -240,6 +240,7 @@ function writeRoute(routePath, html) {
       canonical: canonical || BASE_URL,
       ogImage: seo.ogImage,
       ogType: base.ogType || "website",
+      robots: isNoindex ? "noindex, nofollow" : undefined,
     });
     const shell = renderSeoShell({
       h1: seo.h1,
@@ -248,9 +249,9 @@ function writeRoute(routePath, html) {
       navHtml,
       footerHtml,
     });
-    html = injectBody(html, shell);
+    html = injectShell(html, shell);
     writeRoute(routePath, html);
-    written.push(routePath);
+    written.push(routePath + (isNoindex ? " (noindex)" : ""));
     count++;
   }
 
