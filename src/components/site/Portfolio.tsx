@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { useAdmin, PROJECT_CATEGORIES } from "@/context/AdminContext";
 import { cn } from "@/lib/utils";
 import { SectionNote } from "@/components/site/SectionNote";
+import { getPageSlug } from "@/lib/pageConfig";
 
 export const Portfolio = () => {
-  const { content, portfolio } = useAdmin();
+  const { content, portfolio, seo } = useAdmin();
   const [active, setActive] = useState<string>("All");
+  const portfolioSlug = getPageSlug("portfolio", seo.pageSeo);
 
   const categories = useMemo(() => {
     const used = new Set(portfolio.map((p) => p.category).filter(Boolean) as string[]);
@@ -59,7 +61,7 @@ export const Portfolio = () => {
             {filtered.map((it) => (
               <Link
                 key={it.id}
-                to={`/portfolio/${it.slug?.trim() || it.id}`}
+                to={`/${portfolioSlug}/${it.slug?.trim() || it.id}`}
                 aria-label={`View project: ${it.title}`}
                 className="group relative overflow-hidden rounded-2xl shadow-card hover:shadow-elegant transition-smooth block cursor-pointer ring-1 ring-border/40 hover:ring-accent/60 hover:-translate-y-1"
               >
