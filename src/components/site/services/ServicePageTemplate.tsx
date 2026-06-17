@@ -1,4 +1,4 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { lazy } from "react";
 import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import * as Icons from "lucide-react";
@@ -49,10 +49,7 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
 export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) => {
   const { serviceContent } = useAdmin();
   const services = useServices();
-  const match = services.find((s) => s.slug === incomingSlug || s.publicSlug === incomingSlug);
-  if (match && match.publicSlug !== incomingSlug) {
-    return <Navigate to={`/services/${match.publicSlug}`} replace />;
-  }
+  const match = services.find((s) => s.publicSlug === incomingSlug);
   if (!match) return <NotFound />;
   const slug = match.slug;
   const service = match;
