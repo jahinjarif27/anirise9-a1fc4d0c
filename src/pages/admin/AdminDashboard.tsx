@@ -3200,15 +3200,11 @@ const AdminDashboard = () => {
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><Link2 className="h-5 w-5" /></div>
                       <div>
-                        <h3 className="font-bold leading-tight">URL Redirects</h3>
-                        <p className="text-xs text-muted-foreground">Send old URLs to new locations</p>
+                        <h3 className="font-bold leading-tight">301 Redirects</h3>
+                        <p className="text-xs text-muted-foreground">Old URLs resolve as permanent redirects on the live site</p>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        const json = JSON.stringify({ redirects: seo.redirects.filter(r => r.enabled).map(r => ({ source: r.from, destination: r.to, permanent: r.code === 301 || r.code === 308, statusCode: r.code })) }, null, 2);
-                        navigator.clipboard.writeText(json); toast.success("vercel.json copied");
-                      }}><Copy className="h-4 w-4" /> Copy vercel.json</Button>
                       <Button variant="hero" size="sm" onClick={() => addRedirect({ from: "/old-path", to: "/new-path", code: 301, enabled: true })}>
                         <Plus className="h-4 w-4" /> Add redirect
                       </Button>
@@ -3224,22 +3220,13 @@ const AdminDashboard = () => {
                         <div key={r.id} className="rounded-xl border border-border bg-secondary/20 p-3 space-y-2">
                           <div className="flex items-center gap-2 flex-wrap">
                             <Switch checked={r.enabled} onCheckedChange={(v) => updateRedirect(r.id, { enabled: v })} />
-                            <Badge variant={r.enabled ? "default" : "outline"}>{r.code}</Badge>
+                            <Badge variant={r.enabled ? "default" : "outline"}>301</Badge>
                             <Button variant="ghost" size="sm" className="ml-auto" onClick={() => { deleteRedirect(r.id); toast.success("Removed"); }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                           </div>
-                          <div className="grid sm:grid-cols-[1fr_auto_1fr_auto] gap-2 items-center">
+                          <div className="grid sm:grid-cols-[1fr_auto_1fr] gap-2 items-center">
                             <Input className="h-9 font-mono text-xs" placeholder="/from" value={r.from} onChange={(e) => updateRedirect(r.id, { from: e.target.value })} />
                             <ArrowRight className="h-4 w-4 text-muted-foreground hidden sm:block" />
                             <Input className="h-9 font-mono text-xs" placeholder="/to" value={r.to} onChange={(e) => updateRedirect(r.id, { to: e.target.value })} />
-                            <Select value={String(r.code)} onValueChange={(v) => updateRedirect(r.id, { code: Number(v) as any })}>
-                              <SelectTrigger className="h-9 w-[90px]"><SelectValue /></SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="301">301</SelectItem>
-                                <SelectItem value="302">302</SelectItem>
-                                <SelectItem value="307">307</SelectItem>
-                                <SelectItem value="308">308</SelectItem>
-                              </SelectContent>
-                            </Select>
                           </div>
                         </div>
                       ))}

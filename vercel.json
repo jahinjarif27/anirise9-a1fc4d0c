@@ -1,5 +1,7 @@
 {
-  "redirects": [],
+  "redirects": [
+    { "source": "/services", "destination": "/our-services", "permanent": true, "statusCode": 301 }
+  ],
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/sitemap" },
     { "source": "/robots.txt", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/robots" },
