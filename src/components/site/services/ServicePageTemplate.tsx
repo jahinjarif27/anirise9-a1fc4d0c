@@ -47,12 +47,13 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
 };
 
 export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) => {
-  const { serviceContent } = useAdmin();
+  const { serviceContent, loading } = useAdmin();
   const services = useServices();
   const match = services.find((s) => s.slug === incomingSlug || s.publicSlug === incomingSlug);
   if (match && match.publicSlug !== incomingSlug) {
     return <Navigate to={`/services/${match.publicSlug}`} replace />;
   }
+  if (loading) return null;
   if (!match) return <NotFound />;
   const slug = match.slug;
   const service = match;
