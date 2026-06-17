@@ -61,7 +61,7 @@ export const useResolveServiceSlug = () => {
   const services = useServices();
   return (urlSlug: string): string => {
     const cleaned = (urlSlug || "").replace(/^\/+/, "");
-    const match = services.find((s) => s.publicSlug === cleaned || s.slug === cleaned);
+    const match = services.find((s) => s.publicSlug === cleaned);
     return match ? match.slug : cleaned;
   };
 };
