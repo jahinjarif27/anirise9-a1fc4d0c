@@ -2,9 +2,8 @@
 // Built-in pages live at fixed React-Router routes, but the admin can override
 // the public-facing slug (e.g. /services → /our-services) and toggle draft status.
 //
-// The original (default) path always continues to resolve so existing links and
-// bookmarks never 404. The new admin-set slug also resolves — both render the
-// same content, and canonical points to the admin-set slug.
+// When an admin slug is set, the original/default path no longer resolves.
+// This keeps one public URL per page and prevents stale URLs from staying live.
 
 import type { PageSeo } from "@/context/AdminContext";
 
@@ -61,6 +60,14 @@ export function getPagePath(
   return slug ? `/${slug}` : "/";
 }
 
+export function hasCustomPageSlug(
+  key: BuiltInPageKey,
+  pageSeo: Record<string, PageSeo> | undefined,
+): boolean {
+  const override = pageSeo?.[key]?.slug?.trim().replace(/^\/+/, "");
+  return !!override && override !== BUILTIN_DEFAULT_SLUGS[key];
+}
+
 /** Is the page marked draft / hidden in admin? */
 export function isPageDraft(
   key: string,
@@ -81,9 +88,9 @@ export function resolvePathToBuiltIn(
     const customSlug = pageSeo?.[k]?.slug?.trim();
     if (customSlug && customSlug.replace(/^\/+/, "") === cleaned) return k;
   }
-  // Then default slug
+  // Then default slug, but only while that page has no admin-set replacement.
   for (const k of keys) {
-    if (BUILTIN_DEFAULT_SLUGS[k] === cleaned) return k;
+    if (!hasCustomPageSlug(k, pageSeo) && BUILTIN_DEFAULT_SLUGS[k] === cleaned) return k;
   }
   return null;
 }
