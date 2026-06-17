@@ -3,7 +3,7 @@ import { Home, LayoutGrid, Briefcase, Menu as MenuIcon, Phone, Facebook, Instagr
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import logo from "@/assets/anirise-logo.jpg";
 import { useAdmin } from "@/context/AdminContext";
 import { useServices } from "@/lib/useServices";
@@ -19,7 +19,6 @@ export const BottomNav = () => {
   const [servicesOpen, setServicesOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
   const { pathname } = useLocation();
   const isActive = (href: string) => href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
   const itemCls = (href: string) =>
@@ -57,11 +56,6 @@ export const BottomNav = () => {
       .map((p) => ({ label: p.title || p.slug, href: `/${p.slug}` })),
   ];
 
-  const go = (href: string) => {
-    setOpen(false);
-    navigate(href);
-  };
-
   return (
     <>
       <div
@@ -71,14 +65,14 @@ export const BottomNav = () => {
         style={{ width: "min(94vw, 440px)" }}
       >
         <nav className="relative bg-background/95 backdrop-blur-md shadow-elegant rounded-full border border-border/60 px-2 py-2 grid grid-cols-5 items-center">
-          <button onClick={() => go("/")} className={itemCls("/")}>
+          <a href="/" className={itemCls("/")}>
             <Home className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">HOME</span>
-          </button>
-          <button onClick={() => go(servicesHref)} className={itemCls(servicesHref)}>
+          </a>
+          <a href={servicesHref} className={itemCls(servicesHref)}>
             <LayoutGrid className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">SERVICES</span>
-          </button>
+          </a>
           <div className="flex justify-center">
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
@@ -88,10 +82,10 @@ export const BottomNav = () => {
               <img src={logo} alt="AniRise" className="h-full w-full object-cover" />
             </button>
           </div>
-          <button onClick={() => go(slugFor("portfolio"))} className={itemCls(slugFor("portfolio"))}>
+          <a href={slugFor("portfolio")} className={itemCls(slugFor("portfolio"))}>
             <Briefcase className="h-5 w-5" />
             <span className="text-[10px] font-semibold tracking-wide">PORTFOLIO</span>
-          </button>
+          </a>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <button className="flex flex-col items-center gap-0.5 py-1 text-foreground/80 hover:text-accent">
@@ -111,13 +105,14 @@ export const BottomNav = () => {
                     if (!isServices) {
                       return (
                         <li key={l.href}>
-                          <button
-                            onClick={() => go(l.href)}
+                          <a
+                            href={l.href}
+                            onClick={() => setOpen(false)}
                             className="w-full flex items-center justify-between py-3 text-base font-medium text-foreground/90 hover:text-accent border-b border-border/40"
                           >
                             <span>{l.label}</span>
                             <span className="text-accent">→</span>
-                          </button>
+                          </a>
                         </li>
                       );
                     }
@@ -125,12 +120,13 @@ export const BottomNav = () => {
                       <li key={l.href}>
                         <Collapsible open={servicesOpen} onOpenChange={setServicesOpen}>
                           <div className="flex items-center justify-between border-b border-border/40">
-                            <button
-                              onClick={() => go(l.href)}
+                            <a
+                              href={l.href}
+                              onClick={() => setOpen(false)}
                               className="flex-1 text-left py-3 text-base font-medium text-foreground/90 hover:text-accent"
                             >
                               {l.label}
-                            </button>
+                            </a>
                             <CollapsibleTrigger aria-label="Toggle services" className="p-2 text-foreground/70 hover:text-accent">
                               <ChevronDown className={`h-4 w-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`} />
                             </CollapsibleTrigger>
@@ -139,15 +135,16 @@ export const BottomNav = () => {
                             <ul className="pl-3 ml-1 border-l border-border/40 py-1 space-y-0.5">
                               {services.map((s) => (
                                 <li key={s.slug}>
-                                  <button
-                                    onClick={() => go(`/services/${s.publicSlug}`)}
+                                  <a
+                                    href={`/services/${s.publicSlug}`}
+                                    onClick={() => setOpen(false)}
                                     className="w-full text-left flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-medium text-foreground/80 hover:text-accent hover:bg-secondary/50"
                                   >
                                     <span className="h-8 w-8 rounded-lg bg-accent/10 text-accent grid place-items-center shrink-0">
                                       <s.icon className="h-4 w-4" />
                                     </span>
                                     <span className="flex-1">{s.title}</span>
-                                  </button>
+                                  </a>
                                 </li>
                               ))}
                             </ul>

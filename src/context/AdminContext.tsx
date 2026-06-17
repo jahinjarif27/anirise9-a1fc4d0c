@@ -705,9 +705,7 @@ const defaultSeo: SeoSettings = {
   sitemap: "",
   robotsTxt: `User-agent: *\nAllow: /\nDisallow: /admin\n\nSitemap: https://anirise.com.bd/sitemap.xml`,
   autoSitemap: true,
-  redirects: [
-    { id: "r1", from: "/old-blog", to: "/blog", code: 301, enabled: true },
-  ],
+  redirects: [],
   schemas: [
     {
       id: "s1",
@@ -1484,20 +1482,6 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   }, [seo.schemas]);
 
   useEffect(() => {
-    const apply = () => {
-      const path = window.location.pathname + window.location.search;
-      const match = seo.redirects.find((r) => r.enabled && (r.from === path || r.from === window.location.pathname));
-      if (match && match.to && match.to !== path) {
-        if (/^https?:\/\//i.test(match.to)) window.location.replace(match.to);
-        else { window.history.replaceState({}, "", match.to); window.dispatchEvent(new PopStateEvent("popstate")); }
-      }
-    };
-    apply();
-    window.addEventListener("popstate", apply);
-    return () => window.removeEventListener("popstate", apply);
-  }, [seo.redirects]);
-
-  useEffect(() => {
     const families = Array.from(new Set([appearance.headingFont, appearance.bodyFont]));
     const id = "anirise-google-fonts";
     let link = document.getElementById(id) as HTMLLinkElement | null;
@@ -1631,8 +1615,9 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const updatePortfolioItem = (id: string, p: Partial<PortfolioItem>) => setPortfolio((prev) => prev.map((x) => (x.id === id ? { ...x, ...p } : x)));
   const deletePortfolioItem = (id: string) => setPortfolio((prev) => prev.filter((x) => x.id !== id));
   const updateSeo = (s: Partial<SeoSettings>) => setSeo((prev) => ({ ...prev, ...s }));
-  const addRedirect = (r: Omit<Redirect, "id">) => setSeo((prev) => ({ ...prev, redirects: [...prev.redirects, { ...r, id: Date.now().toString() }] }));
-  const updateRedirect = (id: string, r: Partial<Redirect>) => setSeo((prev) => ({ ...prev, redirects: prev.redirects.map((x) => (x.id === id ? { ...x, ...r } : x)) }));
+  const normalizeRedirect = (r: Partial<Redirect>) => ({ ...r, code: 301 as Redirect["code"] });
+  const addRedirect = (r: Omit<Redirect, "id">) => setSeo((prev) => ({ ...prev, redirects: [...prev.redirects, { ...normalizeRedirect(r), id: Date.now().toString() } as Redirect] }));
+  const updateRedirect = (id: string, r: Partial<Redirect>) => setSeo((prev) => ({ ...prev, redirects: prev.redirects.map((x) => (x.id === id ? { ...x, ...normalizeRedirect(r) } : x)) }));
   const deleteRedirect = (id: string) => setSeo((prev) => ({ ...prev, redirects: prev.redirects.filter((x) => x.id !== id) }));
   const addSchema = (s: Omit<SchemaItem, "id">) => setSeo((prev) => ({ ...prev, schemas: [...prev.schemas, { ...s, id: Date.now().toString() }] }));
   const updateSchema = (id: string, s: Partial<SchemaItem>) => setSeo((prev) => ({ ...prev, schemas: prev.schemas.map((x) => (x.id === id ? { ...x, ...s } : x)) }));
