@@ -67,8 +67,8 @@ export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = cleanPath(url.pathname);
   if (pathname.startsWith("/admin") || pathname.startsWith("/assets") || ASSET_PATH.test(pathname)) return next();
-  if (url.pathname !== pathname) return redirectTo(request, pathname);
   if (STATIC_REDIRECTS[pathname]) return redirectTo(request, STATIC_REDIRECTS[pathname]);
+  if (url.pathname !== pathname) return redirectTo(request, pathname);
 
   const settings = await loadSettings();
   const seo = settings?.seo ?? {};
