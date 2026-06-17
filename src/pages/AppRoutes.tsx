@@ -42,7 +42,8 @@ const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title
  */
 const DynamicSlugResolver = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { seo } = useAdmin();
+  const { seo, loading } = useAdmin();
+  if (loading) return null;
   const matched = resolvePathToBuiltIn(slug || "", seo.pageSeo);
   if (matched === "blog") return <BlogPage />;
   if (matched === "strategy-call") return <StrategyCallPage />;
@@ -62,7 +63,8 @@ const DynamicSlugResolver = () => {
  */
 const DynamicDetailResolver = () => {
   const { section } = useParams<{ section: string; id: string }>();
-  const { seo } = useAdmin();
+  const { seo, loading } = useAdmin();
+  if (loading) return null;
   const matched = resolvePathToBuiltIn(section || "", seo.pageSeo);
   if (matched === "portfolio") return <ProjectDetail />;
   if (matched === "blog") return <BlogPostPage />;
