@@ -194,6 +194,14 @@ function writeRoute(routePath, html) {
   const caseStudies = (settings?.case_studies || []);
   const customPages = (settings?.custom_pages || []).filter((p) => p.published);
 
+  // Effective parent slugs (honor admin overrides everywhere)
+  const parents = {
+    services: clean(pageSeo.services?.slug) || "services",
+    blog: clean(pageSeo.blog?.slug) || "blog",
+    portfolio: clean(pageSeo.portfolio?.slug) || "portfolio",
+    "case-studies": clean(pageSeo["case-studies"]?.slug) || "case-studies",
+  };
+
   // Build navbar links (mirror Navbar.tsx logic — built-in sections only)
   const navItems = [
     { key: "home", label: "Home", href: "/" },
@@ -205,7 +213,7 @@ function writeRoute(routePath, html) {
   ].map((n) => {
     if (n.href) return n;
     const cfg = pageSeo[n.key] || {};
-    const slug = clean(cfg.slug) || (n.key === "services" ? "our-services" : n.key);
+    const slug = clean(cfg.slug) || n.key;
     return { label: n.label, href: `/${slug}` };
   });
 
@@ -216,8 +224,8 @@ function writeRoute(routePath, html) {
 
   const postsForNav = posts || [];
 
-  const navHtml = buildNavLinks(navItems, servicesForNav);
-  const footerHtml = buildFooter(navItems, servicesForNav, postsForNav);
+  const navHtml = buildNavLinks(navItems, servicesForNav, parents);
+  const footerHtml = buildFooter(navItems, servicesForNav, postsForNav, parents);
 
   let count = 0;
   const written = [];
@@ -258,7 +266,7 @@ function writeRoute(routePath, html) {
   for (const svc of servicesList) {
     const tail = clean(svc.urlSlug) || svc.slug;
     const title = (svc.title && svc.title.trim()) || tail;
-    emit(`/services/${tail}`, {
+    emit(`/${parents.services}/${tail}`, {
       cfgKey: `svc:${svc.slug}`,
       title: `${title} | AniRise`,
       description: svc.shortDescription || svc.description || `Professional ${title} services by AniRise.`,
