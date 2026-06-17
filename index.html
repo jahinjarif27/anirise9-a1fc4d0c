@@ -24,93 +24,14 @@
 
     <link rel="icon" type="image/x-icon" href="/favicon.jpg">
     <link rel="apple-touch-icon" href="/favicon.jpg">
-    <link rel="preload" as="image" href="/favicon.jpg">
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
     <link rel="preconnect" href="https://xlrmuspmekwbtnyeutxz.supabase.co" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <style>
-      /* Pre-hydration splash — mirrors HomeLoader (logo + brand + center-out fill). */
-      html, body { margin: 0; padding: 0; background: hsl(220 30% 98%); }
-      #pre-splash {
-        position: fixed; inset: 0; display: grid; place-items: center;
-        background: hsl(220 30% 98%); z-index: 9999; transition: opacity .3s ease;
-      }
-      #pre-splash .ps-inner { display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; }
-      #pre-splash .ps-logo {
-        width: 56px; height: 56px; border-radius: 9999px; object-fit: cover;
-        box-shadow: 0 0 0 2px hsl(241 53% 43% / 0.2);
-      }
-      #pre-splash .ps-brand {
-        font: 800 20px/1.1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-        color: hsl(224 30% 14%); letter-spacing: -0.01em;
-      }
-      #pre-splash .ps-tag {
-        font: 600 9px/1 system-ui, sans-serif; letter-spacing: .3em; text-transform: uppercase;
-        color: hsl(220 14% 36%); margin-top: 6px;
-      }
-      #pre-splash .ps-bar {
-        position: relative; width: 192px; height: 3px;
-        background: hsl(220 25% 92%); border-radius: 999px; overflow: hidden;
-      }
-      #pre-splash .ps-bar::after {
-        content: ""; position: absolute; top: 0; left: 50%; height: 100%; width: 0;
-        background: linear-gradient(90deg, hsl(241 53% 43%), hsl(345 100% 62%));
-        border-radius: 999px; transform: translateX(-50%);
-        animation: ps-fill 0.9s ease-out forwards, ps-pulse 1.4s ease-in-out 0.9s infinite;
-      }
-      @keyframes ps-fill { 0% { width: 0%; } 100% { width: 100%; } }
-      @keyframes ps-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
-      #pre-splash.ps-hide { opacity: 0; pointer-events: none; }
-      /* Prerendered SEO shell inside #root — replaced by React on mount. */
-      #root > .seo-shell { color: hsl(224 30% 14%); font-family: system-ui, sans-serif; line-height: 1.55; }
-      #root > .seo-shell h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 .75rem; }
-      #root > .seo-shell nav ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .75rem; }
-      #root > .seo-shell main, #root > .seo-shell header, #root > .seo-shell footer { max-width: 70rem; margin: 0 auto; padding: 1rem; }
-    </style>
   </head>
 
   <body>
-    <div id="pre-splash" aria-hidden="true">
-      <div class="ps-inner">
-        <img class="ps-logo" src="/favicon.jpg" alt="AniRise" />
-        <div>
-          <div class="ps-brand">AniRise</div>
-          <div class="ps-tag">Visibility · Growth · Success</div>
-        </div>
-        <div class="ps-bar"></div>
-      </div>
-    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      (function(){
-        var ua = (navigator.userAgent || "").toLowerCase();
-        var isBot = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|sogou|exabot|facebot|facebookexternalhit|twitterbot|linkedinbot|embedly|whatsapp|telegrambot|applebot|petalbot|ahrefsbot|semrushbot|mj12bot|seobility/i.test(ua);
-        if (isBot) {
-          var s0 = document.getElementById('pre-splash');
-          if (s0) s0.remove();
-          return;
-        }
-        function hide(){
-          var s = document.getElementById('pre-splash');
-          if (!s) return;
-          s.classList.add('ps-hide');
-          setTimeout(function(){ s && s.remove(); }, 350);
-        }
-        var t = Date.now();
-        var i = setInterval(function(){
-          var r = document.getElementById('root');
-          var first = r && r.firstElementChild;
-          // React has mounted (first child exists and is not the prerendered SEO shell).
-          var mounted = !!first && !first.classList.contains('seo-shell');
-          if (mounted || Date.now() - t > 8000) {
-            clearInterval(i);
-            // Give React's own HomeLoader a paint to take over → no blank flash.
-            requestAnimationFrame(function(){ requestAnimationFrame(hide); });
-          }
-        }, 60);
-      })();
-    </script>
   </body>
 </html>

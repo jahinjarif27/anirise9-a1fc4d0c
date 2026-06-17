@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    { "source": "/our", "destination": "/new-path", "statusCode": 301 },
+    { "source": "/services", "destination": "/our-services", "statusCode": 301 },
+    { "source": "/services/", "destination": "/our-services", "statusCode": 301 },
+    { "source": "/services/website-development", "destination": "/services/web-dev", "statusCode": 301 },
+    { "source": "/blog/seo-checklist-2026", "destination": "/blog/seo-cheaklist-2026", "statusCode": 301 }
+  ],
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/sitemap" },
     { "source": "/robots.txt", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/robots" },

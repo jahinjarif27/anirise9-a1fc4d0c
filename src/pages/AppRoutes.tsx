@@ -5,7 +5,6 @@ import BlogPage from "./Blog.tsx";
 import BlogPostPage from "./BlogPost.tsx";
 import { CustomPageView } from "./CustomPageView";
 import { SectionPage } from "./SectionPage";
-import { HomeLoader } from "@/components/site/HomeLoader";
 import { useAdmin } from "@/context/AdminContext";
 import { useParams } from "react-router-dom";
 import { resolvePathToBuiltIn, type BuiltInPageKey } from "@/lib/pageConfig";
@@ -46,8 +45,7 @@ const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title
  */
 const DynamicSlugResolver = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { seo, loading } = useAdmin();
-  if (loading) return null;
+  const { seo } = useAdmin();
   const matched = resolvePathToBuiltIn(slug || "", seo.pageSeo);
   if (matched && matched !== "home" && matched !== "blog" && matched !== "strategy-call") {
     const entry = SECTION_COMPONENTS[matched as BuiltInPageKey];
@@ -65,8 +63,7 @@ const DynamicSlugResolver = () => {
  */
 const DynamicDetailResolver = () => {
   const { section } = useParams<{ section: string; id: string }>();
-  const { seo, loading } = useAdmin();
-  if (loading) return null;
+  const { seo } = useAdmin();
   const matched = resolvePathToBuiltIn(section || "", seo.pageSeo);
   if (matched === "portfolio") return <ProjectDetail />;
   if (matched === "blog") return <BlogPostPage />;
@@ -76,7 +73,7 @@ const DynamicDetailResolver = () => {
 
 export const AppRoutes = () => {
   return (
-    <Suspense fallback={<HomeLoader />}>
+    <Suspense fallback={null}>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/blog" element={<BlogPage />} />

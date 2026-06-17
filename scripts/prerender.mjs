@@ -117,9 +117,9 @@ ${blogLinks ? `<p><strong>Recent Posts:</strong> ${blogLinks}</p>` : ""}
 }
 
 function renderSeoShell({ h1, description, bodyExtra, navHtml, footerHtml }) {
-  // Visible static SEO content placed INSIDE #root. React's createRoot.render replaces it
-  // on mount — natural pattern, no hidden-text/cloaking CSS, content matches the JS render.
-  return `<div class="seo-shell">
+  // Visible static SEO content. Removed by inline script once React mounts to #root.
+  // Kept visible (not hidden offscreen) so it is fully crawlable and counts as legitimate content.
+  return `<div id="seo-shell">
 <header>${navHtml}</header>
 <main>
 <h1>${esc(h1)}</h1>
@@ -130,7 +130,7 @@ ${footerHtml}
 </div>`;
 }
 
-function rewriteHead(template, { title, description, canonical, ogImage, ogType = "website", robots }) {
+function rewriteHead(template, { title, description, canonical, ogImage, ogType = "website" }) {
   let html = template;
 
   // Title
@@ -141,15 +141,6 @@ function rewriteHead(template, { title, description, canonical, ogImage, ogType 
     html = html.replace(/<meta\s+name=["']description["'][^>]*>/i, `<meta name="description" content="${esc(description)}">`);
   } else {
     html = html.replace(/<\/head>/i, `  <meta name="description" content="${esc(description)}">\n  </head>`);
-  }
-
-  // Robots — override the sitewide tag when this page is noindex.
-  if (robots && /noindex/i.test(robots)) {
-    if (/<meta\s+name=["']robots["'][^>]*>/i.test(html)) {
-      html = html.replace(/<meta\s+name=["']robots["'][^>]*>/i, `<meta name="robots" content="${esc(robots)}">`);
-    } else {
-      html = html.replace(/<\/head>/i, `  <meta name="robots" content="${esc(robots)}">\n  </head>`);
-    }
   }
 
   // Canonical + OG + Twitter — inject before </head>, removing any existing
@@ -175,10 +166,11 @@ function rewriteHead(template, { title, description, canonical, ogImage, ogType 
   return html;
 }
 
-function injectShell(html, shellHtml) {
-  // Replace the empty <div id="root"></div> with one that contains the SEO shell.
-  // React's createRoot.render() will wipe and replace its contents on mount.
-  return html.replace(/<div id="root">\s*<\/div>/i, `<div id="root">${shellHtml}</div>`);
+const SHELL_CLEANUP_SCRIPT = `<script>(function(){var t=Date.now();function clean(){var s=document.getElementById('seo-shell');var r=document.getElementById('root');if(s&&r&&r.children&&r.children.length>0){s.remove();return true}return false}if(clean())return;var i=setInterval(function(){if(clean()||Date.now()-t>10000)clearInterval(i)},100)})();</script>`;
+
+function injectBody(html, shellHtml) {
+  // Inject shell + cleanup script right before </body>, so SEO content is in DOM but invisible.
+  return html.replace(/<\/body>/i, `${shellHtml}\n${SHELL_CLEANUP_SCRIPT}\n</body>`);
 }
 
 function writeRoute(routePath, html) {
@@ -231,7 +223,7 @@ function writeRoute(routePath, html) {
 
   function emit(routePath, base) {
     const cfg = base.cfgKey ? (pageSeo[base.cfgKey] || {}) : {};
-    const isNoindex = cfg.status === "draft" || cfg.robots === "noindex";
+    if (cfg.status === "draft" || cfg.robots === "noindex") return;
     const seo = applySeoOverride(base, cfg);
     const canonical = `${BASE_URL}${routePath === "/" ? "" : routePath}` || BASE_URL + "/";
     let html = rewriteHead(template, {
@@ -240,7 +232,6 @@ function writeRoute(routePath, html) {
       canonical: canonical || BASE_URL,
       ogImage: seo.ogImage,
       ogType: base.ogType || "website",
-      robots: isNoindex ? "noindex, nofollow" : undefined,
     });
     const shell = renderSeoShell({
       h1: seo.h1,
@@ -249,9 +240,9 @@ function writeRoute(routePath, html) {
       navHtml,
       footerHtml,
     });
-    html = injectShell(html, shell);
+    html = injectBody(html, shell);
     writeRoute(routePath, html);
-    written.push(routePath + (isNoindex ? " (noindex)" : ""));
+    written.push(routePath);
     count++;
   }
 
