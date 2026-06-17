@@ -48,19 +48,12 @@ function redirectTo(request: Request, target: string) {
 }
 
 async function loadRuntimeData() {
-  const [settingsRes, postsRes] = await Promise.all([
-    fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content,portfolio,case_studies`, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-      cache: "no-store",
-    }),
-    fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=slug`, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-      cache: "no-store",
-    }),
-  ]);
+  const settingsRes = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content,portfolio,case_studies`, {
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+    cache: "no-store",
+  });
   const settings = settingsRes.ok ? ((await settingsRes.json()) as any[])?.[0] ?? null : null;
-  const posts = postsRes.ok ? ((await postsRes.json()) as any[]) : [];
-  return { settings, posts };
+  return { settings };
 }
 
 function cleanSlug(value: unknown) {
@@ -87,7 +80,7 @@ export default async function middleware(request: Request) {
   if (pathname.startsWith("/admin") || pathname.startsWith("/assets") || ASSET_PATH.test(pathname)) return next();
   if (url.pathname !== pathname) return redirectTo(request, pathname);
 
-  const { settings, posts } = await loadRuntimeData();
+  const { settings } = await loadRuntimeData();
   const seo = settings?.seo ?? {};
   const pageSeo = seo.pageSeo ?? {};
 
@@ -112,9 +105,11 @@ export default async function middleware(request: Request) {
   const caseMatch = pathname.match(/^\/case-studies\/([^/]+)$/);
   if (caseMatch) {
     const cases = Array.isArray(settings?.case_studies) ? settings.case_studies : [];
-    const item = cases.find((c: any) => c?.id === caseMatch[1]);
+    const item = cases.find((c: any) => cleanSlug(pageSeo[`case:${c?.id}`]?.slug) === caseMatch[1]);
     const overrideSlug = cleanSlug(item && pageSeo[`case:${item.id}`]?.slug);
-    if (item && overrideSlug && overrideSlug !== caseMatch[1]) return redirectTo(request, `/case-studies/${overrideSlug}`);
+    if (item && overrideSlug && pageSlug("case-studies", pageSeo) !== "case-studies") {
+      return redirectTo(request, `/${pageSlug("case-studies", pageSeo)}/${overrideSlug}`);
+    }
   }
 
   return next();
