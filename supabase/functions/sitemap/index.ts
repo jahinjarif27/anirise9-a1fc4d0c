@@ -261,10 +261,10 @@ Deno.serve(async (req) => {
     const pageSeo: Record<string, any> = (s.seo?.pageSeo ?? {}) as any;
     const siteUrl = normalizeSiteUrl(s.seo?.canonicalUrl);
     const manualSitemap = typeof s.seo?.sitemap === 'string' ? s.seo.sitemap.trim() : '';
-    const manualLocs = new Set(
-      Array.from(manualSitemap.matchAll(/<loc>([\s\S]*?)<\/loc>/gi))
-        .map((m) => m[1]?.trim().replace(/\/+$/, '') || ''),
-    );
+    const manualLocs = new Set<string>();
+    for (const m of manualSitemap.matchAll(/<loc>([\s\S]*?)<\/loc>/gi)) {
+      manualLocs.add((m[1] || '').trim().replace(/\/+$/, ''));
+    }
     const currentPageSlugs = Object.keys(BUILTIN_DEFAULT_SLUGS)
       .map((key) => (pageSeo[key]?.slug?.trim() || BUILTIN_DEFAULT_SLUGS[key]).replace(/^\/+/, ''))
       .filter(Boolean);
