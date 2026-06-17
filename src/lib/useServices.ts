@@ -1,4 +1,4 @@
-import * as Icons from "lucide-react";
+import { Sparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAdmin, type AdminService } from "@/context/AdminContext";
 import { services as staticServices } from "@/data/services";
@@ -17,13 +17,10 @@ const STATIC_ICON_BY_SLUG: Record<string, LucideIcon> = Object.fromEntries(
   staticServices.map((s) => [s.slug, s.icon]),
 );
 
-export const resolveServiceIcon = (name?: string, slug?: string): LucideIcon => {
-  if (name) {
-    const Cmp = (Icons as any)[name];
-    if (Cmp) return Cmp as LucideIcon;
-  }
+/** Resolve without pulling the entire lucide bundle into the main shell. */
+export const resolveServiceIcon = (_name?: string, slug?: string): LucideIcon => {
   if (slug && STATIC_ICON_BY_SLUG[slug]) return STATIC_ICON_BY_SLUG[slug];
-  return Icons.Sparkles;
+  return Sparkles;
 };
 
 export const getPublicSlug = (s: Pick<AdminService, "slug" | "urlSlug">): string =>
