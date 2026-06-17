@@ -149,7 +149,14 @@ export const Footer = () => {
       <div className="border-t border-primary-foreground/10 pb-24">
         <div className="container py-3 text-center text-[11px] tracking-wider uppercase text-primary-foreground/55">
           Crafted &amp; developed with care by{" "}
-          <span className="font-semibold text-primary-foreground/80">Jahin</span>
+          <a
+            href="https://jahinjarif.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-primary-foreground/80 hover:text-accent transition-smooth underline-offset-4 hover:underline"
+          >
+            Jahin
+          </a>
         </div>
       </div>
     </footer>
