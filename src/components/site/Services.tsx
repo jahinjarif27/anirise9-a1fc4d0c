@@ -6,7 +6,7 @@ import { getPageSlug } from "@/lib/pageConfig";
 import { SectionNote } from "@/components/site/SectionNote";
 import { MarkdownContent } from "@/components/site/MarkdownContent";
 
-type Service = RuntimeService;
+type Service = RuntimeService & { parentSlug: string };
 
 const ServiceCard = ({ service }: { service: Service }) => (
   <Link
