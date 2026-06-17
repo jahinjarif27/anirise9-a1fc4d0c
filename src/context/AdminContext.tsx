@@ -705,9 +705,7 @@ const defaultSeo: SeoSettings = {
   sitemap: "",
   robotsTxt: `User-agent: *\nAllow: /\nDisallow: /admin\n\nSitemap: https://anirise.com.bd/sitemap.xml`,
   autoSitemap: true,
-  redirects: [
-    { id: "r1", from: "/old-blog", to: "/blog", code: 301, enabled: true },
-  ],
+  redirects: [],
   schemas: [
     {
       id: "s1",
