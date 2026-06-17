@@ -117,7 +117,9 @@ ${blogLinks ? `<p><strong>Recent Posts:</strong> ${blogLinks}</p>` : ""}
 }
 
 function renderSeoShell({ h1, description, bodyExtra, navHtml, footerHtml }) {
-  return `<div id="seo-shell" style="position:absolute;left:-99999px;top:auto;width:1px;height:1px;overflow:hidden">
+  // Visible static SEO content. Removed by inline script once React mounts to #root.
+  // Kept visible (not hidden offscreen) so it is fully crawlable and counts as legitimate content.
+  return `<div id="seo-shell">
 <header>${navHtml}</header>
 <main>
 <h1>${esc(h1)}</h1>
