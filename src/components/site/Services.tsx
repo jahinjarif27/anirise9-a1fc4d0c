@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 import { useServices, type RuntimeService } from "@/lib/useServices";
+import { getPageSlug } from "@/lib/pageConfig";
 import { SectionNote } from "@/components/site/SectionNote";
 import { MarkdownContent } from "@/components/site/MarkdownContent";
 
@@ -9,7 +10,7 @@ type Service = RuntimeService;
 
 const ServiceCard = ({ service }: { service: Service }) => (
   <Link
-    to={`/services/${service.publicSlug}`}
+    to={`/${service.parentSlug}/${service.publicSlug}`}
     className="group block bg-card rounded-2xl p-6 shadow-card hover:shadow-elegant transition-smooth border border-border/40"
   >
     <div className="h-12 w-12 rounded-xl bg-accent/10 text-accent grid place-items-center mb-5 group-hover:bg-gradient-accent group-hover:text-accent-foreground transition-smooth">
@@ -65,7 +66,7 @@ const ZigzagRow = ({ service, index }: { service: Service; index: number }) => {
         )}
         <MarkdownContent content={desc} className="prose-base sm:prose-lg text-base sm:text-[17px] leading-relaxed" />
         <Link
-          to={`/services/${service.publicSlug}`}
+          to={`/${service.parentSlug}/${service.publicSlug}`}
           className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:gap-2 transition-all"
         >
           Explore {service.title} <ArrowRight className="h-4 w-4" />
@@ -76,8 +77,9 @@ const ZigzagRow = ({ service, index }: { service: Service; index: number }) => {
 };
 
 export const Services = () => {
-  const { content } = useAdmin();
-  const services = useServices();
+  const { content, seo } = useAdmin();
+  const servicesSlug = getPageSlug("services", seo.pageSeo);
+  const services = useServices().map((s) => ({ ...s, parentSlug: servicesSlug }));
 
   return (
     <section id="services" className="bg-background py-20 lg:py-24">
