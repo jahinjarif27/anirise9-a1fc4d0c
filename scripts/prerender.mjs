@@ -131,7 +131,7 @@ ${footerHtml}
 </div>`;
 }
 
-function rewriteHead(template, { title, description, canonical, ogImage, ogType = "website" }) {
+function rewriteHead(template, { title, description, canonical, ogImage, ogType = "website", routePath = "/" }) {
   let html = template;
 
   // Title
@@ -156,6 +156,8 @@ function rewriteHead(template, { title, description, canonical, ogImage, ogType 
     `<meta property="og:title" content="${esc(title)}">`,
     `<meta property="og:description" content="${esc(description)}">`,
     `<meta property="og:url" content="${esc(canonical)}">`,
+    `<meta name="anirise-prerender-route" content="${esc(routePath)}">`,
+    `<meta name="anirise-prerendered-at" content="${esc(new Date().toISOString())}">`,
     ogAbs ? `<meta property="og:image" content="${esc(ogAbs)}">` : null,
     `<meta name="twitter:card" content="${ogAbs ? "summary_large_image" : "summary"}">`,
     `<meta name="twitter:title" content="${esc(title)}">`,
@@ -241,6 +243,7 @@ function writeRoute(routePath, html) {
       canonical: canonical || BASE_URL,
       ogImage: seo.ogImage,
       ogType: base.ogType || "website",
+      routePath,
     });
     const shell = renderSeoShell({
       h1: seo.h1,

@@ -1431,7 +1431,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
 
   // Build the full payload sent to update_site_settings — used by both the
   // debounced auto-save and the explicit saveAllNow() force-flush.
-  const buildSettingsPayload = () => latestSettingsRef.current;
+  const buildSettingsPayload = () => {
+    const payload = latestSettingsRef.current;
+    if (payload?.seo?.autoSitemap) {
+      return { ...payload, seo: { ...payload.seo, sitemap: buildSitemap(payload.seo.canonicalUrl) } };
+    }
+    return payload;
+  };
 
   // Force-flush any pending debounced save and persist immediately.
   // Returns { ok, error? } so the caller can show feedback.
@@ -1667,11 +1673,15 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     setCustomPages((prev) => prev.map((p) => (p.groupKey === grp.key ? { ...p, groupKey: "" } : p)));
     setHomeSections((prev) => prev.map((p) => (p.groupKey === grp.key ? { ...p, groupKey: "home" } : p)));
   };
-  const updatePageSeo = (key: string, s: Partial<PageSeo>) =>
+  const updatePageSeo = (key: string, s: Partial<PageSeo>) => {
+    const sitemapFields = new Set(["slug", "status", "robots", "changefreq", "priority"]);
+    const touchesSitemap = Object.keys(s).some((field) => sitemapFields.has(field));
     setSeo((prev) => ({
       ...prev,
+      autoSitemap: touchesSitemap ? true : prev.autoSitemap,
       pageSeo: { ...prev.pageSeo, [key]: { ...(prev.pageSeo[key] || { metaTitle: "", metaDescription: "", metaKeywords: "" }), ...s } },
     }));
+  };
   const updateAppearance = (a: Partial<Appearance>) => setAppearance((prev) => ({ ...prev, ...a }));
 
   // ---------------------------------------------------------------
@@ -1739,9 +1749,9 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const deleteProcessFlowStep = (id: string) =>
     setProcessFlow((prev) => ({ ...prev, steps: prev.steps.filter((s) => s.id !== id) }));
 
-  const buildSitemap = (base: string) => {
+  const buildSitemap = (base: string, sourceSeo: SeoSettings = seo) => {
     const origin = (base || "https://anirise.com.bd").replace(/\/$/, "");
-    const ps = seo.pageSeo || {};
+    const ps = sourceSeo.pageSeo || {};
     type E = { path: string; changefreq?: string; priority?: string; lastmod?: string };
     const entries: E[] = [];
 
@@ -1762,23 +1772,26 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       entries.push({ path: slug ? `/${slug}` : "/", changefreq: cfg.changefreq || b.cf, priority: cfg.priority || b.pr });
     }
 
+    // Effective parent slugs (honor admin overrides)
+    const servicesParent = (ps["services"]?.slug?.trim() || "services").replace(/^\/+/, "");
+    const blogParent = (ps["blog"]?.slug?.trim() || "blog").replace(/^\/+/, "");
+    const portfolioParent = (ps["portfolio"]?.slug?.trim() || "portfolio").replace(/^\/+/, "");
+    const caseStudiesParent = (ps["case-studies"]?.slug?.trim() || "case-studies").replace(/^\/+/, "");
+
     // Services (admin-managed) — public detail pages
     for (const s of (content.servicesList || []).filter((x) => x.published)) {
       const cfg: any = ps[`svc:${s.slug}`] || {};
       if (cfg.status === "draft" || cfg.robots === "noindex") continue;
       const tail = (s.urlSlug && s.urlSlug.trim()) || s.slug;
-      entries.push({ path: `/services/${tail}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.8" });
+      entries.push({ path: `/${servicesParent}/${tail}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.8" });
     }
-
-    // Effective parent slugs (honor admin overrides)
-    const blogParent = (ps["blog"]?.slug?.trim() || "blog").replace(/^\/+/, "");
-    const portfolioParent = (ps["portfolio"]?.slug?.trim() || "portfolio").replace(/^\/+/, "");
 
     // Blog posts
     for (const p of posts) {
       const cfg: any = ps[`blog/${p.slug}`] || {};
       if (cfg.status === "draft" || cfg.robots === "noindex") continue;
-      entries.push({ path: `/${blogParent}/${p.slug}`, lastmod: p.date, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
+      const publicSlug = (cfg.slug && String(cfg.slug).trim()) ? String(cfg.slug).trim().replace(/^\/+/, "") : p.slug;
+      entries.push({ path: `/${blogParent}/${publicSlug}`, lastmod: p.date, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
     }
 
     // Portfolio items
@@ -1793,7 +1806,8 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     for (const c of caseStudies) {
       const cfg: any = ps[`case:${c.id}`] || {};
       if (cfg.status === "draft" || cfg.robots === "noindex") continue;
-      entries.push({ path: `/case-studies/${c.id}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
+      const tail = (cfg.slug && String(cfg.slug).trim()) ? String(cfg.slug).trim().replace(/^\/+/, "") : c.id;
+      entries.push({ path: `/${caseStudiesParent}/${tail}`, changefreq: cfg.changefreq || "monthly", priority: cfg.priority || "0.7" });
     }
 
     // Custom pages (with optional parent)
