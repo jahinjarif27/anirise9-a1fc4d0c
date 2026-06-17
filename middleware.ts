@@ -30,7 +30,8 @@ async function loadSettings() {
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
   });
   if (!res.ok) return null;
-  return (await res.json())?.[0] ?? null;
+  const rows = (await res.json()) as any[];
+  return rows?.[0] ?? null;
 }
 
 export default async function middleware(request: Request) {
