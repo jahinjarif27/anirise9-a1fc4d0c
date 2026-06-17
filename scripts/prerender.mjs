@@ -92,21 +92,21 @@ function applySeoOverride(base, cfg) {
   };
 }
 
-function buildNavLinks(navItems, services) {
+function buildNavLinks(navItems, services, parents) {
   const items = navItems
     .map((n) => `<li><a href="${esc(n.href)}">${esc(n.label)}</a></li>`)
     .join("");
   const svcs = services
-    .map((s) => `<li><a href="/services/${esc(s.slug)}">${esc(s.title)}</a></li>`)
+    .map((s) => `<li><a href="/${esc(parents.services)}/${esc(s.slug)}">${esc(s.title)}</a></li>`)
     .join("");
   return `<nav aria-label="Primary"><ul>${items}</ul></nav>
 <nav aria-label="Services"><h2>All Services</h2><ul>${svcs}</ul></nav>`;
 }
 
-function buildFooter(navItems, services, posts) {
+function buildFooter(navItems, services, posts, parents) {
   const navLinks = navItems.map((n) => `<a href="${esc(n.href)}">${esc(n.label)}</a>`).join(" · ");
-  const svcLinks = services.map((s) => `<a href="/services/${esc(s.slug)}">${esc(s.title)}</a>`).join(" · ");
-  const blogLinks = posts.slice(0, 6).map((p) => `<a href="/blog/${esc(p.slug)}">${esc(p.title || p.slug)}</a>`).join(" · ");
+  const svcLinks = services.map((s) => `<a href="/${esc(parents.services)}/${esc(s.slug)}">${esc(s.title)}</a>`).join(" · ");
+  const blogLinks = posts.slice(0, 6).map((p) => `<a href="/${esc(parents.blog)}/${esc(p.slug)}">${esc(p.title || p.slug)}</a>`).join(" · ");
   return `<footer><h2>Sitemap</h2>
 <p><strong>Pages:</strong> ${navLinks}</p>
 <p><strong>Services:</strong> ${svcLinks}</p>
