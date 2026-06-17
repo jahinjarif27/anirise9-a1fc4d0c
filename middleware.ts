@@ -53,6 +53,40 @@ function redirectTo(request: Request, target: string) {
   });
 }
 
+async function loadRuntimeData() {
+  const [settingsRes, postsRes] = await Promise.all([
+    fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content,portfolio,case_studies`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      cache: "no-store",
+    }),
+    fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=slug`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      cache: "no-store",
+    }),
+  ]);
+  const settings = settingsRes.ok ? ((await settingsRes.json()) as any[])?.[0] ?? null : null;
+  const posts = postsRes.ok ? ((await postsRes.json()) as any[]) : [];
+  return { settings, posts };
+}
+
+function cleanSlug(value: unknown) {
+  return String(value || "").trim().replace(/^\/+|\/+$/g, "");
+}
+
+function resolveBuiltIn(slug: string, pageSeo: Record<string, any>) {
+  const cleaned = cleanSlug(slug);
+  for (const [key, defaultSlug] of Object.entries(BUILTIN_DEFAULT_SLUGS)) {
+    const customSlug = cleanSlug(pageSeo[key]?.slug);
+    if (customSlug && customSlug === cleaned) return key;
+    if (defaultSlug === cleaned) return key;
+  }
+  return null;
+}
+
+function pageSlug(key: string, pageSeo: Record<string, any>) {
+  return cleanSlug(pageSeo[key]?.slug) || BUILTIN_DEFAULT_SLUGS[key] || key;
+}
+
 async function loadSettings() {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content`, {
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
