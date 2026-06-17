@@ -98,6 +98,7 @@ async function fetchDynamicEntries(): Promise<{
     }
 
     // Services — admin-managed list (with pageSeo overrides keyed `service:<slug>`)
+    const servicesParent = (pageSeo.services?.slug?.trim() || "services").replace(/^\/+/, "");
     const svcList = row.content?.servicesList || [];
     if (svcList.length) {
       services = svcList
@@ -107,7 +108,7 @@ async function fetchDynamicEntries(): Promise<{
           if (cfg.status === "draft" || cfg.robots === "noindex") return null;
           const tail = (s.urlSlug && s.urlSlug.trim()) || s.slug;
           return {
-            path: `/services/${tail}`,
+            path: `/${servicesParent}/${tail}`,
             changefreq: (cfg.changefreq as SitemapEntry["changefreq"]) || "monthly",
             priority: cfg.priority || "0.9",
             lastmod: settingsDate,
@@ -119,6 +120,7 @@ async function fetchDynamicEntries(): Promise<{
     // Effective parent slugs (honor admin overrides)
     const blogParent = (pageSeo.blog?.slug?.trim() || "blog").replace(/^\/+/, "");
     const portfolioParent = (pageSeo.portfolio?.slug?.trim() || "portfolio").replace(/^\/+/, "");
+    const caseStudiesParent = (pageSeo["case-studies"]?.slug?.trim() || "case-studies").replace(/^\/+/, "");
 
     // Blog posts from DB (with pageSeo overrides keyed `blog/<slug>`)
     if (postsRes.ok) {
@@ -128,8 +130,9 @@ async function fetchDynamicEntries(): Promise<{
           .map((p) => {
             const cfg = pageSeo[`blog/${p.slug}`] || {};
             if (cfg.status === "draft" || cfg.robots === "noindex") return null;
+            const publicSlug = (cfg.slug && String(cfg.slug).trim()) ? String(cfg.slug).trim().replace(/^\/+/, "") : p.slug;
             return {
-              path: `/${blogParent}/${p.slug}`,
+              path: `/${blogParent}/${publicSlug}`,
               changefreq: (cfg.changefreq as SitemapEntry["changefreq"]) || "monthly",
               priority: cfg.priority || "0.7",
               lastmod: p.date || settingsDate,
@@ -158,8 +161,9 @@ async function fetchDynamicEntries(): Promise<{
       if (!c?.id) return;
       const cfg = pageSeo[`case:${c.id}`] || {};
       if (cfg.status === "draft" || cfg.robots === "noindex") return;
+      const tail = (cfg.slug && String(cfg.slug).trim()) ? String(cfg.slug).trim().replace(/^\/+/, "") : c.id;
       extras.push({
-        path: `/case-studies/${c.id}`,
+        path: `/${caseStudiesParent}/${tail}`,
         changefreq: (cfg.changefreq as SitemapEntry["changefreq"]) || "monthly",
         priority: cfg.priority || "0.7",
         lastmod: settingsDate,
