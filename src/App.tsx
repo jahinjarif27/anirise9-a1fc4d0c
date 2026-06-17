@@ -9,6 +9,8 @@ import { AppRoutes } from "./pages/AppRoutes";
 import { useTrackVisit } from "@/hooks/useTrackVisit";
 import { BottomNav } from "@/components/site/BottomNav";
 import { useLocation } from "react-router-dom";
+import { useAdmin } from "@/context/AdminContext";
+import { getPageSlug } from "@/lib/pageConfig";
 
 const RouteEffects = () => {
   useTrackVisit();
@@ -17,9 +19,12 @@ const RouteEffects = () => {
 
 const ConditionalBottomNav = () => {
   const { pathname } = useLocation();
+  const { seo } = useAdmin();
+  const strategyCallSlug = getPageSlug("strategy-call", seo.pageSeo);
+  const blogSlug = getPageSlug("blog", seo.pageSeo);
   if (pathname.startsWith("/admin")) return null;
-  if (pathname.startsWith("/strategy-call")) return null;
-  if (pathname === "/blog" || pathname.startsWith("/blog/")) return null;
+  if (pathname === `/${strategyCallSlug}` || pathname.startsWith(`/${strategyCallSlug}/`)) return null;
+  if (pathname === `/${blogSlug}` || pathname.startsWith(`/${blogSlug}/`)) return null;
   return <BottomNav />;
 };
 
