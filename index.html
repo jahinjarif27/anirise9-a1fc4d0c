@@ -29,13 +29,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
-      /* Pre-hydration splash + hide prerendered SEO shell from users (still in DOM for crawlers) */
+      /* Pre-hydration splash. SEO content lives INSIDE #root and is replaced by React on mount — no hidden-text tricks. */
       html, body { margin: 0; padding: 0; background: hsl(220 30% 98%); }
-      #seo-shell {
-        position: fixed; inset: 0; width: 1px; height: 1px;
-        overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
-        opacity: 0; pointer-events: none; z-index: -1;
-      }
       #pre-splash {
         position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
         background: hsl(220 30% 98%); z-index: 9999; transition: opacity .3s ease;
@@ -57,6 +52,11 @@
       }
       @keyframes ps-slide { 0% { transform: translateX(-110%);} 100% { transform: translateX(360%);} }
       #pre-splash.ps-hide { opacity: 0; pointer-events: none; }
+      /* Prerendered shell inside #root — visible during initial paint but covered by splash. */
+      #root > .seo-shell { color: hsl(224 30% 14%); font-family: system-ui, sans-serif; line-height: 1.55; }
+      #root > .seo-shell h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 .75rem; }
+      #root > .seo-shell nav ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .75rem; }
+      #root > .seo-shell main, #root > .seo-shell header, #root > .seo-shell footer { max-width: 70rem; margin: 0 auto; padding: 1rem; }
     </style>
   </head>
 
@@ -74,11 +74,21 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
       (function(){
+        // Detect known crawlers — they get NO splash overlay so rendered screenshots match real content.
+        var ua = (navigator.userAgent || "").toLowerCase();
+        var isBot = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|sogou|exabot|facebot|facebookexternalhit|twitterbot|linkedinbot|embedly|whatsapp|telegrambot|applebot|petalbot|ahrefsbot|semrushbot|mj12bot|seobility/i.test(ua);
+        if (isBot) {
+          var s0 = document.getElementById('pre-splash');
+          if (s0) s0.remove();
+          return;
+        }
         function hide(){ var s=document.getElementById('pre-splash'); if(!s) return; s.classList.add('ps-hide'); setTimeout(function(){ s && s.remove(); }, 350); }
         var t=Date.now();
         var i=setInterval(function(){
           var r=document.getElementById('root');
-          if((r && r.children && r.children.length>0) || Date.now()-t>8000){ clearInterval(i); hide(); }
+          // React replaced the prerendered shell when first child no longer has the .seo-shell class
+          var ready = r && r.firstElementChild && !r.firstElementChild.classList.contains('seo-shell');
+          if(ready || Date.now()-t>8000){ clearInterval(i); hide(); }
         }, 80);
       })();
     </script>
