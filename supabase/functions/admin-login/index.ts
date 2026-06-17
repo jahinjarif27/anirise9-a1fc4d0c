@@ -59,7 +59,7 @@ function timingSafeEqual(a: string, b: string): boolean {
 }
 
 // Returns true when the supplied password matches:
-//   1. The user-set hash in site_settings.admin_auth (if present), OR
+//   1. The user-set hash in admin_credentials (if present), OR
 //   2. The ADMIN_PASSWORD env var fallback (used until the admin sets a custom one).
 export async function verifyPrimaryPassword(
   sb: ReturnType<typeof createClient>,
@@ -67,11 +67,11 @@ export async function verifyPrimaryPassword(
   envPassword: string,
 ): Promise<boolean> {
   const { data } = await sb
-    .from('site_settings')
-    .select('admin_auth')
+    .from('admin_credentials')
+    .select('hash,salt')
     .eq('id', 1)
     .maybeSingle();
-  const auth: any = data?.admin_auth ?? {};
+  const auth: any = data ?? {};
   if (auth && typeof auth.hash === 'string' && typeof auth.salt === 'string' && auth.hash && auth.salt) {
     const calc = await pbkdf2(password, auth.salt);
     return timingSafeEqual(calc, auth.hash);

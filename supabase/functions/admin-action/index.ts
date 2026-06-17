@@ -66,8 +66,8 @@ async function verifyPrimaryPassword(
   password: string,
   envPassword: string,
 ): Promise<boolean> {
-  const { data } = await sb.from('site_settings').select('admin_auth').eq('id', 1).maybeSingle();
-  const auth: any = (data as any)?.admin_auth ?? {};
+  const { data } = await sb.from('admin_credentials').select('hash,salt').eq('id', 1).maybeSingle();
+  const auth: any = data ?? {};
   if (auth && typeof auth.hash === 'string' && typeof auth.salt === 'string' && auth.hash && auth.salt) {
     const calc = await pbkdf2(password, auth.salt);
     return timingSafeEqual(calc, auth.hash);
@@ -82,8 +82,8 @@ type Op = (sb: ReturnType<typeof createClient>, payload: any) => Promise<unknown
 const ops: Record<string, Op> = {
   ping: async () => ({ ok: true }),
 
-  // Site settings (never allow admin_auth to be overwritten via this op — it is
-  // managed exclusively by change_password).
+  // Site settings (admin_auth column no longer exists; credentials live in
+  // the private admin_credentials table managed by change_password).
   update_site_settings: async (sb, p) => {
     const { admin_auth: _ignored, ...rest } = (p ?? {}) as Record<string, unknown>;
     const { error } = await sb.from('site_settings').update({ ...rest, updated_at: new Date().toISOString() }).eq('id', 1);
@@ -108,9 +108,8 @@ const ops: Record<string, Op> = {
     const salt = btoa(String.fromCharCode(...saltBytes));
     const hash = await pbkdf2(newPassword, salt);
     const { error } = await sb
-      .from('site_settings')
-      .update({ admin_auth: { hash, salt, updated_at: new Date().toISOString() } })
-      .eq('id', 1);
+      .from('admin_credentials')
+      .upsert({ id: 1, hash, salt, updated_at: new Date().toISOString() });
     if (error) throw error;
     return { ok: true };
   },

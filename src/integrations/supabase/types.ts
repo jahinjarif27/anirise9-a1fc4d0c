@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_credentials: {
+        Row: {
+          hash: string | null
+          id: number
+          salt: string | null
+          updated_at: string
+        }
+        Insert: {
+          hash?: string | null
+          id: number
+          salt?: string | null
+          updated_at?: string
+        }
+        Update: {
+          hash?: string | null
+          id?: number
+          salt?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author: string
@@ -157,7 +178,6 @@ export type Database = {
       }
       site_settings: {
         Row: {
-          admin_auth: Json
           appearance: Json
           case_studies: Json
           contact: Json
@@ -182,7 +202,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          admin_auth?: Json
           appearance?: Json
           case_studies?: Json
           contact?: Json
@@ -207,7 +226,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          admin_auth?: Json
           appearance?: Json
           case_studies?: Json
           contact?: Json
