@@ -261,7 +261,11 @@ Deno.serve(async (req) => {
     const pageSeo: Record<string, any> = (s.seo?.pageSeo ?? {}) as any;
     const siteUrl = normalizeSiteUrl(s.seo?.canonicalUrl);
     const manualSitemap = typeof s.seo?.sitemap === 'string' ? s.seo.sitemap.trim() : '';
-    const useManual = s.seo?.autoSitemap === false && isSafeManualSitemap(manualSitemap);
+    const currentPageSlugs = Object.keys(BUILTIN_DEFAULT_SLUGS)
+      .map((key) => (pageSeo[key]?.slug?.trim() || BUILTIN_DEFAULT_SLUGS[key]).replace(/^\/+/, ''))
+      .filter(Boolean);
+    const manualMatchesCurrentSlugs = currentPageSlugs.every((slug) => manualSitemap.includes(`${siteUrl}/${slug}`));
+    const useManual = s.seo?.autoSitemap === false && isSafeManualSitemap(manualSitemap) && manualMatchesCurrentSlugs;
     if (useManual && (!sub || sub === 'all')) {
       const htmlMode = wantsHtml(req, url);
       if (htmlMode) {
