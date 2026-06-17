@@ -29,8 +29,8 @@ export const SectionPage = ({ Section, title, sectionKey }: Props) => {
   const location = useLocation();
   const ps = sectionKey ? seo.pageSeo?.[sectionKey] : undefined;
 
-  // Draft page → 404 on public site
-  if (sectionKey && isPageDraft(sectionKey, seo.pageSeo)) {
+  // Draft page → 404 on public site (only once admin settings have loaded)
+  if (!loading && sectionKey && isPageDraft(sectionKey, seo.pageSeo)) {
     return (
       <Suspense fallback={null}>
         <NotFound />
@@ -39,7 +39,8 @@ export const SectionPage = ({ Section, title, sectionKey }: Props) => {
   }
 
   // If admin overrode the slug, the default path must 404 (single source of truth).
-  if (sectionKey && (sectionKey in BUILTIN_DEFAULT_SLUGS)) {
+  // Wait for settings to load — otherwise a freshly-saved slug change briefly 404s.
+  if (!loading && sectionKey && (sectionKey in BUILTIN_DEFAULT_SLUGS)) {
     const effective = getPagePath(sectionKey as BuiltInPageKey, seo.pageSeo);
     const current = location.pathname.replace(/\/+$/, "") || "/";
     if (current !== effective.replace(/\/+$/, "") && current !== effective) {
