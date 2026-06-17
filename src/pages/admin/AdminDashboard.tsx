@@ -3205,6 +3205,9 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" onClick={() => persistNow("Redirects saved — live server rules updated")}>
+                        <Save className="h-4 w-4" /> Save redirects
+                      </Button>
                       <Button variant="hero" size="sm" onClick={() => addRedirect({ from: "/old-path", to: "/new-path", code: 301, enabled: true })}>
                         <Plus className="h-4 w-4" /> Add redirect
                       </Button>
@@ -3228,6 +3231,7 @@ const AdminDashboard = () => {
                             <ArrowRight className="h-4 w-4 text-muted-foreground hidden sm:block" />
                             <Input className="h-9 font-mono text-xs" placeholder="/to" value={r.to} onChange={(e) => updateRedirect(r.id, { to: e.target.value })} />
                           </div>
+                          <p className="text-[10px] text-muted-foreground">Always saved as HTTP 301. Use the save button above after editing.</p>
                         </div>
                       ))}
                     </div>

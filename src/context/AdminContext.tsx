@@ -1333,7 +1333,16 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (s.content && Object.keys(s.content).length) setContent({ ...defaultContent, ...(s.content as any) });
         if (s.contact && Object.keys(s.contact).length) setContact({ ...defaultContact, ...(s.contact as any) });
         if (Array.isArray(s.portfolio)) setPortfolio(s.portfolio as any);
-        if (s.seo && Object.keys(s.seo).length) setSeo({ ...defaultSeo, ...(s.seo as any) });
+        if (s.seo && Object.keys(s.seo).length) {
+          const incomingSeo = s.seo as any;
+          setSeo({
+            ...defaultSeo,
+            ...incomingSeo,
+            redirects: Array.isArray(incomingSeo.redirects)
+              ? incomingSeo.redirects.map((r: any) => ({ ...r, code: 301 as const }))
+              : defaultSeo.redirects,
+          });
+        }
         if (s.appearance && Object.keys(s.appearance).length) setAppearance({ ...defaultAppearance, ...(s.appearance as any) });
         if (Array.isArray(s.custom_pages)) setCustomPages(mergeLegalPages((s.custom_pages as any[]).map((p) => ({
           ...p,

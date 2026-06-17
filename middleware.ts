@@ -1,5 +1,12 @@
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://xlrmuspmekwbtnyeutxz.supabase.co";
-const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6Inhscm11c3BtZWt3YnRueWV1dHh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTUzMzUsImV4cCI6MjA5NDU5MTMzNX0.7hnEy_HPG4rzOZBeF7k6iPP0c51ohnoedXAsTA_Wisw";
+import { next } from "@vercel/functions";
+
+const env = typeof process !== "undefined" ? process.env : {};
+const SUPABASE_URL = env.SUPABASE_URL || env.VITE_SUPABASE_URL || "https://xlrmuspmekwbtnyeutxz.supabase.co";
+const SUPABASE_KEY =
+  env.SUPABASE_ANON_KEY ||
+  env.SUPABASE_PUBLISHABLE_KEY ||
+  env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhscm11c3BtZWt3YnRueWV1dHh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTUzMzUsImV4cCI6MjA5NDU5MTMzNX0.7hnEy_HPG4rzOZBeF7k6iPP0c51ohnoedXAsTA_Wisw";
 
 const BUILTIN_DEFAULT_SLUGS: Record<string, string> = {
   services: "services",
@@ -18,6 +25,14 @@ function cleanPath(pathname: string) {
   return pathname.length > 1 ? pathname.replace(/\/+$/, "") : "/";
 }
 
+function rulePath(value: string) {
+  try {
+    return cleanPath(/^https?:\/\//i.test(value) ? new URL(value).pathname : value.startsWith("/") ? value : `/${value}`);
+  } catch {
+    return cleanPath(value.startsWith("/") ? value : `/${value}`);
+  }
+}
+
 function redirectTo(request: Request, target: string) {
   const source = new URL(request.url);
   const destination = /^https?:\/\//i.test(target) ? new URL(target) : new URL(target.startsWith("/") ? target : `/${target}`, request.url);
@@ -28,6 +43,7 @@ function redirectTo(request: Request, target: string) {
 async function loadSettings() {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content`, {
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+    cache: "no-store",
   });
   if (!res.ok) return null;
   const rows = (await res.json()) as any[];
@@ -37,7 +53,7 @@ async function loadSettings() {
 export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = cleanPath(url.pathname);
-  if (pathname.startsWith("/admin") || pathname.startsWith("/assets") || ASSET_PATH.test(pathname)) return;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/assets") || ASSET_PATH.test(pathname)) return next();
   if (url.pathname !== pathname) return redirectTo(request, pathname);
 
   const settings = await loadSettings();
@@ -45,7 +61,7 @@ export default async function middleware(request: Request) {
   const pageSeo = seo.pageSeo ?? {};
 
   const manual = Array.isArray(seo.redirects) ? seo.redirects : [];
-  const exact = manual.find((r: any) => r?.enabled !== false && cleanPath(String(r.from || "")) === pathname && r.to && cleanPath(String(r.to)) !== pathname);
+  const exact = manual.find((r: any) => r?.enabled !== false && rulePath(String(r.from || "")) === pathname && r.to && rulePath(String(r.to)) !== pathname);
   if (exact) return redirectTo(request, exact.to);
 
   for (const [key, defaultSlug] of Object.entries(BUILTIN_DEFAULT_SLUGS)) {
@@ -67,6 +83,8 @@ export default async function middleware(request: Request) {
     if (!customSlug || customSlug === defaultSlug) continue;
     if (pathname.startsWith(`/${defaultSlug}/`)) return redirectTo(request, pathname.replace(`/${defaultSlug}/`, `/${customSlug}/`));
   }
+
+  return next();
 }
 
 export const config = {
