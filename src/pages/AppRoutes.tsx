@@ -5,6 +5,7 @@ import BlogPage from "./Blog.tsx";
 import BlogPostPage from "./BlogPost.tsx";
 import { CustomPageView } from "./CustomPageView";
 import { SectionPage } from "./SectionPage";
+import { HomeLoader } from "@/components/site/HomeLoader";
 import { useAdmin } from "@/context/AdminContext";
 import { useParams } from "react-router-dom";
 import { resolvePathToBuiltIn, type BuiltInPageKey } from "@/lib/pageConfig";
