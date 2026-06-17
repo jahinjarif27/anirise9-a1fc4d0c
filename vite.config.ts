@@ -48,8 +48,9 @@ async function getPrerenderRoutes() {
       fetch(`${supabaseUrl}/rest/v1/site_settings?id=eq.1&select=seo,content,custom_pages,portfolio,case_studies`, { headers }),
       fetch(`${supabaseUrl}/rest/v1/blog_posts?select=slug,date`, { headers }),
     ]);
-    const settings = (await settingsRes.json())?.[0] ?? {};
-    const posts = await postsRes.json();
+    const settingsRows = (await settingsRes.json()) as any[];
+    const settings = settingsRows?.[0] ?? {};
+    const posts = (await postsRes.json()) as any[];
     const pageSeo = settings.seo?.pageSeo ?? {};
     const add = (pathName: string) => routes.add(pathName.startsWith("/") ? pathName : `/${pathName}`);
 
