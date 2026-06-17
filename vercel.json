@@ -1,4 +1,12 @@
 {
+  "redirects": [
+    {
+      "//": "Add 301 redirects for old URLs here. Example:",
+      "source": "/__example_old_path__",
+      "destination": "/new-path",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/sitemap" },
     { "source": "/robots.txt", "destination": "https://xlrmuspmekwbtnyeutxz.supabase.co/functions/v1/robots" },
