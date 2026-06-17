@@ -379,7 +379,6 @@ const AdminDashboard = () => {
     seo, updateSeo, appearance, updateAppearance, fontChoices, saveAllNow,
     contact, updateContact, regenerateSitemap, buildSitemap,
     portfolio, addPortfolioItem, updatePortfolioItem, deletePortfolioItem,
-    addRedirect, updateRedirect, deleteRedirect,
     addSchema, updateSchema, deleteSchema,
     customPages, addCustomPage, updateCustomPage, deleteCustomPage,
     homeSections, addHomeSection, updateHomeSection, deleteHomeSection,
@@ -563,7 +562,6 @@ const AdminDashboard = () => {
     wrap("Keywords", seo.metaKeywords);
     wrap("Canonical URL", seo.canonicalUrl);
     wrap("Active schemas", seo.schemas.filter((s) => s.enabled).map((s) => s.type).join(", "));
-    wrap("Active redirects", seo.redirects.filter((r) => r.enabled).length.toString());
 
     y += 10;
     doc.setFont("helvetica", "bold");
@@ -2749,7 +2747,6 @@ const AdminDashboard = () => {
                   <TabsTrigger value="schema" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Code2 className="h-3.5 w-3.5" /> Schema</TabsTrigger>
                   <TabsTrigger value="sitemap" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><FileText className="h-3.5 w-3.5" /> Sitemap</TabsTrigger>
                   <TabsTrigger value="robots" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Bot className="h-3.5 w-3.5" /> Robots</TabsTrigger>
-                  <TabsTrigger value="redirects" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Link2 className="h-3.5 w-3.5" /> Redirects</TabsTrigger>
                   <TabsTrigger value="canonical" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Globe className="h-3.5 w-3.5" /> Canonical</TabsTrigger>
                   <TabsTrigger value="appearance" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Type className="h-3.5 w-3.5" /> Appearance</TabsTrigger>
                   <TabsTrigger value="security" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Lock className="h-3.5 w-3.5" /> Security</TabsTrigger>
