@@ -11,9 +11,6 @@ import { resolvePathToBuiltIn, type BuiltInPageKey } from "@/lib/pageConfig";
 
 const NotFound = lazy(() => import("./NotFound.tsx"));
 const AdminDashboard = lazy(() => import("./admin/AdminDashboard.tsx"));
-const WebsiteSEOPage = lazy(() => import("./services/WebsiteSEO.tsx"));
-const EcommerceSEOPage = lazy(() => import("./services/EcommerceSEO.tsx"));
-const GraphicsDesignPage = lazy(() => import("./services/GraphicsDesign.tsx"));
 const ComingSoonService = lazy(() => import("./services/ComingSoon.tsx"));
 const StrategyCallPage = lazy(() => import("./StrategyCallPage.tsx"));
 const CaseStudyDetail = lazy(() => import("./CaseStudyDetail.tsx"));
@@ -40,14 +37,16 @@ const SECTION_COMPONENTS: Record<string, { Component: React.ComponentType; title
 /**
  * Catch-all single-segment route. Order of resolution:
  *   1. Admin-set custom slug for a built-in page → render that page
- *   2. Default slug for a built-in page → render that page
+ *   2. Default slug for a built-in page only when it has no admin replacement
  *   3. Custom page (CustomPageView)
  */
 const DynamicSlugResolver = () => {
   const { slug } = useParams<{ slug: string }>();
   const { seo } = useAdmin();
   const matched = resolvePathToBuiltIn(slug || "", seo.pageSeo);
-  if (matched && matched !== "home" && matched !== "blog" && matched !== "strategy-call") {
+  if (matched === "blog") return <BlogPage />;
+  if (matched === "strategy-call") return <StrategyCallPage />;
+  if (matched && matched !== "home") {
     const entry = SECTION_COMPONENTS[matched as BuiltInPageKey];
     if (entry) {
       return <SectionPage Section={entry.Component} title={entry.title} sectionKey={matched} />;
@@ -67,6 +66,8 @@ const DynamicDetailResolver = () => {
   const matched = resolvePathToBuiltIn(section || "", seo.pageSeo);
   if (matched === "portfolio") return <ProjectDetail />;
   if (matched === "blog") return <BlogPostPage />;
+  if (matched === "services") return <ComingSoonService />;
+  if (matched === "case-studies") return <CaseStudyDetail />;
   return <NotFound />;
 };
 
@@ -76,15 +77,6 @@ export const AppRoutes = () => {
     <Suspense fallback={null}>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/strategy-call" element={<StrategyCallPage />} />
-        <Route path="/case-studies/:id" element={<CaseStudyDetail />} />
-        <Route path="/portfolio/:id" element={<ProjectDetail />} />
-        <Route path="/blog/:slug" element={<BlogPostPage />} />
-        <Route path="/services/website-seo" element={<WebsiteSEOPage />} />
-        <Route path="/services/ecommerce-seo" element={<EcommerceSEOPage />} />
-        <Route path="/services/graphics-design" element={<GraphicsDesignPage />} />
-        <Route path="/services/:slug" element={<ComingSoonService />} />
         {Object.entries(SECTION_COMPONENTS).map(([key, { Component, title }]) => (
           <Route
             key={key}
