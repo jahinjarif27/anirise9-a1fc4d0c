@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 import { SectionNote } from "@/components/site/SectionNote";
+import { getPageSlug } from "@/lib/pageConfig";
 
 export const CaseStudies = () => {
-  const { caseStudies } = useAdmin();
+  const { caseStudies, seo } = useAdmin();
+  const caseStudiesSlug = getPageSlug("case-studies", seo.pageSeo);
   if (!caseStudies.length) return null;
 
   return (
@@ -17,7 +19,7 @@ export const CaseStudies = () => {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {caseStudies.map((c) => (
-            <Link to={`/case-studies/${c.id}`} key={c.id} className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-smooth border border-border/40 flex flex-col">
+            <Link to={`/${caseStudiesSlug}/${c.id}`} key={c.id} className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-smooth border border-border/40 flex flex-col">
               {c.image && (
                 <div className="aspect-video lg:aspect-[16/9] overflow-hidden bg-secondary max-h-48 lg:max-h-44">
                   <img src={c.image} alt={c.imageAlt || c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" />

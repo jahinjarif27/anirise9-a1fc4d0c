@@ -1,4 +1,4 @@
-import { useParams, Link, Navigate, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
@@ -12,11 +12,14 @@ const BlogPostPage = () => {
   const { slug } = useParams();
   const location = useLocation();
   const { posts, seo, loading } = useAdmin();
-  const post = posts.find((p) => p.slug === slug || seo.pageSeo?.[`blog/${p.slug}`]?.slug === slug);
+  const post = posts.find((p) => {
+    const customSlug = seo.pageSeo?.[`blog/${p.slug}`]?.slug?.trim();
+    return (customSlug || p.slug) === slug;
+  });
   const blogSlug = getPageSlug("blog", seo.pageSeo);
   const publicPostSlug = post ? (seo.pageSeo?.[`blog/${post.slug}`]?.slug?.trim() || post.slug) : (slug ?? "");
   const expectedPath = `/${blogSlug}/${publicPostSlug}`;
-  const sectionRedirect = !!post && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
+  const wrongPath = !!post && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
   const override: any = post ? (seo.pageSeo?.[`blog/${post.slug}`] || {}) : {};
   const overrideExtra = fromPageSeo(override);
   // If the user added their own schemas via admin, use them; otherwise fall back to BlogPosting JSON-LD.
@@ -58,8 +61,7 @@ const BlogPostPage = () => {
   });
 
   if (loading) return null;
-  if (sectionRedirect) return <Navigate to={expectedPath} replace />;
-  if (!post || override.status === "draft") {
+  if (!post || wrongPath || override.status === "draft") {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />

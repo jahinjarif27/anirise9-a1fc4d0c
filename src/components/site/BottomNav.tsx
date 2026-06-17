@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 import logo from "@/assets/anirise-logo.jpg";
 import { useAdmin } from "@/context/AdminContext";
 import { useServices } from "@/lib/useServices";
+import { getPageSlug } from "@/lib/pageConfig";
 
 const SECTION_LABELS: Record<string, string> = {
   hero: "Home", services: "Services", portfolio: "Portfolio",
@@ -16,6 +17,7 @@ const SECTION_LABELS: Record<string, string> = {
 export const BottomNav = () => {
   const { contact, customPages, seo } = useAdmin();
   const services = useServices();
+  const servicesSlug = getPageSlug("services", seo.pageSeo);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
@@ -136,7 +138,7 @@ export const BottomNav = () => {
                               {services.map((s) => (
                                 <li key={s.slug}>
                                   <a
-                                    href={`/services/${s.publicSlug}`}
+                                    href={`/${servicesSlug}/${s.publicSlug}`}
                                     onClick={() => setOpen(false)}
                                     className="w-full text-left flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-medium text-foreground/80 hover:text-accent hover:bg-secondary/50"
                                   >

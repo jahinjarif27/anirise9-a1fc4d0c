@@ -4,6 +4,7 @@ import { Facebook, ArrowRight, Play, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { getPagePath } from "@/lib/pageConfig";
 
 const addPreconnect = (href: string) => {
   if (typeof document === "undefined") return;
@@ -17,7 +18,9 @@ const addPreconnect = (href: string) => {
 };
 
 export const Hero = () => {
-  const { content, contact } = useAdmin();
+  const { content, contact, seo } = useAdmin();
+  const servicesPath = getPagePath("services", seo.pageSeo);
+  const strategyCallPath = getPagePath("strategy-call", seo.pageSeo);
   const [videoOpen, setVideoOpen] = useState(false);
 
   const rawVideoUrl = content.heroVideoUrl?.trim();
@@ -126,13 +129,13 @@ export const Hero = () => {
               </Button>
             ) : (
               <Button asChild variant="hero" size="xl">
-                <Link to="/strategy-call">
+                <Link to={strategyCallPath}>
                   Book A Strategy Call <ArrowRight />
                 </Link>
               </Button>
             )}
             <Button asChild variant="outline" size="xl" className="rounded-full">
-              <Link to="/services">Our Services</Link>
+              <Link to={servicesPath}>Our Services</Link>
             </Button>
           </div>
 
@@ -220,7 +223,7 @@ export const Hero = () => {
           </div>
           <div className="p-5 flex flex-col items-center text-center gap-3">
             <Button asChild variant="hero" size="lg" onClick={() => setVideoOpen(false)}>
-              <Link to="/strategy-call">
+              <Link to={strategyCallPath}>
                 Book A Strategy Call <ArrowRight />
               </Link>
             </Button>

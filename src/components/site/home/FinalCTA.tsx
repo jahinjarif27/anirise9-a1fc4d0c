@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/context/AdminContext";
 import { SectionNote } from "@/components/site/SectionNote";
+import { getPagePath } from "@/lib/pageConfig";
 
 export const FinalCTA = () => {
-  const { finalCta, contact } = useAdmin();
+  const { finalCta, contact, seo } = useAdmin();
+  const strategyCallPath = getPagePath("strategy-call", seo.pageSeo);
   return (
     <section className="py-20 lg:py-24 bg-background">
       <div className="container max-w-3xl text-center">
@@ -63,7 +65,7 @@ export const FinalCTA = () => {
 
         <div className="mt-10">
           <Button asChild variant="hero" size="xl" className="min-w-[240px]">
-            <Link to="/strategy-call">
+            <Link to={strategyCallPath}>
               {finalCta.primaryLabel || "Book A Strategy Call"} <ArrowRight />
             </Link>
           </Button>

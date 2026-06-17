@@ -1,4 +1,4 @@
-import { useParams, Link, Navigate, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Building2, UserCircle2, Calendar, CheckCircle2 } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
@@ -26,14 +26,11 @@ const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const { portfolio, seo, loading } = useAdmin();
-  const p = portfolio.find((x) => x.id === id || (x.slug && x.slug === id));
+  const p = portfolio.find((x) => (x.slug?.trim() || x.id) === id);
   const portfolioSlug = getPageSlug("portfolio", seo.pageSeo); // effective parent slug
   const publicTail = p?.slug?.trim() || p?.id || id || "";
   const expectedPath = `/${portfolioSlug}/${publicTail}`;
-  // If a custom slug exists for the item, only that slug should resolve; redirect from raw id.
-  const itemRedirect = !!p && !!p.slug?.trim() && id !== p.slug;
-  // If the parent section slug was overridden, redirect /portfolio/... → /<override>/...
-  const sectionRedirect = !!p && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
+  const wrongPath = !!p && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
 
   const override: any = p ? (seo.pageSeo?.[`proj:${p.id}`] || {}) : {};
   const isDraft = override.status === "draft";
@@ -57,9 +54,7 @@ const ProjectDetail = () => {
   });
 
   if (loading) return null;
-  if (itemRedirect) return <Navigate to={`/${portfolioSlug}/${p!.slug}`} replace />;
-  if (sectionRedirect) return <Navigate to={expectedPath} replace />;
-  if (!p || isDraft) {
+  if (!p || wrongPath || isDraft) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />

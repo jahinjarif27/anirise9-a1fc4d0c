@@ -292,8 +292,10 @@ Deno.serve(async (req) => {
     const settingsDate = s.updated_at ? String(s.updated_at).slice(0, 10) : today;
 
     // Effective parent slugs
+    const servicesParent = (pageSeo.services?.slug?.trim() || 'services').replace(/^\/+/, '');
     const blogParent = (pageSeo.blog?.slug?.trim() || 'blog').replace(/^\/+/, '');
     const portfolioParent = (pageSeo.portfolio?.slug?.trim() || 'portfolio').replace(/^\/+/, '');
+    const caseStudiesParent = (pageSeo['case-studies']?.slug?.trim() || 'case-studies').replace(/^\/+/, '');
 
     // ---- Build each sub-set ----
     const pagesEntries: Entry[] = [];
@@ -327,7 +329,7 @@ Deno.serve(async (req) => {
       const tail = (sv.urlSlug?.trim() || sv.slug || '').replace(/^\/+/, '');
       if (!tail) continue;
       servicesEntries.push({
-        path: `/services/${tail}`,
+        path: `/${servicesParent}/${tail}`,
         changefreq: ps.changefreq || 'monthly',
         priority: ps.priority || '0.9',
         lastmod: settingsDate,
@@ -339,11 +341,12 @@ Deno.serve(async (req) => {
       for (const p of postsRes.data) {
         const ps = pageSeo[`blog/${p.slug}`] || {};
         if (ps.status === 'draft' || ps.robots === 'noindex') continue;
+        const publicSlug = (ps.slug?.trim() || p.slug).replace(/^\/+/, '');
         const postLastmod = (p as any).updated_at
           ? String((p as any).updated_at).slice(0, 10)
           : (p.date || settingsDate);
         blogEntries.push({
-          path: `/${blogParent}/${p.slug}`,
+          path: `/${blogParent}/${publicSlug}`,
           lastmod: postLastmod,
           changefreq: ps.changefreq || 'monthly',
           priority: ps.priority || '0.7',
@@ -368,8 +371,9 @@ Deno.serve(async (req) => {
       if (!c?.id) continue;
       const ps = pageSeo[`case:${c.id}`] || {};
       if (ps.status === 'draft' || ps.robots === 'noindex') continue;
+      const tail = (ps.slug?.trim() || c.id).replace(/^\/+/, '');
       portfolioEntries.push({
-        path: `/case-studies/${c.id}`,
+        path: `/${caseStudiesParent}/${tail}`,
         changefreq: ps.changefreq || 'monthly',
         priority: ps.priority || '0.7',
         lastmod: settingsDate,

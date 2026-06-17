@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { useServices } from "@/lib/useServices";
 import { useAdmin } from "@/context/AdminContext";
 import { SectionNote } from "@/components/site/SectionNote";
+import { getPagePath, getPageSlug } from "@/lib/pageConfig";
 
 // Rotating gradient tints for icon tiles (split layout)
 const SPLIT_TINTS = [
@@ -15,8 +16,10 @@ const SPLIT_TINTS = [
 ];
 
 export const ServicesPreview = () => {
-  const { content, servicePreviews } = useAdmin();
+  const { content, servicePreviews, seo } = useAdmin();
   const services = useServices();
+  const servicesPath = getPagePath("services", seo.pageSeo);
+  const servicesSlug = getPageSlug("services", seo.pageSeo);
   const layout = content.servicesLayout || "marquee";
 
   // ---------- Light header (used by grid + split) ----------
@@ -33,7 +36,7 @@ export const ServicesPreview = () => {
           <p className="mt-3 text-muted-foreground">{content.servicesBlurb}</p>
         </div>
         <Link
-          to="/services"
+          to={servicesPath}
           className="text-sm font-semibold text-accent inline-flex items-center gap-1 hover:gap-2 transition-all"
         >
           View all <ArrowRight className="h-4 w-4" />
@@ -54,7 +57,7 @@ export const ServicesPreview = () => {
           <p className="mt-3 text-primary-foreground/80">{content.servicesBlurb}</p>
         </div>
         <Link
-          to="/services"
+          to={servicesPath}
           className="text-sm font-semibold text-accent inline-flex items-center gap-1 hover:gap-2 transition-all"
         >
           View all <ArrowRight className="h-4 w-4" />
@@ -90,7 +93,7 @@ export const ServicesPreview = () => {
               return (
                 <Link
                   key={s.slug}
-                  to={`/services/${s.publicSlug}`}
+                  to={`/${servicesSlug}/${s.publicSlug}`}
                   className={`group relative flex flex-col items-start text-left p-8 lg:p-10 transition-colors hover:bg-accent/5 ${
                     isBottomRow ? "lg:border-t lg:border-border/70" : ""
                   }`}
@@ -145,7 +148,7 @@ export const ServicesPreview = () => {
 
       return (
         <Link
-          to={`/services/${s.publicSlug}`}
+          to={`/${servicesSlug}/${s.publicSlug}`}
           className={`group flex flex-col items-center text-center gap-5 ${sideClasses} lg:items-center`}
         >
           {/* Icon tile */}
@@ -243,7 +246,7 @@ export const ServicesPreview = () => {
             return (
               <Link
                 key={`${s.slug}-${idx}`}
-                to={`/services/${s.publicSlug}`}
+                to={`/${servicesSlug}/${s.publicSlug}`}
                 className="group/card block w-[280px] sm:w-[320px] shrink-0 bg-card rounded-3xl p-6 shadow-elegant hover:scale-[1.02] transition-smooth"
               >
                 <div className="aspect-square rounded-2xl bg-accent/20 grid place-items-center mb-5 overflow-hidden group-hover/card:bg-gradient-accent transition-smooth">

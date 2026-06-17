@@ -20,12 +20,6 @@ const BUILTIN_DEFAULT_SLUGS: Record<string, string> = {
 };
 
 const ASSET_PATH = /\.[a-z0-9]{2,8}$/i;
-const STATIC_REDIRECTS: Record<string, string> = {
-  "/our": "/new-path",
-  "/services": "/our-services",
-  "/services/website-development": "/services/web-dev",
-  "/blog/seo-checklist-2026": "/blog/seo-cheaklist-2026",
-};
 
 function cleanPath(pathname: string) {
   return pathname.length > 1 ? pathname.replace(/\/+$/, "") : "/";
@@ -54,19 +48,12 @@ function redirectTo(request: Request, target: string) {
 }
 
 async function loadRuntimeData() {
-  const [settingsRes, postsRes] = await Promise.all([
-    fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content,portfolio,case_studies`, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-      cache: "no-store",
-    }),
-    fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=slug`, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-      cache: "no-store",
-    }),
-  ]);
+  const settingsRes = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content,portfolio,case_studies`, {
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+    cache: "no-store",
+  });
   const settings = settingsRes.ok ? ((await settingsRes.json()) as any[])?.[0] ?? null : null;
-  const posts = postsRes.ok ? ((await postsRes.json()) as any[]) : [];
-  return { settings, posts };
+  return { settings };
 }
 
 function cleanSlug(value: unknown) {
@@ -78,7 +65,7 @@ function resolveBuiltIn(slug: string, pageSeo: Record<string, any>) {
   for (const [key, defaultSlug] of Object.entries(BUILTIN_DEFAULT_SLUGS)) {
     const customSlug = cleanSlug(pageSeo[key]?.slug);
     if (customSlug && customSlug === cleaned) return key;
-    if (defaultSlug === cleaned) return key;
+    if (!customSlug && defaultSlug === cleaned) return key;
   }
   return null;
 }
@@ -91,10 +78,9 @@ export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = cleanPath(url.pathname);
   if (pathname.startsWith("/admin") || pathname.startsWith("/assets") || ASSET_PATH.test(pathname)) return next();
-  if (STATIC_REDIRECTS[pathname]) return redirectTo(request, STATIC_REDIRECTS[pathname]);
   if (url.pathname !== pathname) return redirectTo(request, pathname);
 
-  const { settings, posts } = await loadRuntimeData();
+  const { settings } = await loadRuntimeData();
   const seo = settings?.seo ?? {};
   const pageSeo = seo.pageSeo ?? {};
 
@@ -102,40 +88,15 @@ export default async function middleware(request: Request) {
   const exact = manual.find((r: any) => r?.enabled !== false && rulePath(String(r.from || "")) === pathname && r.to && rulePath(String(r.to)) !== pathname);
   if (exact) return redirectTo(request, exact.to);
 
-  for (const [key, defaultSlug] of Object.entries(BUILTIN_DEFAULT_SLUGS)) {
-    const customSlug = cleanSlug(pageSeo[key]?.slug);
-    if (!customSlug || customSlug === defaultSlug) continue;
-    if (pathname === `/${defaultSlug}`) return redirectTo(request, `/${customSlug}`);
-  }
-
-  const services = Array.isArray(settings?.content?.servicesList) ? settings.content.servicesList : [];
-  const serviceMatch = pathname.match(/^\/services\/([^/]+)$/);
-  if (serviceMatch) {
-    const item = services.find((s: any) => s?.slug === serviceMatch[1] && cleanSlug(s?.urlSlug) && cleanSlug(s.urlSlug) !== s.slug);
-    if (item) return redirectTo(request, `/services/${cleanSlug(item.urlSlug)}`);
-  }
-
-  for (const key of ["blog", "portfolio"] as const) {
-    const defaultSlug = BUILTIN_DEFAULT_SLUGS[key];
-    const customSlug = cleanSlug(pageSeo[key]?.slug);
-    if (!customSlug || customSlug === defaultSlug) continue;
-    if (pathname.startsWith(`/${defaultSlug}/`)) return redirectTo(request, pathname.replace(`/${defaultSlug}/`, `/${customSlug}/`));
-  }
-
   const detailMatch = pathname.match(/^\/([^/]+)\/([^/]+)$/);
   if (detailMatch) {
     const [, sectionSlug, itemSlug] = detailMatch;
     const section = resolveBuiltIn(sectionSlug, pageSeo);
-    if (section === "blog") {
-      const post = posts.find((p: any) => p?.slug === itemSlug);
-      const overrideSlug = cleanSlug(pageSeo[`blog/${itemSlug}`]?.slug);
-      if (post && overrideSlug && overrideSlug !== itemSlug) return redirectTo(request, `/${pageSlug("blog", pageSeo)}/${overrideSlug}`);
-    }
     if (section === "portfolio") {
       const portfolio = Array.isArray(settings?.portfolio) ? settings.portfolio : [];
-      const item = portfolio.find((p: any) => p?.id === itemSlug || cleanSlug(p?.slug) === itemSlug);
+      const item = portfolio.find((p: any) => cleanSlug(p?.slug) === itemSlug);
       const publicTail = cleanSlug(item?.slug) || item?.id;
-      if (item && publicTail && (sectionSlug !== pageSlug("portfolio", pageSeo) || itemSlug !== publicTail)) {
+      if (item && publicTail && sectionSlug !== pageSlug("portfolio", pageSeo)) {
         return redirectTo(request, `/${pageSlug("portfolio", pageSeo)}/${publicTail}`);
       }
     }
@@ -144,9 +105,11 @@ export default async function middleware(request: Request) {
   const caseMatch = pathname.match(/^\/case-studies\/([^/]+)$/);
   if (caseMatch) {
     const cases = Array.isArray(settings?.case_studies) ? settings.case_studies : [];
-    const item = cases.find((c: any) => c?.id === caseMatch[1]);
+    const item = cases.find((c: any) => cleanSlug(pageSeo[`case:${c?.id}`]?.slug) === caseMatch[1]);
     const overrideSlug = cleanSlug(item && pageSeo[`case:${item.id}`]?.slug);
-    if (item && overrideSlug && overrideSlug !== caseMatch[1]) return redirectTo(request, `/case-studies/${overrideSlug}`);
+    if (item && overrideSlug && pageSlug("case-studies", pageSeo) !== "case-studies") {
+      return redirectTo(request, `/${pageSlug("case-studies", pageSeo)}/${overrideSlug}`);
+    }
   }
 
   return next();

@@ -4,17 +4,19 @@ import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { useAdmin } from "@/context/AdminContext";
 import { useSEO } from "@/hooks/useSEO";
+import { getPageSlug } from "@/lib/pageConfig";
 import { Calendar, Clock } from "lucide-react";
 
 const BlogPage = () => {
   const { posts, seo } = useAdmin();
   const pageSeo = seo.pageSeo?.blog;
+  const blogSlug = getPageSlug("blog", seo.pageSeo);
   useSEO({
     title: pageSeo?.metaTitle || "Blog — SEO, Marketing & Growth Insights | AniRise",
     description:
       pageSeo?.metaDescription ||
       "Practical SEO, marketing, and growth tactics from the AniRise team. Read our latest articles to grow your traffic, leads, and revenue.",
-    path: "/blog",
+    path: `/${blogSlug}`,
   });
 
   return (
@@ -27,7 +29,7 @@ const BlogPage = () => {
           <p className="text-muted-foreground text-lg max-w-2xl mb-12">SEO, marketing, and growth tactics from the AniRise team.</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((p) => (
-              <Link key={p.id} to={`/blog/${p.slug}`} className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-smooth border border-border/40 hover:-translate-y-1">
+              <Link key={p.id} to={`/${blogSlug}/${seo.pageSeo?.[`blog/${p.slug}`]?.slug?.trim() || p.slug}`} className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-smooth border border-border/40 hover:-translate-y-1">
                 <div className="aspect-[16/10] overflow-hidden">
                   <img src={p.cover} alt={p.coverAlt || p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                 </div>

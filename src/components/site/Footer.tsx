@@ -3,6 +3,7 @@ import { Facebook, Mail, Phone, Instagram, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
 import { useServices } from "@/lib/useServices";
+import { getPagePath, getPageSlug } from "@/lib/pageConfig";
 
 const PAGE_KEYS = [
   { key: "home", label: "Home", defaultSlug: "" },
@@ -15,6 +16,7 @@ const PAGE_KEYS = [
 export const Footer = () => {
   const { contact, content, seo } = useAdmin();
   const services = useServices();
+  const servicesSlug = getPageSlug("services", seo.pageSeo);
   const pagesOverride = ((content as any).footerPagesItems || []) as { id: string; label: string; href: string }[];
   const servicesOverride = ((content as any).footerServicesItems || []) as { id: string; label: string; href: string }[];
   const pages = pagesOverride.length > 0
@@ -28,13 +30,13 @@ export const Footer = () => {
         });
   const servicesItems = servicesOverride.length > 0
     ? servicesOverride.map((s) => ({ title: s.label, href: s.href, slug: s.id }))
-    : services.map((s) => ({ title: s.title, href: `/services/${s.publicSlug}`, slug: s.slug }));
+    : services.map((s) => ({ title: s.title, href: `/${servicesSlug}/${s.publicSlug}`, slug: s.slug }));
 
   const logo = (content as any).footerLogo || defaultLogo;
   const brand = (content as any).footerBrandName || "AniRise";
   const tagline = (content as any).footerTagline || "";
   const ctaLabel = (content as any).footerCtaLabel || "";
-  const ctaHref = (content as any).footerCtaHref || "/strategy-call";
+  const ctaHref = (content as any).footerCtaHref || getPagePath("strategy-call", seo.pageSeo);
   const pagesHeading = (content as any).footerPagesHeading || "Pages";
   const servicesHeading = (content as any).footerServicesHeading || "Services";
   const connectHeading = (content as any).footerConnectHeading || "Connect";
