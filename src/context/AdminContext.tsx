@@ -1431,7 +1431,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
 
   // Build the full payload sent to update_site_settings — used by both the
   // debounced auto-save and the explicit saveAllNow() force-flush.
-  const buildSettingsPayload = () => latestSettingsRef.current;
+  const buildSettingsPayload = () => {
+    const payload = latestSettingsRef.current;
+    if (payload?.seo?.autoSitemap) {
+      return { ...payload, seo: { ...payload.seo, sitemap: buildSitemap(payload.seo.canonicalUrl) } };
+    }
+    return payload;
+  };
 
   // Force-flush any pending debounced save and persist immediately.
   // Returns { ok, error? } so the caller can show feedback.
@@ -1667,11 +1673,15 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     setCustomPages((prev) => prev.map((p) => (p.groupKey === grp.key ? { ...p, groupKey: "" } : p)));
     setHomeSections((prev) => prev.map((p) => (p.groupKey === grp.key ? { ...p, groupKey: "home" } : p)));
   };
-  const updatePageSeo = (key: string, s: Partial<PageSeo>) =>
+  const updatePageSeo = (key: string, s: Partial<PageSeo>) => {
+    const sitemapFields = new Set(["slug", "status", "robots", "changefreq", "priority"]);
+    const touchesSitemap = Object.keys(s).some((field) => sitemapFields.has(field));
     setSeo((prev) => ({
       ...prev,
+      autoSitemap: touchesSitemap ? true : prev.autoSitemap,
       pageSeo: { ...prev.pageSeo, [key]: { ...(prev.pageSeo[key] || { metaTitle: "", metaDescription: "", metaKeywords: "" }), ...s } },
     }));
+  };
   const updateAppearance = (a: Partial<Appearance>) => setAppearance((prev) => ({ ...prev, ...a }));
 
   // ---------------------------------------------------------------
