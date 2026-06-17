@@ -56,7 +56,7 @@ const STATIC_PAGES = [
   { key: "about",         slug: "about",         h1: "About AniRise",
     title: "About AniRise — SEO & Digital Growth Agency in Bangladesh",
     description: "Learn about AniRise — our mission, team, and approach to SEO, web development, and digital marketing." },
-  { key: "services",      slug: "our-services",  h1: "Our Services",
+  { key: "services",      slug: "services",      h1: "Our Services",
     title: "Our Services — SEO, Web Development, Graphics & Marketing | AniRise",
     description: "Explore AniRise services: SEO, ecommerce SEO, website development, graphics design, social media marketing, and Google Ads." },
   { key: "portfolio",     slug: "portfolio",     h1: "Our Portfolio",
@@ -92,21 +92,21 @@ function applySeoOverride(base, cfg) {
   };
 }
 
-function buildNavLinks(navItems, services) {
+function buildNavLinks(navItems, services, parents) {
   const items = navItems
     .map((n) => `<li><a href="${esc(n.href)}">${esc(n.label)}</a></li>`)
     .join("");
   const svcs = services
-    .map((s) => `<li><a href="/services/${esc(s.slug)}">${esc(s.title)}</a></li>`)
+    .map((s) => `<li><a href="/${esc(parents.services)}/${esc(s.slug)}">${esc(s.title)}</a></li>`)
     .join("");
   return `<nav aria-label="Primary"><ul>${items}</ul></nav>
 <nav aria-label="Services"><h2>All Services</h2><ul>${svcs}</ul></nav>`;
 }
 
-function buildFooter(navItems, services, posts) {
+function buildFooter(navItems, services, posts, parents) {
   const navLinks = navItems.map((n) => `<a href="${esc(n.href)}">${esc(n.label)}</a>`).join(" · ");
-  const svcLinks = services.map((s) => `<a href="/services/${esc(s.slug)}">${esc(s.title)}</a>`).join(" · ");
-  const blogLinks = posts.slice(0, 6).map((p) => `<a href="/blog/${esc(p.slug)}">${esc(p.title || p.slug)}</a>`).join(" · ");
+  const svcLinks = services.map((s) => `<a href="/${esc(parents.services)}/${esc(s.slug)}">${esc(s.title)}</a>`).join(" · ");
+  const blogLinks = posts.slice(0, 6).map((p) => `<a href="/${esc(parents.blog)}/${esc(p.slug)}">${esc(p.title || p.slug)}</a>`).join(" · ");
   return `<footer><h2>Sitemap</h2>
 <p><strong>Pages:</strong> ${navLinks}</p>
 <p><strong>Services:</strong> ${svcLinks}</p>
@@ -194,6 +194,14 @@ function writeRoute(routePath, html) {
   const caseStudies = (settings?.case_studies || []);
   const customPages = (settings?.custom_pages || []).filter((p) => p.published);
 
+  // Effective parent slugs (honor admin overrides everywhere)
+  const parents = {
+    services: clean(pageSeo.services?.slug) || "services",
+    blog: clean(pageSeo.blog?.slug) || "blog",
+    portfolio: clean(pageSeo.portfolio?.slug) || "portfolio",
+    "case-studies": clean(pageSeo["case-studies"]?.slug) || "case-studies",
+  };
+
   // Build navbar links (mirror Navbar.tsx logic — built-in sections only)
   const navItems = [
     { key: "home", label: "Home", href: "/" },
@@ -205,7 +213,7 @@ function writeRoute(routePath, html) {
   ].map((n) => {
     if (n.href) return n;
     const cfg = pageSeo[n.key] || {};
-    const slug = clean(cfg.slug) || (n.key === "services" ? "our-services" : n.key);
+    const slug = clean(cfg.slug) || n.key;
     return { label: n.label, href: `/${slug}` };
   });
 
@@ -216,8 +224,8 @@ function writeRoute(routePath, html) {
 
   const postsForNav = posts || [];
 
-  const navHtml = buildNavLinks(navItems, servicesForNav);
-  const footerHtml = buildFooter(navItems, servicesForNav, postsForNav);
+  const navHtml = buildNavLinks(navItems, servicesForNav, parents);
+  const footerHtml = buildFooter(navItems, servicesForNav, postsForNav, parents);
 
   let count = 0;
   const written = [];
@@ -258,7 +266,7 @@ function writeRoute(routePath, html) {
   for (const svc of servicesList) {
     const tail = clean(svc.urlSlug) || svc.slug;
     const title = (svc.title && svc.title.trim()) || tail;
-    emit(`/services/${tail}`, {
+    emit(`/${parents.services}/${tail}`, {
       cfgKey: `svc:${svc.slug}`,
       title: `${title} | AniRise`,
       description: svc.shortDescription || svc.description || `Professional ${title} services by AniRise.`,
@@ -270,9 +278,10 @@ function writeRoute(routePath, html) {
   // Blog posts
   for (const post of posts) {
     if (!post?.slug) continue;
-    const blogParent = clean(pageSeo.blog?.slug) || "blog";
+    const cfg = pageSeo[`blog/${post.slug}`] || {};
+    const publicSlug = clean(cfg.slug) || post.slug;
     const title = post.title || post.slug;
-    emit(`/${blogParent}/${post.slug}`, {
+    emit(`/${parents.blog}/${publicSlug}`, {
       cfgKey: `blog/${post.slug}`,
       title: `${title} | AniRise Blog`,
       description: post.excerpt || `Read "${title}" on the AniRise blog.`,
@@ -285,9 +294,8 @@ function writeRoute(routePath, html) {
   for (const item of portfolio) {
     if (!item?.id) continue;
     const tail = clean(item.slug) || item.id;
-    const portfolioParent = clean(pageSeo.portfolio?.slug) || "portfolio";
     const title = item.title || tail;
-    emit(`/${portfolioParent}/${tail}`, {
+    emit(`/${parents.portfolio}/${tail}`, {
       cfgKey: `proj:${item.id}`,
       title: `${title} — Project | AniRise Portfolio`,
       description: item.summary || item.description || `${title} — project case from AniRise.`,
@@ -299,8 +307,10 @@ function writeRoute(routePath, html) {
   // Case studies
   for (const cs of caseStudies) {
     if (!cs?.id) continue;
+    const cfg = pageSeo[`case:${cs.id}`] || {};
+    const tail = clean(cfg.slug) || cs.id;
     const title = cs.title || cs.id;
-    emit(`/case-studies/${cs.id}`, {
+    emit(`/${parents["case-studies"]}/${tail}`, {
       cfgKey: `case:${cs.id}`,
       title: `${title} — Case Study | AniRise`,
       description: cs.summary || cs.description || `${title} — case study by AniRise.`,
