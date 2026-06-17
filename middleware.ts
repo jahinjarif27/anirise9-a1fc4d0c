@@ -53,14 +53,38 @@ function redirectTo(request: Request, target: string) {
   });
 }
 
-async function loadSettings() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content`, {
-    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-    cache: "no-store",
-  });
-  if (!res.ok) return null;
-  const rows = (await res.json()) as any[];
-  return rows?.[0] ?? null;
+async function loadRuntimeData() {
+  const [settingsRes, postsRes] = await Promise.all([
+    fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content,portfolio,case_studies`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      cache: "no-store",
+    }),
+    fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=slug`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      cache: "no-store",
+    }),
+  ]);
+  const settings = settingsRes.ok ? ((await settingsRes.json()) as any[])?.[0] ?? null : null;
+  const posts = postsRes.ok ? ((await postsRes.json()) as any[]) : [];
+  return { settings, posts };
+}
+
+function cleanSlug(value: unknown) {
+  return String(value || "").trim().replace(/^\/+|\/+$/g, "");
+}
+
+function resolveBuiltIn(slug: string, pageSeo: Record<string, any>) {
+  const cleaned = cleanSlug(slug);
+  for (const [key, defaultSlug] of Object.entries(BUILTIN_DEFAULT_SLUGS)) {
+    const customSlug = cleanSlug(pageSeo[key]?.slug);
+    if (customSlug && customSlug === cleaned) return key;
+    if (defaultSlug === cleaned) return key;
+  }
+  return null;
+}
+
+function pageSlug(key: string, pageSeo: Record<string, any>) {
+  return cleanSlug(pageSeo[key]?.slug) || BUILTIN_DEFAULT_SLUGS[key] || key;
 }
 
 export default async function middleware(request: Request) {
@@ -70,7 +94,7 @@ export default async function middleware(request: Request) {
   if (STATIC_REDIRECTS[pathname]) return redirectTo(request, STATIC_REDIRECTS[pathname]);
   if (url.pathname !== pathname) return redirectTo(request, pathname);
 
-  const settings = await loadSettings();
+  const { settings, posts } = await loadRuntimeData();
   const seo = settings?.seo ?? {};
   const pageSeo = seo.pageSeo ?? {};
 
@@ -79,7 +103,7 @@ export default async function middleware(request: Request) {
   if (exact) return redirectTo(request, exact.to);
 
   for (const [key, defaultSlug] of Object.entries(BUILTIN_DEFAULT_SLUGS)) {
-    const customSlug = String(pageSeo[key]?.slug || "").replace(/^\/+|\/+$/g, "");
+    const customSlug = cleanSlug(pageSeo[key]?.slug);
     if (!customSlug || customSlug === defaultSlug) continue;
     if (pathname === `/${defaultSlug}`) return redirectTo(request, `/${customSlug}`);
   }
@@ -87,15 +111,42 @@ export default async function middleware(request: Request) {
   const services = Array.isArray(settings?.content?.servicesList) ? settings.content.servicesList : [];
   const serviceMatch = pathname.match(/^\/services\/([^/]+)$/);
   if (serviceMatch) {
-    const item = services.find((s: any) => s?.slug === serviceMatch[1] && s?.urlSlug && s.urlSlug !== s.slug);
-    if (item) return redirectTo(request, `/services/${String(item.urlSlug).replace(/^\/+|\/+$/g, "")}`);
+    const item = services.find((s: any) => s?.slug === serviceMatch[1] && cleanSlug(s?.urlSlug) && cleanSlug(s.urlSlug) !== s.slug);
+    if (item) return redirectTo(request, `/services/${cleanSlug(item.urlSlug)}`);
   }
 
   for (const key of ["blog", "portfolio"] as const) {
     const defaultSlug = BUILTIN_DEFAULT_SLUGS[key];
-    const customSlug = String(pageSeo[key]?.slug || "").replace(/^\/+|\/+$/g, "");
+    const customSlug = cleanSlug(pageSeo[key]?.slug);
     if (!customSlug || customSlug === defaultSlug) continue;
     if (pathname.startsWith(`/${defaultSlug}/`)) return redirectTo(request, pathname.replace(`/${defaultSlug}/`, `/${customSlug}/`));
+  }
+
+  const detailMatch = pathname.match(/^\/([^/]+)\/([^/]+)$/);
+  if (detailMatch) {
+    const [, sectionSlug, itemSlug] = detailMatch;
+    const section = resolveBuiltIn(sectionSlug, pageSeo);
+    if (section === "blog") {
+      const post = posts.find((p: any) => p?.slug === itemSlug);
+      const overrideSlug = cleanSlug(pageSeo[`blog/${itemSlug}`]?.slug);
+      if (post && overrideSlug && overrideSlug !== itemSlug) return redirectTo(request, `/${pageSlug("blog", pageSeo)}/${overrideSlug}`);
+    }
+    if (section === "portfolio") {
+      const portfolio = Array.isArray(settings?.portfolio) ? settings.portfolio : [];
+      const item = portfolio.find((p: any) => p?.id === itemSlug || cleanSlug(p?.slug) === itemSlug);
+      const publicTail = cleanSlug(item?.slug) || item?.id;
+      if (item && publicTail && (sectionSlug !== pageSlug("portfolio", pageSeo) || itemSlug !== publicTail)) {
+        return redirectTo(request, `/${pageSlug("portfolio", pageSeo)}/${publicTail}`);
+      }
+    }
+  }
+
+  const caseMatch = pathname.match(/^\/case-studies\/([^/]+)$/);
+  if (caseMatch) {
+    const cases = Array.isArray(settings?.case_studies) ? settings.case_studies : [];
+    const item = cases.find((c: any) => c?.id === caseMatch[1]);
+    const overrideSlug = cleanSlug(item && pageSeo[`case:${item.id}`]?.slug);
+    if (item && overrideSlug && overrideSlug !== caseMatch[1]) return redirectTo(request, `/case-studies/${overrideSlug}`);
   }
 
   return next();

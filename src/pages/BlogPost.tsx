@@ -12,11 +12,12 @@ const BlogPostPage = () => {
   const { slug } = useParams();
   const location = useLocation();
   const { posts, seo, loading } = useAdmin();
-  const post = posts.find((p) => p.slug === slug);
+  const post = posts.find((p) => p.slug === slug || seo.pageSeo?.[`blog/${p.slug}`]?.slug === slug);
   const blogSlug = getPageSlug("blog", seo.pageSeo);
-  const expectedPath = `/${blogSlug}/${slug ?? ""}`;
+  const publicPostSlug = post ? (seo.pageSeo?.[`blog/${post.slug}`]?.slug?.trim() || post.slug) : (slug ?? "");
+  const expectedPath = `/${blogSlug}/${publicPostSlug}`;
   const sectionRedirect = !!post && location.pathname.replace(/\/+$/, "") !== expectedPath.replace(/\/+$/, "");
-  const override: any = seo.pageSeo?.[`blog/${slug ?? ""}`] || {};
+  const override: any = post ? (seo.pageSeo?.[`blog/${post.slug}`] || {}) : {};
   const overrideExtra = fromPageSeo(override);
   // If the user added their own schemas via admin, use them; otherwise fall back to BlogPosting JSON-LD.
   const userSchemas = overrideExtra.schemas;
@@ -51,7 +52,7 @@ const BlogPostPage = () => {
             name: "AniRise",
             logo: { "@type": "ImageObject", url: "https://anirise.com.bd/favicon.jpg" },
           },
-          mainEntityOfPage: `https://anirise.com.bd/blog/${slug ?? ""}`,
+          mainEntityOfPage: `https://anirise.com.bd${expectedPath}`,
         }
       : undefined,
   });
