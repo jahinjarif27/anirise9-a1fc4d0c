@@ -459,7 +459,8 @@ const AdminDashboard = () => {
   };
 
   const saveSitemapNow = async () => {
-    updateSeo({ sitemap: seo.sitemap, autoSitemap: false });
+    const nextSitemap = seo.autoSitemap ? buildSitemap(seo.canonicalUrl) : seo.sitemap;
+    updateSeo({ sitemap: nextSitemap, autoSitemap: seo.autoSitemap });
     const tId = toast.loading("Saving sitemap…");
     const r = await saveAllNow();
     if (!r.ok) {
@@ -3029,6 +3030,9 @@ const AdminDashboard = () => {
                     <label className="text-xs font-semibold mb-1.5 block text-foreground/80">Raw XML</label>
                     <Textarea rows={10} className="font-mono text-xs" value={seo.sitemap} onChange={(e) => updateSeo({ sitemap: e.target.value, autoSitemap: false })} />
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    Live sitemap auto-updates from admin data. Prerendered HTML updates during the next frontend publish/redeploy; verify by opening the page source after publish and checking canonical/internal links.
+                  </p>
                   <div className="flex flex-wrap justify-end gap-2">
                     <Button asChild variant="outline" size="sm">
                       <a
