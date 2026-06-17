@@ -66,8 +66,8 @@ async function verifyPrimaryPassword(
   password: string,
   envPassword: string,
 ): Promise<boolean> {
-  const { data } = await sb.from('site_settings').select('admin_auth').eq('id', 1).maybeSingle();
-  const auth: any = (data as any)?.admin_auth ?? {};
+  const { data } = await sb.from('admin_credentials').select('hash,salt').eq('id', 1).maybeSingle();
+  const auth: any = data ?? {};
   if (auth && typeof auth.hash === 'string' && typeof auth.salt === 'string' && auth.hash && auth.salt) {
     const calc = await pbkdf2(password, auth.salt);
     return timingSafeEqual(calc, auth.hash);
