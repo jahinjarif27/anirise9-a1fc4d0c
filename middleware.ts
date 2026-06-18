@@ -8,37 +8,33 @@ const SUPABASE_KEY =
   env.VITE_SUPABASE_PUBLISHABLE_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhscm11c3BtZWt3YnRueWV1dHh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTUzMzUsImV4cCI6MjA5NDU5MTMzNX0.7hnEy_HPG4rzOZBeF7k6iPP0c51ohnoedXAsTA_Wisw";
 
-const BUILTIN_DEFAULT_SLUGS: Record<string, string> = {
-  services: "services",
-  portfolio: "portfolio",
-  blog: "blog",
-  testimonials: "testimonials",
-  contact: "contact",
-  about: "about",
-  "case-studies": "case-studies",
-  "strategy-call": "strategy-call",
-};
-
 const ASSET_PATH = /\.[a-z0-9]{2,8}$/i;
+const ALLOWED_CODES = new Set([301, 302, 307, 308]);
 
 function cleanPath(pathname: string) {
   return pathname.length > 1 ? pathname.replace(/\/+$/, "") : "/";
 }
 
-function rulePath(value: string) {
+function normalizeSource(value: string) {
   try {
-    return cleanPath(/^https?:\/\//i.test(value) ? new URL(value).pathname : value.startsWith("/") ? value : `/${value}`);
+    const v = value.trim();
+    if (!v) return "";
+    if (/^https?:\/\//i.test(v)) return cleanPath(new URL(v).pathname);
+    return cleanPath(v.startsWith("/") ? v : `/${v}`);
   } catch {
     return cleanPath(value.startsWith("/") ? value : `/${value}`);
   }
 }
 
-function redirectTo(request: Request, target: string) {
+function redirectTo(request: Request, target: string, code: number) {
   const source = new URL(request.url);
-  const destination = /^https?:\/\//i.test(target) ? new URL(target) : new URL(target.startsWith("/") ? target : `/${target}`, request.url);
+  const destination = /^https?:\/\//i.test(target)
+    ? new URL(target)
+    : new URL(target.startsWith("/") ? target : `/${target}`, request.url);
   if (!destination.search && source.search) destination.search = source.search;
+  const status = ALLOWED_CODES.has(code) ? code : 301;
   return new Response(null, {
-    status: 301,
+    status,
     headers: {
       Location: destination.toString(),
       "Cache-Control": "public, max-age=0, must-revalidate",
@@ -47,72 +43,62 @@ function redirectTo(request: Request, target: string) {
   });
 }
 
-async function loadRuntimeData() {
-  const settingsRes = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo,content,portfolio,case_studies`, {
+async function loadRedirects(): Promise<Array<{ from: string; to: string; code: number; enabled: boolean }>> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.1&select=seo`, {
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
     cache: "no-store",
   });
-  const settings = settingsRes.ok ? ((await settingsRes.json()) as any[])?.[0] ?? null : null;
-  return { settings };
-}
-
-function cleanSlug(value: unknown) {
-  return String(value || "").trim().replace(/^\/+|\/+$/g, "");
-}
-
-function resolveBuiltIn(slug: string, pageSeo: Record<string, any>) {
-  const cleaned = cleanSlug(slug);
-  for (const [key, defaultSlug] of Object.entries(BUILTIN_DEFAULT_SLUGS)) {
-    const customSlug = cleanSlug(pageSeo[key]?.slug);
-    if (customSlug && customSlug === cleaned) return key;
-    if (!customSlug && defaultSlug === cleaned) return key;
-  }
-  return null;
-}
-
-function pageSlug(key: string, pageSeo: Record<string, any>) {
-  return cleanSlug(pageSeo[key]?.slug) || BUILTIN_DEFAULT_SLUGS[key] || key;
+  if (!res.ok) return [];
+  const row = ((await res.json()) as any[])?.[0];
+  const list = Array.isArray(row?.seo?.redirects) ? row.seo.redirects : [];
+  return list
+    .filter((r: any) => r && r.enabled !== false && r.from && r.to)
+    .map((r: any) => ({
+      from: normalizeSource(String(r.from)),
+      to: String(r.to).trim(),
+      code: ALLOWED_CODES.has(Number(r.code)) ? Number(r.code) : 301,
+      enabled: true,
+    }));
 }
 
 export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = cleanPath(url.pathname);
   if (pathname.startsWith("/admin") || pathname.startsWith("/assets") || ASSET_PATH.test(pathname)) return next();
-  if (url.pathname !== pathname) return redirectTo(request, pathname);
 
-  const { settings } = await loadRuntimeData();
-  const seo = settings?.seo ?? {};
-  const pageSeo = seo.pageSeo ?? {};
+  // Canonicalize trailing slash with 308 (preserves method, safe).
+  if (url.pathname !== pathname) return redirectTo(request, pathname, 308);
 
-  const manual = Array.isArray(seo.redirects) ? seo.redirects : [];
-  const exact = manual.find((r: any) => r?.enabled !== false && rulePath(String(r.from || "")) === pathname && r.to && rulePath(String(r.to)) !== pathname);
-  if (exact) return redirectTo(request, exact.to);
+  const rules = await loadRedirects();
+  if (!rules.length) return next();
 
-  const detailMatch = pathname.match(/^\/([^/]+)\/([^/]+)$/);
-  if (detailMatch) {
-    const [, sectionSlug, itemSlug] = detailMatch;
-    const section = resolveBuiltIn(sectionSlug, pageSeo);
-    if (section === "portfolio") {
-      const portfolio = Array.isArray(settings?.portfolio) ? settings.portfolio : [];
-      const item = portfolio.find((p: any) => cleanSlug(p?.slug) === itemSlug);
-      const publicTail = cleanSlug(item?.slug) || item?.id;
-      if (item && publicTail && sectionSlug !== pageSlug("portfolio", pageSeo)) {
-        return redirectTo(request, `/${pageSlug("portfolio", pageSeo)}/${publicTail}`);
-      }
+  // Build map and resolve, following chains while guarding against loops.
+  const map = new Map<string, { to: string; code: number }>();
+  for (const r of rules) {
+    if (!map.has(r.from)) map.set(r.from, { to: r.to, code: r.code });
+  }
+  const rule = map.get(pathname);
+  if (!rule) return next();
+
+  let target = rule.to;
+  let code = rule.code;
+  const seen = new Set<string>([pathname]);
+  for (let i = 0; i < 8; i++) {
+    const targetPath = normalizeSource(target);
+    if (!targetPath.startsWith("/")) break; // absolute URL — stop chain
+    if (seen.has(targetPath)) {
+      // Loop — refuse to redirect.
+      return next();
     }
+    const nxt = map.get(targetPath);
+    if (!nxt) break;
+    seen.add(targetPath);
+    target = nxt.to;
+    code = nxt.code;
   }
 
-  const caseMatch = pathname.match(/^\/case-studies\/([^/]+)$/);
-  if (caseMatch) {
-    const cases = Array.isArray(settings?.case_studies) ? settings.case_studies : [];
-    const item = cases.find((c: any) => cleanSlug(pageSeo[`case:${c?.id}`]?.slug) === caseMatch[1]);
-    const overrideSlug = cleanSlug(item && pageSeo[`case:${item.id}`]?.slug);
-    if (item && overrideSlug && pageSlug("case-studies", pageSeo) !== "case-studies") {
-      return redirectTo(request, `/${pageSlug("case-studies", pageSeo)}/${overrideSlug}`);
-    }
-  }
-
-  return next();
+  if (normalizeSource(target) === pathname) return next();
+  return redirectTo(request, target, code);
 }
 
 export const config = {
