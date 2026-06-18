@@ -1339,7 +1339,10 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
             ...defaultSeo,
             ...incomingSeo,
             redirects: Array.isArray(incomingSeo.redirects)
-              ? incomingSeo.redirects.map((r: any) => ({ ...r, code: 301 as const }))
+              ? incomingSeo.redirects.map((r: any) => {
+                  const allowed = [301, 302, 307, 308];
+                  return { ...r, code: allowed.includes(r?.code) ? r.code : 301 };
+                })
               : defaultSeo.redirects,
           });
         }
@@ -1630,7 +1633,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const updatePortfolioItem = (id: string, p: Partial<PortfolioItem>) => setPortfolio((prev) => prev.map((x) => (x.id === id ? { ...x, ...p } : x)));
   const deletePortfolioItem = (id: string) => setPortfolio((prev) => prev.filter((x) => x.id !== id));
   const updateSeo = (s: Partial<SeoSettings>) => setSeo((prev) => ({ ...prev, ...s }));
-  const normalizeRedirect = (r: Partial<Redirect>) => ({ ...r, code: 301 as Redirect["code"] });
+  const normalizeRedirect = (r: Partial<Redirect>) => {
+    const allowed: Redirect["code"][] = [301, 302, 307, 308];
+    const code = (allowed.includes(r.code as Redirect["code"]) ? r.code : 301) as Redirect["code"];
+    return { ...r, code };
+  };
   const addRedirect = (r: Omit<Redirect, "id">) => setSeo((prev) => ({ ...prev, redirects: [...prev.redirects, { ...normalizeRedirect(r), id: Date.now().toString() } as Redirect] }));
   const updateRedirect = (id: string, r: Partial<Redirect>) => setSeo((prev) => ({ ...prev, redirects: prev.redirects.map((x) => (x.id === id ? { ...x, ...normalizeRedirect(r) } : x)) }));
   const deleteRedirect = (id: string) => setSeo((prev) => ({ ...prev, redirects: prev.redirects.filter((x) => x.id !== id) }));
