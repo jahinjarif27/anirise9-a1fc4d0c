@@ -25,6 +25,7 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 import { ServiceContentEditor } from "@/components/admin/ServiceContentEditor";
 import { TextBlocksEditor } from "@/components/admin/TextBlocksEditor";
 import { SortableList } from "@/components/admin/SortableList";
+import { RedirectsManager } from "@/components/admin/RedirectsManager";
 import { SectionNoteEditor } from "@/components/admin/SectionNoteEditor";
 import { LinkableTextarea } from "@/components/admin/LinkableTextarea";
 import { CaseStudiesEditor } from "@/components/admin/CaseStudiesEditor";
@@ -2749,6 +2750,7 @@ const AdminDashboard = () => {
                   <TabsTrigger value="sitemap" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><FileText className="h-3.5 w-3.5" /> Sitemap</TabsTrigger>
                   <TabsTrigger value="robots" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Bot className="h-3.5 w-3.5" /> Robots</TabsTrigger>
                   <TabsTrigger value="canonical" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Globe className="h-3.5 w-3.5" /> Canonical</TabsTrigger>
+                  <TabsTrigger value="redirects" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><ArrowRight className="h-3.5 w-3.5" /> Redirects</TabsTrigger>
                   <TabsTrigger value="appearance" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Type className="h-3.5 w-3.5" /> Appearance</TabsTrigger>
                   <TabsTrigger value="security" className="gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm"><Lock className="h-3.5 w-3.5" /> Security</TabsTrigger>
                 </TabsList>
@@ -3274,6 +3276,10 @@ const AdminDashboard = () => {
                     );
                   })()}
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="redirects" className="space-y-4 mt-0">
+                <RedirectsManager />
               </TabsContent>
 
               <TabsContent value="appearance" className="space-y-4 mt-0">
