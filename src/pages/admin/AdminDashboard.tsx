@@ -34,6 +34,7 @@ import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
 import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES, SERVICE_ICON_CHOICES, DEFAULT_HOME_ORDER } from "@/context/AdminContext";
 import { SERVICE_SECTION_IDS, SERVICE_SECTION_LABELS, type ServiceSectionId } from "@/data/serviceContentDefaults";
+import { getPagePath, getPageSlug } from "@/lib/pageConfig";
 
 const visitData = Array.from({ length: 14 }, (_, i) => ({
   day: `D${i + 1}`,
