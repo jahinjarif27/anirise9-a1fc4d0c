@@ -1129,8 +1129,8 @@ const AdminDashboard = () => {
             pageKey={`svc:${slug}`}
             seo={seo}
             updatePageSeo={updatePageSeo}
-            defaultPath={`/services/${slug}`}
-            slugPrefix={adminSvc ? "/services/" : undefined}
+            defaultPath={`${getPagePath("services", seo.pageSeo)}/${slug}`}
+            slugPrefix={adminSvc ? `${getPagePath("services", seo.pageSeo)}/` : undefined}
             disableSlug={!adminSvc}
             externalSlug={adminSvc ? urlSlugVal : undefined}
             onExternalSlugChange={adminSvc ? (next) => updateService(adminSvc.id, { urlSlug: next }) : undefined}
