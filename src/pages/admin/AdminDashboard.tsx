@@ -1591,7 +1591,7 @@ const AdminDashboard = () => {
                 const servicesDefaults = siteServices.map((s) => ({
                   id: `auto-${s.slug}`,
                   label: s.label,
-                  href: `/services/${s.slug}`,
+                  href: `${getPagePath("services", seo.pageSeo)}/${s.slug}`,
                 }));
                 return (["footerPagesItems", "footerServicesItems"] as const).map((key) => {
                   const isPages = key === "footerPagesItems";
