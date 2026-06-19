@@ -1079,9 +1079,9 @@ const AdminDashboard = () => {
             <SectionHeader
               icon={Layers}
               title={svc.label}
-              subtitle={`Service page — /services/${publicTail}`}
+              subtitle={`Service page — ${getPagePath("services", seo.pageSeo)}/${publicTail}`}
               action={
-                <Button asChild variant="outline" size="sm"><Link to={`/services/${publicTail}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
+                <Button asChild variant="outline" size="sm"><Link to={`${getPagePath("services", seo.pageSeo)}/${publicTail}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
               }
             />
             {adminSvc ? (
