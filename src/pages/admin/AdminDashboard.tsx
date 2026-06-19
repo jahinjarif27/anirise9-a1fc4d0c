@@ -34,6 +34,7 @@ import MDEditor from "@uiw/react-md-editor";
 import jsPDF from "jspdf";
 import { SECTION_KEYS, SectionKey, PROJECT_CATEGORIES, SERVICE_ICON_CHOICES, DEFAULT_HOME_ORDER } from "@/context/AdminContext";
 import { SERVICE_SECTION_IDS, SERVICE_SECTION_LABELS, type ServiceSectionId } from "@/data/serviceContentDefaults";
+import { getPagePath, getPageSlug } from "@/lib/pageConfig";
 
 const visitData = Array.from({ length: 14 }, (_, i) => ({
   day: `D${i + 1}`,
@@ -1078,9 +1079,9 @@ const AdminDashboard = () => {
             <SectionHeader
               icon={Layers}
               title={svc.label}
-              subtitle={`Service page — /services/${publicTail}`}
+              subtitle={`Service page — ${getPagePath("services", seo.pageSeo)}/${publicTail}`}
               action={
-                <Button asChild variant="outline" size="sm"><Link to={`/services/${publicTail}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
+                <Button asChild variant="outline" size="sm"><Link to={`${getPagePath("services", seo.pageSeo)}/${publicTail}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>
               }
             />
             {adminSvc ? (
@@ -1128,8 +1129,8 @@ const AdminDashboard = () => {
             pageKey={`svc:${slug}`}
             seo={seo}
             updatePageSeo={updatePageSeo}
-            defaultPath={`/services/${slug}`}
-            slugPrefix={adminSvc ? "/services/" : undefined}
+            defaultPath={`${getPagePath("services", seo.pageSeo)}/${slug}`}
+            slugPrefix={adminSvc ? `${getPagePath("services", seo.pageSeo)}/` : undefined}
             disableSlug={!adminSvc}
             externalSlug={adminSvc ? urlSlugVal : undefined}
             onExternalSlugChange={adminSvc ? (next) => updateService(adminSvc.id, { urlSlug: next }) : undefined}
@@ -1244,8 +1245,8 @@ const AdminDashboard = () => {
             <SectionHeader
               icon={ImgIcon}
               title={it.title || "Untitled project"}
-              subtitle={`Project detail page — /portfolio/${(it.slug?.trim() || it.id)}`}
-              action={<Button asChild variant="outline" size="sm"><Link to={`/portfolio/${it.slug?.trim() || it.id}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>}
+              subtitle={`Project detail page — ${getPagePath("portfolio", seo.pageSeo)}/${(it.slug?.trim() || it.id)}`}
+              action={<Button asChild variant="outline" size="sm"><Link to={`${getPagePath("portfolio", seo.pageSeo)}/${it.slug?.trim() || it.id}`} target="_blank"><ArrowRight className="h-4 w-4" /> View page</Link></Button>}
             />
 
             <div className="grid sm:grid-cols-2 gap-3">
@@ -1410,8 +1411,8 @@ const AdminDashboard = () => {
             pageKey={`proj:${it.id}`}
             seo={seo}
             updatePageSeo={updatePageSeo}
-            defaultPath={`/portfolio/${it.id}`}
-            slugPrefix="/portfolio/"
+            defaultPath={`${getPagePath("portfolio", seo.pageSeo)}/${it.id}`}
+            slugPrefix={`${getPagePath("portfolio", seo.pageSeo)}/`}
             externalSlug={it.slug || ""}
             onExternalSlugChange={(next) => updatePortfolioItem(it.id, { slug: next })}
           />
@@ -1590,7 +1591,7 @@ const AdminDashboard = () => {
                 const servicesDefaults = siteServices.map((s) => ({
                   id: `auto-${s.slug}`,
                   label: s.label,
-                  href: `/services/${s.slug}`,
+                  href: `${getPagePath("services", seo.pageSeo)}/${s.slug}`,
                 }));
                 return (["footerPagesItems", "footerServicesItems"] as const).map((key) => {
                   const isPages = key === "footerPagesItems";
