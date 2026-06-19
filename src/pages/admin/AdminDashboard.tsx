@@ -1411,8 +1411,8 @@ const AdminDashboard = () => {
             pageKey={`proj:${it.id}`}
             seo={seo}
             updatePageSeo={updatePageSeo}
-            defaultPath={`/portfolio/${it.id}`}
-            slugPrefix="/portfolio/"
+            defaultPath={`${getPagePath("portfolio", seo.pageSeo)}/${it.id}`}
+            slugPrefix={`${getPagePath("portfolio", seo.pageSeo)}/`}
             externalSlug={it.slug || ""}
             onExternalSlugChange={(next) => updatePortfolioItem(it.id, { slug: next })}
           />
