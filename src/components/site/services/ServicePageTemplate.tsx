@@ -262,7 +262,7 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
   ];
 
   return (
-    <ServiceLayout title={service?.title ?? c.heroEyebrow ?? "Service"} description={c.heroBlurb} path={`/services/${publicSlug}`} seoKey={`svc:${slug}`}>
+    <ServiceLayout title={service?.title ?? c.heroEyebrow ?? "Service"} description={c.heroBlurb} path={`${getPagePath("services", seo.pageSeo)}/${publicSlug}`} seoKey={`svc:${slug}`}>
       {orderedIds.map((id) => sections[id])}
       <SectionNote id={`svc:${slug}`} />
     </ServiceLayout>
