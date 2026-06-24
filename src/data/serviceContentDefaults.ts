@@ -31,15 +31,17 @@ export type ServicePricing = {
   tiers: ServicePricingTier[];
 };
 
-export type ServicePricingParagraphTab = { id: string; label: string };
+export type ServicePricingParagraphTab = { id: string; label: string; paragraph: string };
 export type ServicePricingParagraph = {
   enabled: boolean;
   eyebrow: string;
   title: string;
   titleAccent: string;
   tabs: ServicePricingParagraphTab[];
-  paragraph: string;
+  /** @deprecated kept for backward compat — first tab's paragraph wins */
+  paragraph?: string;
 };
+
 
 
 export type ServiceChart = {
