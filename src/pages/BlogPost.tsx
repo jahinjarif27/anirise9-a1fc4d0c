@@ -61,6 +61,7 @@ const BlogPostPage = () => {
   });
 
   if (loading) return null;
+  console.log("[BlogPost debug]", { slug, postsCount: posts.length, foundPost: !!post, wrongPath, expectedPath, locationPath: location.pathname, status: override.status });
   if (!post || wrongPath || override.status === "draft") {
     return (
       <div className="min-h-screen bg-background">
