@@ -331,13 +331,13 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
       tiers: [
         {
           id: "t1",
-          name: "Basic",
-          price: "$299",
+          name: "Starter",
+          price: "$599",
           period: "/ project",
           description: "A clean, professional starter site for new brands.",
           highlighted: false,
           badge: "",
-          icon: "Rocket",
+          icon: "",
           ctaLabel: "Get Started",
           ctaUrl: "/#contact",
           features: [
@@ -348,6 +348,7 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
             { id: "f5", text: "1 round of revisions" },
           ],
         },
+
         {
           id: "t2",
           name: "Standard",
@@ -356,7 +357,7 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
           description: "Everything growing businesses need to convert visitors.",
           highlighted: true,
           badge: "Most Popular",
-          icon: "Zap",
+          icon: "",
           ctaLabel: "Choose Standard",
           ctaUrl: "/#contact",
           features: [
@@ -376,7 +377,7 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
           description: "Tailor-made build for ecommerce & high-traffic brands.",
           highlighted: false,
           badge: "",
-          icon: "Crown",
+          icon: "",
           ctaLabel: "Talk To Us",
           ctaUrl: "/#contact",
           features: [
