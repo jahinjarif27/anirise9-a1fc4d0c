@@ -206,7 +206,7 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
           id: "t1",
           label: "SEO Pricing",
           paragraph:
-            "Our SEO packages are customized for your goals. We definitely don't offer the cheapest services out there, but we do offer the most value for your money. Many factors determine the SEO pricing. For example, the SEO pricing in Bangladesh is not the same as the SEO pricing in the USA. The price also depends on your current keyword positions, the nature of keywords, the landing page strategy, business location, and many more. Our SEO packages cost starts from $500/month in the BD market for small businesses and goes up from there for medium and large businesses.",
+            "Our SEO packages are customized for your goals. We definitely don't offer the cheapest services out there, but we do offer the most value for your money. Many factors determine the SEO pricing. For example, the SEO pricing in Bangladesh is not the same as the SEO pricing in the USA. The price also depends on your current keyword positions, the nature of keywords, the landing page strategy, business location, and many more. Our SEO packages cost starts from **$300/month** in the BD market for small businesses and goes up from there for medium and large businesses.",
         },
         {
           id: "t2",

@@ -78,7 +78,13 @@ const PricingParagraphBlock = ({ data }: { data: import("@/data/serviceContentDe
         {body && (
           <div className="mt-8 bg-card border border-border/40 rounded-2xl p-6 sm:p-8 shadow-card">
             <p className="text-base sm:text-lg leading-relaxed text-muted-foreground whitespace-pre-line">
-              {body}
+              {body.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+                part.startsWith("**") && part.endsWith("**") ? (
+                  <strong key={i} className="font-bold text-foreground">{part.slice(2, -2)}</strong>
+                ) : (
+                  <span key={i}>{part}</span>
+                )
+              )}
             </p>
           </div>
         )}
