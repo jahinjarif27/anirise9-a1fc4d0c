@@ -31,15 +31,17 @@ export type ServicePricing = {
   tiers: ServicePricingTier[];
 };
 
-export type ServicePricingParagraphTab = { id: string; label: string };
+export type ServicePricingParagraphTab = { id: string; label: string; paragraph: string };
 export type ServicePricingParagraph = {
   enabled: boolean;
   eyebrow: string;
   title: string;
   titleAccent: string;
   tabs: ServicePricingParagraphTab[];
-  paragraph: string;
+  /** @deprecated kept for backward compat — first tab's paragraph wins */
+  paragraph?: string;
 };
+
 
 
 export type ServiceChart = {
@@ -200,12 +202,26 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
       title: "Our",
       titleAccent: "SEO Values",
       tabs: [
-        { id: "t1", label: "SEO Pricing" },
-        { id: "t2", label: "Reporting" },
-        { id: "t3", label: "Accountability" },
+        {
+          id: "t1",
+          label: "SEO Pricing",
+          paragraph:
+            "Our SEO packages are customized for your goals. We definitely don't offer the cheapest services out there, but we do offer the most value for your money. Many factors determine the SEO pricing. For example, the SEO pricing in Bangladesh is not the same as the SEO pricing in the USA. The price also depends on your current keyword positions, the nature of keywords, the landing page strategy, business location, and many more. Our SEO packages cost starts from $500/month in the BD market for small businesses and goes up from there for medium and large businesses.",
+        },
+        {
+          id: "t2",
+          label: "Reporting",
+          paragraph:
+            "Every month you'll receive a clear, jargon-free report covering keyword movements, organic traffic, top landing pages, leads or revenue from organic search, and the work we shipped that month. No vanity metrics — just the numbers tied to business growth, plus a short summary of what's next.",
+        },
+        {
+          id: "t3",
+          label: "Accountability",
+          paragraph:
+            "You'll always know what we're working on and why. Each engagement has a documented roadmap, weekly check-ins, and a single point of contact. If a tactic isn't moving the needle, we tell you, change course, and adjust the plan — your wins are how we measure ours.",
+        },
       ],
-      paragraph:
-        "Our SEO packages are customized for your goals. We definitely don't offer the cheapest services out there, but we do offer the most value for your money. Many factors determine the SEO pricing. For example, the SEO pricing in Bangladesh is not the same as the SEO pricing in the USA. The price also depends on your current keyword positions, the nature of keywords, the landing page strategy, business location, and many more. Our SEO packages cost starts from $500/month in the BD market for small businesses and goes up from there for medium and large businesses.",
+
     },
     ctaHeadline: "Ready to outrank your competition?",
     ctaBlurb: "Get a free SEO audit — no commitment, no jargon. Just clear next steps.",
@@ -268,12 +284,26 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
       title: "Our",
       titleAccent: "Ecommerce SEO Values",
       tabs: [
-        { id: "t1", label: "Ecommerce Pricing" },
-        { id: "t2", label: "Reporting" },
-        { id: "t3", label: "Accountability" },
+        {
+          id: "t1",
+          label: "Ecommerce Pricing",
+          paragraph:
+            "Our Ecommerce SEO packages are customized for your store, catalog size, and target markets. We don't offer the cheapest service out there, but we do deliver the highest value per dollar. Pricing depends on the platform, number of products, current ranking positions, competition level, and the scope of optimization required. Ecommerce SEO packages typically start from $600/month for small stores and scale up for larger catalogs and competitive niches — always tied to measurable revenue impact, never vanity metrics.",
+        },
+        {
+          id: "t2",
+          label: "Reporting",
+          paragraph:
+            "Each month you get a revenue-focused report: category and product rankings, organic sessions, add-to-carts, transactions, and revenue attributed to organic search. You'll also see which SKUs are gaining traction and where we're investing next month's effort.",
+        },
+        {
+          id: "t3",
+          label: "Accountability",
+          paragraph:
+            "We commit to a clear roadmap and review it with you in regular check-ins. You'll always know what's in progress, what's blocked, and what's coming next. If something underperforms, we own it and adjust — your store's revenue is the only KPI that matters.",
+        },
       ],
-      paragraph:
-        "Our Ecommerce SEO packages are customized for your store, catalog size, and target markets. We don't offer the cheapest service out there, but we do deliver the highest value per dollar. Pricing depends on the platform, number of products, current ranking positions, competition level, and the scope of optimization required. Ecommerce SEO packages typically start from $600/month for small stores and scale up for larger catalogs and competitive niches — always tied to measurable revenue impact, never vanity metrics.",
+
     },
     ctaHeadline: "Want more buyers from organic search?",
     ctaBlurb: "Let's map your highest-value products and categories into an SEO growth plan.",

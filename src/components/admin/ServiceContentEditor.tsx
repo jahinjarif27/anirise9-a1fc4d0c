@@ -343,21 +343,23 @@ export const ServiceContentEditor = ({ slug, content, onChange }: Props) => {
                 <Field label="Title — accent word(s)"><Input value={pp.titleAccent} onChange={(e) => update({ titleAccent: e.target.value })} placeholder="SEO Values" /></Field>
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-foreground/80">Tab chips (first one is highlighted)</label>
-                <Button size="sm" onClick={() => update({ tabs: [...pp.tabs, { id: newId(), label: "New tab" }] })}><Plus className="h-4 w-4" /> Add tab</Button>
+                <label className="text-xs font-semibold text-foreground/80">Tabs (each with its own paragraph)</label>
+                <Button size="sm" onClick={() => update({ tabs: [...pp.tabs, { id: newId(), label: "New tab", paragraph: "" }] })}><Plus className="h-4 w-4" /> Add tab</Button>
               </div>
-              <div className="space-y-2">
-                {pp.tabs.map((tab) => (
-                  <div key={tab.id} className="flex items-center gap-2">
-                    <Input value={tab.label} onChange={(e) => update({ tabs: pp.tabs.map((x) => x.id === tab.id ? { ...x, label: e.target.value } : x) })} placeholder="Tab label" />
-                    <Button size="icon" variant="ghost" className="text-destructive shrink-0" onClick={() => update({ tabs: pp.tabs.filter((x) => x.id !== tab.id) })}><Trash2 className="h-4 w-4" /></Button>
+              <div className="space-y-3">
+                {pp.tabs.map((tab, idx) => (
+                  <div key={tab.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground shrink-0">Tab {idx + 1}{idx === 0 ? " · default" : ""}</span>
+                      <Input value={tab.label} onChange={(e) => update({ tabs: pp.tabs.map((x) => x.id === tab.id ? { ...x, label: e.target.value } : x) })} placeholder="Tab label" />
+                      <Button size="icon" variant="ghost" className="text-destructive shrink-0" onClick={() => update({ tabs: pp.tabs.filter((x) => x.id !== tab.id) })}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                    <Textarea rows={5} value={tab.paragraph} onChange={(e) => update({ tabs: pp.tabs.map((x) => x.id === tab.id ? { ...x, paragraph: e.target.value } : x) })} placeholder="Paragraph shown when this tab is active…" />
                   </div>
                 ))}
                 {!pp.tabs.length && <p className="text-xs text-muted-foreground">No tabs.</p>}
               </div>
-              <Field label="Paragraph">
-                <Textarea rows={6} value={pp.paragraph} onChange={(e) => update({ paragraph: e.target.value })} placeholder="Describe your pricing model in plain language…" />
-              </Field>
+
             </>
           );
         })()}
