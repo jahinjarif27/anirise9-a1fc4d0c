@@ -227,6 +227,10 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
                     <span className={`text-sm ${t.highlighted ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{t.period}</span>
                   )}
                 </div>
+                {t.priceNote && (
+                  <p className={`mt-1 text-xs font-semibold ${t.highlighted ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{t.priceNote}</p>
+                )}
+
                 <ul className="mt-6 space-y-3 flex-1">
                   {t.features.map((f) => (
                     <li key={f.id} className="flex items-start gap-2 text-sm">
