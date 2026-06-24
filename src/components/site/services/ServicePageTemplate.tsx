@@ -39,6 +39,11 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
     ...a,
     ...b,
     chart: { ...a.chart, ...(b.chart || {}), bars: b.chart?.bars?.length ? b.chart.bars : a.chart.bars },
+    pricing: {
+      ...a.pricing,
+      ...(b.pricing || {}),
+      tiers: b.pricing?.tiers?.length ? b.pricing.tiers : a.pricing.tiers,
+    },
     stats: b.stats?.length ? b.stats : a.stats,
     whyCards: b.whyCards?.length ? b.whyCards : a.whyCards,
     processSteps: b.processSteps?.length ? b.processSteps : a.processSteps,
@@ -63,6 +68,7 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
     heroBlurb: service?.desc ?? "",
     stats: [], whyCards: [], processSteps: [], deliverables: [],
     chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] },
+    pricing: { enabled: false, eyebrow: "", title: "", blurb: "", tiers: [] },
   };
   const c = merge(base, serviceContent?.[slug]);
 
