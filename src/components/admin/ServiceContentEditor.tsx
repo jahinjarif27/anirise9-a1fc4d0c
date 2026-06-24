@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Trash2, GripVertical, BarChart3, Sparkles, Target, Layers, DollarSign } from "lucide-react";
+import { Plus, Trash2, GripVertical, BarChart3, Sparkles, Target, Layers, DollarSign, FileText } from "lucide-react";
 import type {
   ServiceContent,
   ServiceStat,
@@ -13,7 +13,9 @@ import type {
   ServiceChartBar,
   ServicePricingTier,
   ServicePricingFeature,
+  ServicePricingParagraphTab,
 } from "@/data/serviceContentDefaults";
+
 
 type Props = {
   slug: string;
@@ -314,6 +316,51 @@ export const ServiceContentEditor = ({ slug, content, onChange }: Props) => {
           );
         })()}
       </Section>
+
+      {/* PRICING PARAGRAPH (text-only pricing summary, e.g. SEO services) */}
+      <Section
+        title="Pricing paragraph (text-only)"
+        icon={FileText}
+        action={
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
+            <Switch
+              checked={content.pricingParagraph?.enabled ?? false}
+              onCheckedChange={(v) => onChange({ pricingParagraph: { ...(content.pricingParagraph ?? { enabled: false, eyebrow: "", title: "", titleAccent: "", tabs: [], paragraph: "" }), enabled: v } })}
+            />
+            <span className="text-sm font-medium">{content.pricingParagraph?.enabled ? "Visible" : "Hidden"}</span>
+          </div>
+        }
+      >
+        {(() => {
+          const pp = content.pricingParagraph ?? { enabled: false, eyebrow: "", title: "", titleAccent: "", tabs: [], paragraph: "" };
+          const update = (patch: Partial<typeof pp>) => onChange({ pricingParagraph: { ...pp, ...patch } });
+          return (
+            <>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Title (plain)"><Input value={pp.title} onChange={(e) => update({ title: e.target.value })} placeholder="Our" /></Field>
+                <Field label="Title — accent word(s)"><Input value={pp.titleAccent} onChange={(e) => update({ titleAccent: e.target.value })} placeholder="SEO Values" /></Field>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground/80">Tab chips (first one is highlighted)</label>
+                <Button size="sm" onClick={() => update({ tabs: [...pp.tabs, { id: newId(), label: "New tab" }] })}><Plus className="h-4 w-4" /> Add tab</Button>
+              </div>
+              <div className="space-y-2">
+                {pp.tabs.map((tab) => (
+                  <div key={tab.id} className="flex items-center gap-2">
+                    <Input value={tab.label} onChange={(e) => update({ tabs: pp.tabs.map((x) => x.id === tab.id ? { ...x, label: e.target.value } : x) })} placeholder="Tab label" />
+                    <Button size="icon" variant="ghost" className="text-destructive shrink-0" onClick={() => update({ tabs: pp.tabs.filter((x) => x.id !== tab.id) })}><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+                ))}
+                {!pp.tabs.length && <p className="text-xs text-muted-foreground">No tabs.</p>}
+              </div>
+              <Field label="Paragraph">
+                <Textarea rows={6} value={pp.paragraph} onChange={(e) => update({ paragraph: e.target.value })} placeholder="Describe your pricing model in plain language…" />
+              </Field>
+            </>
+          );
+        })()}
+      </Section>
+
 
       {/* CTA */}
       <Section title="Bottom CTA section" icon={Sparkles}>
