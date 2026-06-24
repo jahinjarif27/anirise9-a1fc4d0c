@@ -9,7 +9,8 @@ import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { MarkdownContent } from "@/components/site/MarkdownContent";
 
 const BlogPostPage = () => {
-  const { slug } = useParams();
+  const params = useParams<{ slug?: string; id?: string }>();
+  const slug = params.slug ?? params.id;
   const location = useLocation();
   const { posts, seo, loading } = useAdmin();
   const post = posts.find((p) => {
