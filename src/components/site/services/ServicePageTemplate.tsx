@@ -294,18 +294,31 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
                     </li>
                   ))}
                 </ul>
-                {t.ctaLabel && (
-                  <Button
-                    asChild
-                    variant={t.highlighted ? "hero" : "outline"}
-                    size="lg"
-                    className="mt-8 w-full rounded-full"
-                  >
-                    <Link to={t.ctaUrl || "/#contact"}>
-                      {t.ctaLabel} <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                )}
+                {t.ctaLabel && (() => {
+                  const strategyPath = "/" + getPagePath("strategy-call", seo.pageSeo).replace(/^\/+/, "");
+                  const params = new URLSearchParams();
+                  if (service?.title) params.set("service", service.title);
+                  if (t.name) params.set("plan", t.name);
+                  if (t.price) params.set("price", t.price);
+                  if (t.period) params.set("period", t.period);
+                  if (t.priceNote) params.set("priceNote", t.priceNote);
+                  const prefillUrl = `${strategyPath}?${params.toString()}`;
+                  const href = t.ctaUrl && !/^\/?#?contact/i.test(t.ctaUrl) && t.ctaUrl !== "/#contact"
+                    ? t.ctaUrl
+                    : prefillUrl;
+                  return (
+                    <Button
+                      asChild
+                      variant={t.highlighted ? "hero" : "outline"}
+                      size="lg"
+                      className="mt-8 w-full rounded-full"
+                    >
+                      <Link to={href}>
+                        {t.ctaLabel} <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  );
+                })()}
               </div>
             ))}
           </div>
