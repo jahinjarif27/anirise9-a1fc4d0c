@@ -11,6 +11,7 @@ export type ServicePricingTier = {
   id: string;
   name: string;
   price: string;
+  priceNote: string;
   period: string;
   description: string;
   highlighted: boolean;
@@ -20,6 +21,7 @@ export type ServicePricingTier = {
   ctaLabel: string;
   ctaUrl: string;
 };
+
 export type ServicePricing = {
   enabled: boolean;
   eyebrow: string;
