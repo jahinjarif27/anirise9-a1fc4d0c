@@ -284,12 +284,26 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
       title: "Our",
       titleAccent: "Ecommerce SEO Values",
       tabs: [
-        { id: "t1", label: "Ecommerce Pricing" },
-        { id: "t2", label: "Reporting" },
-        { id: "t3", label: "Accountability" },
+        {
+          id: "t1",
+          label: "Ecommerce Pricing",
+          paragraph:
+            "Our Ecommerce SEO packages are customized for your store, catalog size, and target markets. We don't offer the cheapest service out there, but we do deliver the highest value per dollar. Pricing depends on the platform, number of products, current ranking positions, competition level, and the scope of optimization required. Ecommerce SEO packages typically start from $600/month for small stores and scale up for larger catalogs and competitive niches — always tied to measurable revenue impact, never vanity metrics.",
+        },
+        {
+          id: "t2",
+          label: "Reporting",
+          paragraph:
+            "Each month you get a revenue-focused report: category and product rankings, organic sessions, add-to-carts, transactions, and revenue attributed to organic search. You'll also see which SKUs are gaining traction and where we're investing next month's effort.",
+        },
+        {
+          id: "t3",
+          label: "Accountability",
+          paragraph:
+            "We commit to a clear roadmap and review it with you in regular check-ins. You'll always know what's in progress, what's blocked, and what's coming next. If something underperforms, we own it and adjust — your store's revenue is the only KPI that matters.",
+        },
       ],
-      paragraph:
-        "Our Ecommerce SEO packages are customized for your store, catalog size, and target markets. We don't offer the cheapest service out there, but we do deliver the highest value per dollar. Pricing depends on the platform, number of products, current ranking positions, competition level, and the scope of optimization required. Ecommerce SEO packages typically start from $600/month for small stores and scale up for larger catalogs and competitive niches — always tied to measurable revenue impact, never vanity metrics.",
+
     },
     ctaHeadline: "Want more buyers from organic search?",
     ctaBlurb: "Let's map your highest-value products and categories into an SEO growth plan.",
