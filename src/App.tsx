@@ -28,6 +28,20 @@ const ConditionalBottomNav = () => {
   return <BottomNav />;
 };
 
+const ConstructionBanner = () => {
+  const { pathname } = useLocation();
+  if (pathname.startsWith("/admin")) return null;
+  return (
+    <div
+      className="fixed top-0 left-0 right-0 z-[100] bg-destructive text-destructive-foreground text-center text-xs sm:text-sm font-semibold py-1.5 px-3 shadow-md"
+      role="alert"
+    >
+      This website is currently under construction
+    </div>
+  );
+};
+
+
 const queryClient = new QueryClient();
 
 const App = () => (
