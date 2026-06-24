@@ -28,6 +28,17 @@ export type ServicePricing = {
   tiers: ServicePricingTier[];
 };
 
+export type ServicePricingParagraphTab = { id: string; label: string };
+export type ServicePricingParagraph = {
+  enabled: boolean;
+  eyebrow: string;
+  title: string;
+  titleAccent: string;
+  tabs: ServicePricingParagraphTab[];
+  paragraph: string;
+};
+
+
 export type ServiceChart = {
   enabled: boolean;
   eyebrow: string;
@@ -68,6 +79,7 @@ export type ServiceContent = {
   deliverables: ServiceDeliverable[];
   chart: ServiceChart;
   pricing: ServicePricing;
+  pricingParagraph: ServicePricingParagraph;
   ctaHeadline: string;
   ctaBlurb: string;
   ctaLabel: string;
@@ -77,7 +89,7 @@ export type ServiceContent = {
 };
 
 /** Canonical list of internal sections on a service page (in default order). */
-export const SERVICE_SECTION_IDS = ["hero", "whyCards", "process", "deliverables", "pricing", "chart", "faq", "cta"] as const;
+export const SERVICE_SECTION_IDS = ["hero", "whyCards", "process", "deliverables", "pricing", "pricingParagraph", "chart", "faq", "cta"] as const;
 export type ServiceSectionId = typeof SERVICE_SECTION_IDS[number];
 export const SERVICE_SECTION_LABELS: Record<ServiceSectionId, string> = {
   hero: "Hero",
@@ -85,10 +97,12 @@ export const SERVICE_SECTION_LABELS: Record<ServiceSectionId, string> = {
   process: "Process",
   deliverables: "Deliverables",
   pricing: "Pricing",
+  pricingParagraph: "Pricing paragraph",
   chart: "Chart",
   faq: "FAQ",
   cta: "CTA",
 };
+
 
 const blank: ServiceContent = {
   enabled: true,
@@ -113,6 +127,8 @@ const blank: ServiceContent = {
   deliverables: [],
   chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] },
   pricing: { enabled: false, eyebrow: "", title: "", blurb: "", tiers: [] },
+  pricingParagraph: { enabled: false, eyebrow: "", title: "", titleAccent: "", tabs: [], paragraph: "" },
+
   ctaHeadline: "Ready to grow?",
   ctaBlurb: "Get a free audit — no commitment, no jargon.",
   ctaLabel: "Book Free Audit",
@@ -175,11 +191,25 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
         { id: "b4", name: "Revenue %", value: 220 },
       ],
     },
+    pricingParagraph: {
+      enabled: true,
+      eyebrow: "",
+      title: "Our",
+      titleAccent: "SEO Values",
+      tabs: [
+        { id: "t1", label: "SEO Pricing" },
+        { id: "t2", label: "Reporting" },
+        { id: "t3", label: "Accountability" },
+      ],
+      paragraph:
+        "Our SEO packages are customized for your goals. We definitely don't offer the cheapest services out there, but we do offer the most value for your money. Many factors determine the SEO pricing. For example, the SEO pricing in Bangladesh is not the same as the SEO pricing in the USA. The price also depends on your current keyword positions, the nature of keywords, the landing page strategy, business location, and many more. Our SEO packages cost starts from $500/month in the BD market for small businesses and goes up from there for medium and large businesses.",
+    },
     ctaHeadline: "Ready to outrank your competition?",
     ctaBlurb: "Get a free SEO audit — no commitment, no jargon. Just clear next steps.",
     ctaLabel: "Book Free Audit",
     ctaUrl: "/#contact",
   },
+
   "ecommerce-seo": {
     ...blank,
     heroEyebrow: "Ecommerce SEO",
@@ -229,10 +259,24 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
         { id: "b3", name: "Organic Rev %", value: 64 },
       ],
     },
+    pricingParagraph: {
+      enabled: true,
+      eyebrow: "",
+      title: "Our",
+      titleAccent: "Ecommerce SEO Values",
+      tabs: [
+        { id: "t1", label: "Ecommerce Pricing" },
+        { id: "t2", label: "Reporting" },
+        { id: "t3", label: "Accountability" },
+      ],
+      paragraph:
+        "Our Ecommerce SEO packages are customized for your store, catalog size, and target markets. We don't offer the cheapest service out there, but we do deliver the highest value per dollar. Pricing depends on the platform, number of products, current ranking positions, competition level, and the scope of optimization required. Ecommerce SEO packages typically start from $600/month for small stores and scale up for larger catalogs and competitive niches — always tied to measurable revenue impact, never vanity metrics.",
+    },
     ctaHeadline: "Want more buyers from organic search?",
     ctaBlurb: "Let's map your highest-value products and categories into an SEO growth plan.",
     ctaLabel: "Request ecommerce audit",
   },
+
   "graphics-design": {
     ...blank,
     heroEyebrow: "Graphics Design",
@@ -287,13 +331,13 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
       tiers: [
         {
           id: "t1",
-          name: "Basic",
-          price: "$299",
+          name: "Starter",
+          price: "$599",
           period: "/ project",
           description: "A clean, professional starter site for new brands.",
           highlighted: false,
           badge: "",
-          icon: "Rocket",
+          icon: "",
           ctaLabel: "Get Started",
           ctaUrl: "/#contact",
           features: [
@@ -304,6 +348,7 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
             { id: "f5", text: "1 round of revisions" },
           ],
         },
+
         {
           id: "t2",
           name: "Standard",
@@ -312,7 +357,7 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
           description: "Everything growing businesses need to convert visitors.",
           highlighted: true,
           badge: "Most Popular",
-          icon: "Zap",
+          icon: "",
           ctaLabel: "Choose Standard",
           ctaUrl: "/#contact",
           features: [
@@ -332,7 +377,7 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
           description: "Tailor-made build for ecommerce & high-traffic brands.",
           highlighted: false,
           badge: "",
-          icon: "Crown",
+          icon: "",
           ctaLabel: "Talk To Us",
           ctaUrl: "/#contact",
           features: [
@@ -376,5 +421,70 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
       { id: "d4", text: "Landing page conversion optimization" },
       { id: "d5", text: "Monthly ROI report" },
     ],
+    pricing: {
+      enabled: true,
+      eyebrow: "Pricing",
+      title: "Choose Your Digital Marketing Plan",
+      blurb: "Transparent monthly retainers. Pick the plan that matches your growth stage — upgrade anytime.",
+      tiers: [
+        {
+          id: "t1",
+          name: "Basic",
+          price: "$10.90",
+          period: "per month",
+          description: "Get started with essentials for small brands testing the channel.",
+          highlighted: false,
+          badge: "",
+          icon: "",
+          ctaLabel: "Select Plan",
+          ctaUrl: "/#contact",
+          features: [
+            { id: "f1", text: "1 ad channel managed" },
+            { id: "f2", text: "Monthly performance report" },
+            { id: "f3", text: "Basic audience targeting" },
+            { id: "f4", text: "Email support" },
+          ],
+        },
+        {
+          id: "t2",
+          name: "Startup",
+          price: "$79.90",
+          period: "per month",
+          description: "Everything growing startups need to scale acquisition.",
+          highlighted: true,
+          badge: "Most Popular",
+          icon: "",
+          ctaLabel: "Select Plan",
+          ctaUrl: "/#contact",
+          features: [
+            { id: "f1", text: "3 ad channels managed" },
+            { id: "f2", text: "Weekly optimization" },
+            { id: "f3", text: "Retargeting + lookalikes" },
+            { id: "f4", text: "Landing page CRO" },
+            { id: "f5", text: "Priority chat support" },
+          ],
+        },
+        {
+          id: "t3",
+          name: "Enterprise",
+          price: "$400.90",
+          period: "per month",
+          description: "Full-funnel growth program for established brands.",
+          highlighted: false,
+          badge: "",
+          icon: "",
+          ctaLabel: "Select Plan",
+          ctaUrl: "/#contact",
+          features: [
+            { id: "f1", text: "Unlimited ad channels" },
+            { id: "f2", text: "Dedicated growth manager" },
+            { id: "f3", text: "Custom dashboards" },
+            { id: "f4", text: "Email automation flows" },
+            { id: "f5", text: "Quarterly strategy reviews" },
+          ],
+        },
+      ],
+    },
   },
+
 };

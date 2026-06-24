@@ -44,6 +44,11 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
       ...(b.pricing || {}),
       tiers: b.pricing?.tiers?.length ? b.pricing.tiers : a.pricing.tiers,
     },
+    pricingParagraph: {
+      ...(a.pricingParagraph ?? { enabled: false, eyebrow: "", title: "", titleAccent: "", tabs: [], paragraph: "" }),
+      ...(b.pricingParagraph || {}),
+      tabs: b.pricingParagraph?.tabs?.length ? b.pricingParagraph.tabs : (a.pricingParagraph?.tabs ?? []),
+    },
     stats: b.stats?.length ? b.stats : a.stats,
     whyCards: b.whyCards?.length ? b.whyCards : a.whyCards,
     processSteps: b.processSteps?.length ? b.processSteps : a.processSteps,
@@ -51,6 +56,7 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
     sectionOrder: b.sectionOrder?.length ? b.sectionOrder : a.sectionOrder,
   };
 };
+
 
 export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) => {
   const { serviceContent, seo } = useAdmin();
@@ -69,7 +75,9 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
     stats: [], whyCards: [], processSteps: [], deliverables: [],
     chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] },
     pricing: { enabled: false, eyebrow: "", title: "", blurb: "", tiers: [] },
+    pricingParagraph: { enabled: false, eyebrow: "", title: "", titleAccent: "", tabs: [], paragraph: "" },
   };
+
   const c = merge(base, serviceContent?.[slug]);
 
   const publicSlug = service?.publicSlug ?? slug;
@@ -209,11 +217,6 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
                     t.highlighted ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"
                   }`}>{t.badge}</span>
                 )}
-                <div className={`h-14 w-14 rounded-2xl grid place-items-center mb-5 ${
-                  t.highlighted ? "bg-primary-foreground/15 text-primary-foreground" : "bg-gradient-accent text-accent-foreground"
-                }`}>
-                  <Icon name={t.icon} className="h-7 w-7" />
-                </div>
                 <h3 className="text-2xl font-extrabold">{t.name}</h3>
                 {t.description && (
                   <p className={`mt-1 text-sm ${t.highlighted ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{t.description}</p>
@@ -247,6 +250,43 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+    ) : null,
+    pricingParagraph: c.pricingParagraph?.enabled && (c.pricingParagraph.paragraph || c.pricingParagraph.title) ? (
+      <section key="pricingParagraph" className="py-20">
+        <div className="container max-w-4xl">
+          {(c.pricingParagraph.title || c.pricingParagraph.titleAccent) && (
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground text-center">
+              {c.pricingParagraph.title}{" "}
+              {c.pricingParagraph.titleAccent && (
+                <span className="text-gradient-accent">{c.pricingParagraph.titleAccent}</span>
+              )}
+            </h2>
+          )}
+          {c.pricingParagraph.tabs.length > 0 && (
+            <div className="mt-8 flex flex-wrap justify-center gap-2">
+              {c.pricingParagraph.tabs.map((tab, idx) => (
+                <span
+                  key={tab.id}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold border ${
+                    idx === 0
+                      ? "bg-accent text-accent-foreground border-transparent shadow-card"
+                      : "bg-card text-muted-foreground border-border/60"
+                  }`}
+                >
+                  {tab.label}
+                </span>
+              ))}
+            </div>
+          )}
+          {c.pricingParagraph.paragraph && (
+            <div className="mt-8 bg-card border border-border/40 rounded-2xl p-6 sm:p-8 shadow-card">
+              <p className="text-base sm:text-lg leading-relaxed text-muted-foreground whitespace-pre-line">
+                {c.pricingParagraph.paragraph}
+              </p>
+            </div>
+          )}
         </div>
       </section>
     ) : null,
