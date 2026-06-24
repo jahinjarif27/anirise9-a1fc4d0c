@@ -44,6 +44,11 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
       ...(b.pricing || {}),
       tiers: b.pricing?.tiers?.length ? b.pricing.tiers : a.pricing.tiers,
     },
+    pricingParagraph: {
+      ...(a.pricingParagraph ?? { enabled: false, eyebrow: "", title: "", titleAccent: "", tabs: [], paragraph: "" }),
+      ...(b.pricingParagraph || {}),
+      tabs: b.pricingParagraph?.tabs?.length ? b.pricingParagraph.tabs : (a.pricingParagraph?.tabs ?? []),
+    },
     stats: b.stats?.length ? b.stats : a.stats,
     whyCards: b.whyCards?.length ? b.whyCards : a.whyCards,
     processSteps: b.processSteps?.length ? b.processSteps : a.processSteps,
@@ -51,6 +56,7 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
     sectionOrder: b.sectionOrder?.length ? b.sectionOrder : a.sectionOrder,
   };
 };
+
 
 export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) => {
   const { serviceContent, seo } = useAdmin();
@@ -69,7 +75,9 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
     stats: [], whyCards: [], processSteps: [], deliverables: [],
     chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] },
     pricing: { enabled: false, eyebrow: "", title: "", blurb: "", tiers: [] },
+    pricingParagraph: { enabled: false, eyebrow: "", title: "", titleAccent: "", tabs: [], paragraph: "" },
   };
+
   const c = merge(base, serviceContent?.[slug]);
 
   const publicSlug = service?.publicSlug ?? slug;
