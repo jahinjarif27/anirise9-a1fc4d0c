@@ -28,6 +28,17 @@ export type ServicePricing = {
   tiers: ServicePricingTier[];
 };
 
+export type ServicePricingParagraphTab = { id: string; label: string };
+export type ServicePricingParagraph = {
+  enabled: boolean;
+  eyebrow: string;
+  title: string;
+  titleAccent: string;
+  tabs: ServicePricingParagraphTab[];
+  paragraph: string;
+};
+
+
 export type ServiceChart = {
   enabled: boolean;
   eyebrow: string;
@@ -68,6 +79,7 @@ export type ServiceContent = {
   deliverables: ServiceDeliverable[];
   chart: ServiceChart;
   pricing: ServicePricing;
+  pricingParagraph: ServicePricingParagraph;
   ctaHeadline: string;
   ctaBlurb: string;
   ctaLabel: string;
@@ -77,7 +89,7 @@ export type ServiceContent = {
 };
 
 /** Canonical list of internal sections on a service page (in default order). */
-export const SERVICE_SECTION_IDS = ["hero", "whyCards", "process", "deliverables", "pricing", "chart", "faq", "cta"] as const;
+export const SERVICE_SECTION_IDS = ["hero", "whyCards", "process", "deliverables", "pricing", "pricingParagraph", "chart", "faq", "cta"] as const;
 export type ServiceSectionId = typeof SERVICE_SECTION_IDS[number];
 export const SERVICE_SECTION_LABELS: Record<ServiceSectionId, string> = {
   hero: "Hero",
@@ -85,10 +97,12 @@ export const SERVICE_SECTION_LABELS: Record<ServiceSectionId, string> = {
   process: "Process",
   deliverables: "Deliverables",
   pricing: "Pricing",
+  pricingParagraph: "Pricing paragraph",
   chart: "Chart",
   faq: "FAQ",
   cta: "CTA",
 };
+
 
 const blank: ServiceContent = {
   enabled: true,
@@ -113,6 +127,8 @@ const blank: ServiceContent = {
   deliverables: [],
   chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] },
   pricing: { enabled: false, eyebrow: "", title: "", blurb: "", tiers: [] },
+  pricingParagraph: { enabled: false, eyebrow: "", title: "", titleAccent: "", tabs: [], paragraph: "" },
+
   ctaHeadline: "Ready to grow?",
   ctaBlurb: "Get a free audit — no commitment, no jargon.",
   ctaLabel: "Book Free Audit",
