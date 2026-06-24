@@ -6,6 +6,27 @@ export type ServiceWhyCard = { id: string; icon: string; title: string; desc: st
 export type ServiceProcessStep = { id: string; icon: string; title: string; desc: string };
 export type ServiceDeliverable = { id: string; text: string };
 export type ServiceChartBar = { id: string; name: string; value: number };
+export type ServicePricingFeature = { id: string; text: string };
+export type ServicePricingTier = {
+  id: string;
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  highlighted: boolean;
+  badge: string;
+  icon: string;
+  features: ServicePricingFeature[];
+  ctaLabel: string;
+  ctaUrl: string;
+};
+export type ServicePricing = {
+  enabled: boolean;
+  eyebrow: string;
+  title: string;
+  blurb: string;
+  tiers: ServicePricingTier[];
+};
 
 export type ServiceChart = {
   enabled: boolean;
@@ -46,6 +67,7 @@ export type ServiceContent = {
   deliverablesBlurb: string;
   deliverables: ServiceDeliverable[];
   chart: ServiceChart;
+  pricing: ServicePricing;
   ctaHeadline: string;
   ctaBlurb: string;
   ctaLabel: string;
@@ -55,13 +77,14 @@ export type ServiceContent = {
 };
 
 /** Canonical list of internal sections on a service page (in default order). */
-export const SERVICE_SECTION_IDS = ["hero", "whyCards", "process", "deliverables", "chart", "faq", "cta"] as const;
+export const SERVICE_SECTION_IDS = ["hero", "whyCards", "process", "deliverables", "pricing", "chart", "faq", "cta"] as const;
 export type ServiceSectionId = typeof SERVICE_SECTION_IDS[number];
 export const SERVICE_SECTION_LABELS: Record<ServiceSectionId, string> = {
   hero: "Hero",
   whyCards: "Why cards",
   process: "Process",
   deliverables: "Deliverables",
+  pricing: "Pricing",
   chart: "Chart",
   faq: "FAQ",
   cta: "CTA",
@@ -89,6 +112,7 @@ const blank: ServiceContent = {
   deliverablesBlurb: "",
   deliverables: [],
   chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] },
+  pricing: { enabled: false, eyebrow: "", title: "", blurb: "", tiers: [] },
   ctaHeadline: "Ready to grow?",
   ctaBlurb: "Get a free audit — no commitment, no jargon.",
   ctaLabel: "Book Free Audit",
