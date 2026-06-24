@@ -32,9 +32,38 @@ const ConditionalBottomNav = () => {
 
 const ConstructionBanner = () => {
   const { pathname } = useLocation();
-  if (pathname.startsWith("/admin")) return null;
+  const ref = useRef<HTMLDivElement>(null);
+  const isAdmin = pathname.startsWith("/admin");
+
+  useEffect(() => {
+    if (isAdmin) {
+      document.documentElement.style.setProperty("--banner-h", "0px");
+      document.body.style.paddingTop = "";
+      return;
+    }
+    const el = ref.current;
+    if (!el) return;
+    const update = () => {
+      const h = el.offsetHeight;
+      document.documentElement.style.setProperty("--banner-h", `${h}px`);
+      document.body.style.paddingTop = `${h}px`;
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+      document.documentElement.style.setProperty("--banner-h", "0px");
+      document.body.style.paddingTop = "";
+    };
+  }, [isAdmin]);
+
+  if (isAdmin) return null;
   return (
     <div
+      ref={ref}
       className="fixed top-0 left-0 right-0 z-[100] bg-destructive text-destructive-foreground text-center text-xs sm:text-sm font-semibold py-1.5 px-3 shadow-md"
       role="alert"
     >
@@ -42,6 +71,7 @@ const ConstructionBanner = () => {
     </div>
   );
 };
+
 
 
 const queryClient = new QueryClient();
