@@ -312,43 +312,10 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
         </div>
       </section>
     ) : null,
-    pricingParagraph: c.pricingParagraph?.enabled && (c.pricingParagraph.paragraph || c.pricingParagraph.title) ? (
-      <section key="pricingParagraph" className="py-20">
-        <div className="container max-w-4xl">
-          {(c.pricingParagraph.title || c.pricingParagraph.titleAccent) && (
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground text-center">
-              {c.pricingParagraph.title}{" "}
-              {c.pricingParagraph.titleAccent && (
-                <span className="text-gradient-accent">{c.pricingParagraph.titleAccent}</span>
-              )}
-            </h2>
-          )}
-          {c.pricingParagraph.tabs.length > 0 && (
-            <div className="mt-8 flex flex-wrap justify-center gap-2">
-              {c.pricingParagraph.tabs.map((tab, idx) => (
-                <span
-                  key={tab.id}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold border ${
-                    idx === 0
-                      ? "bg-accent text-accent-foreground border-transparent shadow-card"
-                      : "bg-card text-muted-foreground border-border/60"
-                  }`}
-                >
-                  {tab.label}
-                </span>
-              ))}
-            </div>
-          )}
-          {c.pricingParagraph.paragraph && (
-            <div className="mt-8 bg-card border border-border/40 rounded-2xl p-6 sm:p-8 shadow-card">
-              <p className="text-base sm:text-lg leading-relaxed text-muted-foreground whitespace-pre-line">
-                {c.pricingParagraph.paragraph}
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
+    pricingParagraph: c.pricingParagraph?.enabled ? (
+      <PricingParagraphBlock key="pricingParagraph" data={c.pricingParagraph} />
     ) : null,
+
     chart: c.chart.enabled && c.chart.bars.length > 0 ? (
       <section key="chart" className="py-20 bg-secondary/40">
         <div className="container">
