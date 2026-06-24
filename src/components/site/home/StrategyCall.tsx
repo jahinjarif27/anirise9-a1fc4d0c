@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,10 +30,22 @@ const BUDGET_OPTIONS = [
   "$5000+",
 ];
 
+const matchBudget = (priceStr?: string | null): string | null => {
+  if (!priceStr) return null;
+  const num = parseFloat(priceStr.replace(/[^\d.]/g, ""));
+  if (!isFinite(num) || num <= 0) return null;
+  if (num < 500) return "Below $500";
+  if (num <= 1000) return "$500 - $1000";
+  if (num <= 3000) return "$1000 - $3000";
+  if (num <= 5000) return "$3000 - $5000";
+  return "$5000+";
+};
+
 export const StrategyCall = () => {
   const { addLead } = useAdmin();
   const dynServices = useServices();
   const SERVICE_OPTIONS = [...dynServices.map((s) => s.title), "Custom Web Development", "Other"];
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -44,6 +57,32 @@ export const StrategyCall = () => {
     note: "",
   });
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const qService = searchParams.get("service");
+    const qPlan = searchParams.get("plan");
+    const qPrice = searchParams.get("price");
+    const qPeriod = searchParams.get("period");
+    const qPriceNote = searchParams.get("priceNote");
+    if (!qService && !qPlan && !qPrice) return;
+    const matchedService = qService
+      ? SERVICE_OPTIONS.find((o) => o.toLowerCase() === qService.toLowerCase()) ?? "Other"
+      : null;
+    const budget = matchBudget(qPrice);
+    const noteLines = [
+      qPlan && `Selected Plan: ${qPlan}`,
+      qPrice && `Price: ${qPrice}${qPeriod ? ` ${qPeriod}` : ""}`,
+      qPriceNote && `(${qPriceNote})`,
+      qService && `Service: ${qService}`,
+    ].filter(Boolean);
+    setForm((f) => ({
+      ...f,
+      service: matchedService ?? f.service,
+      budget: budget ?? f.budget,
+      note: noteLines.join("\n"),
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, dynServices.length]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
