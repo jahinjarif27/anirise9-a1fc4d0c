@@ -39,6 +39,11 @@ const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent =
     ...a,
     ...b,
     chart: { ...a.chart, ...(b.chart || {}), bars: b.chart?.bars?.length ? b.chart.bars : a.chart.bars },
+    pricing: {
+      ...a.pricing,
+      ...(b.pricing || {}),
+      tiers: b.pricing?.tiers?.length ? b.pricing.tiers : a.pricing.tiers,
+    },
     stats: b.stats?.length ? b.stats : a.stats,
     whyCards: b.whyCards?.length ? b.whyCards : a.whyCards,
     processSteps: b.processSteps?.length ? b.processSteps : a.processSteps,
@@ -63,6 +68,7 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
     heroBlurb: service?.desc ?? "",
     stats: [], whyCards: [], processSteps: [], deliverables: [],
     chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] },
+    pricing: { enabled: false, eyebrow: "", title: "", blurb: "", tiers: [] },
   };
   const c = merge(base, serviceContent?.[slug]);
 
@@ -171,6 +177,76 @@ export const ServicePageTemplate = ({ slug: incomingSlug }: { slug: string }) =>
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+    ) : null,
+    pricing: c.pricing?.enabled && c.pricing.tiers.length > 0 ? (
+      <section key="pricing" id="pricing" className="py-20 bg-secondary/30">
+        <div className="container">
+          <div className="max-w-2xl mx-auto text-center mb-12">
+            {c.pricing.eyebrow && (
+              <p className="text-xs font-semibold tracking-[0.25em] text-accent uppercase mb-3">{c.pricing.eyebrow}</p>
+            )}
+            {c.pricing.title && (
+              <h2 className="text-4xl font-extrabold text-foreground">{c.pricing.title}</h2>
+            )}
+            {c.pricing.blurb && (
+              <p className="mt-4 text-muted-foreground leading-relaxed">{c.pricing.blurb}</p>
+            )}
+          </div>
+          <div className={`grid md:grid-cols-2 lg:grid-cols-${Math.min(3, c.pricing.tiers.length)} gap-6 items-stretch max-w-6xl mx-auto`}>
+            {c.pricing.tiers.map((t) => (
+              <div
+                key={t.id}
+                className={`relative rounded-2xl p-8 border flex flex-col ${
+                  t.highlighted
+                    ? "bg-gradient-primary text-primary-foreground border-transparent shadow-elegant lg:scale-105"
+                    : "bg-card text-foreground border-border/40 shadow-card"
+                }`}
+              >
+                {t.badge && (
+                  <span className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase ${
+                    t.highlighted ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"
+                  }`}>{t.badge}</span>
+                )}
+                <div className={`h-14 w-14 rounded-2xl grid place-items-center mb-5 ${
+                  t.highlighted ? "bg-primary-foreground/15 text-primary-foreground" : "bg-gradient-accent text-accent-foreground"
+                }`}>
+                  <Icon name={t.icon} className="h-7 w-7" />
+                </div>
+                <h3 className="text-2xl font-extrabold">{t.name}</h3>
+                {t.description && (
+                  <p className={`mt-1 text-sm ${t.highlighted ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{t.description}</p>
+                )}
+                <div className="mt-5 flex items-baseline gap-1">
+                  <span className="text-4xl font-extrabold">{t.price}</span>
+                  {t.period && (
+                    <span className={`text-sm ${t.highlighted ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{t.period}</span>
+                  )}
+                </div>
+                <ul className="mt-6 space-y-3 flex-1">
+                  {t.features.map((f) => (
+                    <li key={f.id} className="flex items-start gap-2 text-sm">
+                      <CheckCircle2 className={`h-5 w-5 shrink-0 mt-0.5 ${t.highlighted ? "text-primary-foreground" : "text-accent"}`} />
+                      <span>{f.text}</span>
+                    </li>
+                  ))}
+                </ul>
+                {t.ctaLabel && (
+                  <Button
+                    asChild
+                    variant={t.highlighted ? "hero" : "outline"}
+                    size="lg"
+                    className="mt-8 w-full rounded-full"
+                  >
+                    <Link to={t.ctaUrl || "/#contact"}>
+                      {t.ctaLabel} <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     ) : null,

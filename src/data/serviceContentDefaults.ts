@@ -6,6 +6,27 @@ export type ServiceWhyCard = { id: string; icon: string; title: string; desc: st
 export type ServiceProcessStep = { id: string; icon: string; title: string; desc: string };
 export type ServiceDeliverable = { id: string; text: string };
 export type ServiceChartBar = { id: string; name: string; value: number };
+export type ServicePricingFeature = { id: string; text: string };
+export type ServicePricingTier = {
+  id: string;
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  highlighted: boolean;
+  badge: string;
+  icon: string;
+  features: ServicePricingFeature[];
+  ctaLabel: string;
+  ctaUrl: string;
+};
+export type ServicePricing = {
+  enabled: boolean;
+  eyebrow: string;
+  title: string;
+  blurb: string;
+  tiers: ServicePricingTier[];
+};
 
 export type ServiceChart = {
   enabled: boolean;
@@ -46,6 +67,7 @@ export type ServiceContent = {
   deliverablesBlurb: string;
   deliverables: ServiceDeliverable[];
   chart: ServiceChart;
+  pricing: ServicePricing;
   ctaHeadline: string;
   ctaBlurb: string;
   ctaLabel: string;
@@ -55,13 +77,14 @@ export type ServiceContent = {
 };
 
 /** Canonical list of internal sections on a service page (in default order). */
-export const SERVICE_SECTION_IDS = ["hero", "whyCards", "process", "deliverables", "chart", "faq", "cta"] as const;
+export const SERVICE_SECTION_IDS = ["hero", "whyCards", "process", "deliverables", "pricing", "chart", "faq", "cta"] as const;
 export type ServiceSectionId = typeof SERVICE_SECTION_IDS[number];
 export const SERVICE_SECTION_LABELS: Record<ServiceSectionId, string> = {
   hero: "Hero",
   whyCards: "Why cards",
   process: "Process",
   deliverables: "Deliverables",
+  pricing: "Pricing",
   chart: "Chart",
   faq: "FAQ",
   cta: "CTA",
@@ -89,6 +112,7 @@ const blank: ServiceContent = {
   deliverablesBlurb: "",
   deliverables: [],
   chart: { enabled: false, eyebrow: "", title: "", subtitle: "", bars: [] },
+  pricing: { enabled: false, eyebrow: "", title: "", blurb: "", tiers: [] },
   ctaHeadline: "Ready to grow?",
   ctaBlurb: "Get a free audit — no commitment, no jargon.",
   ctaLabel: "Book Free Audit",
@@ -255,6 +279,73 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
       { id: "d5", text: "Analytics & conversion tracking" },
       { id: "d6", text: "Post-launch support" },
     ],
+    pricing: {
+      enabled: true,
+      eyebrow: "Pricing",
+      title: "Choose The Plan That Fits Your Business",
+      blurb: "Transparent, all-inclusive packages. No hidden fees — pick a tier and we'll have your site live in weeks.",
+      tiers: [
+        {
+          id: "t1",
+          name: "Basic",
+          price: "$299",
+          period: "/ project",
+          description: "A clean, professional starter site for new brands.",
+          highlighted: false,
+          badge: "",
+          icon: "Rocket",
+          ctaLabel: "Get Started",
+          ctaUrl: "/#contact",
+          features: [
+            { id: "f1", text: "Up to 5 pages" },
+            { id: "f2", text: "Mobile responsive design" },
+            { id: "f3", text: "Basic on-page SEO" },
+            { id: "f4", text: "Contact form" },
+            { id: "f5", text: "1 round of revisions" },
+          ],
+        },
+        {
+          id: "t2",
+          name: "Standard",
+          price: "$699",
+          period: "/ project",
+          description: "Everything growing businesses need to convert visitors.",
+          highlighted: true,
+          badge: "Most Popular",
+          icon: "Zap",
+          ctaLabel: "Choose Standard",
+          ctaUrl: "/#contact",
+          features: [
+            { id: "f1", text: "Up to 12 pages" },
+            { id: "f2", text: "Custom design system" },
+            { id: "f3", text: "Advanced SEO + schema" },
+            { id: "f4", text: "Blog / CMS setup" },
+            { id: "f5", text: "Analytics & tracking" },
+            { id: "f6", text: "3 rounds of revisions" },
+          ],
+        },
+        {
+          id: "t3",
+          name: "Premium",
+          price: "$1,499",
+          period: "/ project",
+          description: "Tailor-made build for ecommerce & high-traffic brands.",
+          highlighted: false,
+          badge: "",
+          icon: "Crown",
+          ctaLabel: "Talk To Us",
+          ctaUrl: "/#contact",
+          features: [
+            { id: "f1", text: "Unlimited pages" },
+            { id: "f2", text: "Ecommerce / booking setup" },
+            { id: "f3", text: "Performance & Core Web Vitals" },
+            { id: "f4", text: "Conversion-focused copy" },
+            { id: "f5", text: "Priority support 30 days" },
+            { id: "f6", text: "Unlimited revisions" },
+          ],
+        },
+      ],
+    },
   },
   "social-media-marketing": {
     ...blank,
