@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Trash2, GripVertical, BarChart3, Sparkles, Target, Layers } from "lucide-react";
+import { Plus, Trash2, GripVertical, BarChart3, Sparkles, Target, Layers, DollarSign } from "lucide-react";
 import type {
   ServiceContent,
   ServiceStat,
@@ -11,6 +11,8 @@ import type {
   ServiceProcessStep,
   ServiceDeliverable,
   ServiceChartBar,
+  ServicePricingTier,
+  ServicePricingFeature,
 } from "@/data/serviceContentDefaults";
 
 type Props = {
@@ -215,6 +217,102 @@ export const ServiceContentEditor = ({ slug, content, onChange }: Props) => {
           ))}
           {!content.chart.bars.length && <p className="text-xs text-muted-foreground">No chart data.</p>}
         </div>
+      </Section>
+
+      {/* PRICING */}
+      <Section
+        title="Pricing tiers"
+        icon={DollarSign}
+        action={
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary">
+            <Switch
+              checked={content.pricing?.enabled ?? false}
+              onCheckedChange={(v) => onChange({ pricing: { ...(content.pricing ?? { enabled: false, eyebrow: "", title: "", blurb: "", tiers: [] }), enabled: v } })}
+            />
+            <span className="text-sm font-medium">{content.pricing?.enabled ? "Visible" : "Hidden"}</span>
+          </div>
+        }
+      >
+        {(() => {
+          const pricing = content.pricing ?? { enabled: false, eyebrow: "", title: "", blurb: "", tiers: [] };
+          const updatePricing = (patch: Partial<typeof pricing>) =>
+            onChange({ pricing: { ...pricing, ...patch } });
+          const editTier = (id: string, patch: Partial<ServicePricingTier>) =>
+            updatePricing({ tiers: pricing.tiers.map((t) => (t.id === id ? { ...t, ...patch } : t)) });
+          const delTier = (id: string) =>
+            updatePricing({ tiers: pricing.tiers.filter((t) => t.id !== id) });
+          const addTier = () =>
+            updatePricing({
+              tiers: [
+                ...pricing.tiers,
+                {
+                  id: newId(),
+                  name: "New plan",
+                  price: "$0",
+                  period: "/ project",
+                  description: "",
+                  highlighted: false,
+                  badge: "",
+                  icon: "Rocket",
+                  ctaLabel: "Get Started",
+                  ctaUrl: "/#contact",
+                  features: [],
+                },
+              ],
+            });
+          return (
+            <>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Eyebrow"><Input value={pricing.eyebrow} onChange={(e) => updatePricing({ eyebrow: e.target.value })} /></Field>
+                <Field label="Section title"><Input value={pricing.title} onChange={(e) => updatePricing({ title: e.target.value })} /></Field>
+              </div>
+              <Field label="Blurb"><Textarea rows={2} value={pricing.blurb} onChange={(e) => updatePricing({ blurb: e.target.value })} /></Field>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground/80">Tiers</label>
+                <Button size="sm" onClick={addTier}><Plus className="h-4 w-4" /> Add tier</Button>
+              </div>
+              <div className="space-y-3">
+                {pricing.tiers.map((t) => (
+                  <div key={t.id} className="p-3 rounded-xl border border-border/60 bg-card space-y-2">
+                    <div className="grid sm:grid-cols-3 gap-2">
+                      <Input value={t.name} onChange={(e) => editTier(t.id, { name: e.target.value })} placeholder="Tier name" />
+                      <Input value={t.price} onChange={(e) => editTier(t.id, { price: e.target.value })} placeholder="$299" />
+                      <Input value={t.period} onChange={(e) => editTier(t.id, { period: e.target.value })} placeholder="/ project" />
+                    </div>
+                    <div className="grid sm:grid-cols-3 gap-2">
+                      <Input value={t.icon} onChange={(e) => editTier(t.id, { icon: e.target.value })} placeholder="lucide icon e.g. Rocket" />
+                      <Input value={t.badge} onChange={(e) => editTier(t.id, { badge: e.target.value })} placeholder="Badge e.g. Most Popular" />
+                      <div className="flex items-center gap-2 px-3 rounded-md border border-border/60">
+                        <Switch checked={t.highlighted} onCheckedChange={(v) => editTier(t.id, { highlighted: v })} />
+                        <span className="text-xs font-medium">Highlighted</span>
+                      </div>
+                    </div>
+                    <Textarea rows={2} value={t.description} onChange={(e) => editTier(t.id, { description: e.target.value })} placeholder="Short description" />
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      <Input value={t.ctaLabel} onChange={(e) => editTier(t.id, { ctaLabel: e.target.value })} placeholder="Button label" />
+                      <Input value={t.ctaUrl} onChange={(e) => editTier(t.id, { ctaUrl: e.target.value })} placeholder="Button URL" />
+                    </div>
+                    <div className="space-y-2 pt-2 border-t border-border/40">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-foreground/80">Features</span>
+                        <Button size="sm" variant="outline" onClick={() => editTier(t.id, { features: [...t.features, { id: newId(), text: "" }] })}><Plus className="h-3 w-3" /> Add feature</Button>
+                      </div>
+                      {t.features.map((f) => (
+                        <div key={f.id} className="flex items-center gap-2">
+                          <Input value={f.text} onChange={(e) => editTier(t.id, { features: t.features.map((x) => x.id === f.id ? { ...x, text: e.target.value } : x) })} placeholder="Feature text" />
+                          <Button size="icon" variant="ghost" className="text-destructive shrink-0" onClick={() => editTier(t.id, { features: t.features.filter((x) => x.id !== f.id) })}><Trash2 className="h-4 w-4" /></Button>
+                        </div>
+                      ))}
+                      {!t.features.length && <p className="text-xs text-muted-foreground">No features yet.</p>}
+                    </div>
+                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => delTier(t.id)}><Trash2 className="h-4 w-4" /> Remove tier</Button>
+                  </div>
+                ))}
+                {!pricing.tiers.length && <p className="text-xs text-muted-foreground">No pricing tiers yet. Add up to 3 for the best layout.</p>}
+              </div>
+            </>
+          );
+        })()}
       </Section>
 
       {/* CTA */}
