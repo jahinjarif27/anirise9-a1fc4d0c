@@ -281,6 +281,8 @@ export const ServiceContentEditor = ({ slug, content, onChange }: Props) => {
                       <Input value={t.price} onChange={(e) => editTier(t.id, { price: e.target.value })} placeholder="$299" />
                       <Input value={t.period} onChange={(e) => editTier(t.id, { period: e.target.value })} placeholder="/ project" />
                     </div>
+                    <Input value={t.priceNote ?? ""} onChange={(e) => editTier(t.id, { priceNote: e.target.value })} placeholder="Price note (e.g. *Tk 59,000)" />
+
                     <div className="grid sm:grid-cols-3 gap-2">
                       <Input value={t.icon} onChange={(e) => editTier(t.id, { icon: e.target.value })} placeholder="lucide icon e.g. Rocket" />
                       <Input value={t.badge} onChange={(e) => editTier(t.id, { badge: e.target.value })} placeholder="Badge e.g. Most Popular" />

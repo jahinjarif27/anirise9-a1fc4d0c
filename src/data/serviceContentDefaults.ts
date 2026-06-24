@@ -11,6 +11,8 @@ export type ServicePricingTier = {
   id: string;
   name: string;
   price: string;
+  priceNote?: string;
+
   period: string;
   description: string;
   highlighted: boolean;
@@ -20,6 +22,7 @@ export type ServicePricingTier = {
   ctaLabel: string;
   ctaUrl: string;
 };
+
 export type ServicePricing = {
   enabled: boolean;
   eyebrow: string;
@@ -331,8 +334,9 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
       tiers: [
         {
           id: "t1",
-          name: "Starter",
+          name: "Start up",
           price: "$599",
+          priceNote: "*Tk 59,000",
           period: "/ project",
           description: "A clean, professional starter site for new brands.",
           highlighted: false,
@@ -351,14 +355,15 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
 
         {
           id: "t2",
-          name: "Standard",
-          price: "$699",
+          name: "Small Business",
+          price: "$999",
+          priceNote: "*Tk 99,000",
           period: "/ project",
           description: "Everything growing businesses need to convert visitors.",
           highlighted: true,
-          badge: "Most Popular",
+          badge: "Popular",
           icon: "",
-          ctaLabel: "Choose Standard",
+          ctaLabel: "Choose Small Business",
           ctaUrl: "/#contact",
           features: [
             { id: "f1", text: "Up to 12 pages" },
@@ -371,8 +376,9 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
         },
         {
           id: "t3",
-          name: "Premium",
-          price: "$1,499",
+          name: "Corporate",
+          price: "$1999",
+          priceNote: "*Tk 199,000",
           period: "/ project",
           description: "Tailor-made build for ecommerce & high-traffic brands.",
           highlighted: false,
@@ -390,6 +396,7 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
           ],
         },
       ],
+
     },
   },
   "social-media-marketing": {
