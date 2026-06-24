@@ -100,7 +100,7 @@ export const Navbar = () => {
 
   return (
     <>
-    <header className={cn("fixed top-0 left-0 right-0 z-50 transition-all duration-300", pastHero ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100")}>
+    <header style={{ top: "var(--banner-h, 0px)" }} className={cn("fixed left-0 right-0 z-50 transition-all duration-300", pastHero ? "-translate-y-[calc(100%+var(--banner-h,0px))] opacity-0 pointer-events-none" : "translate-y-0 opacity-100")}>
       {/* Top contact bar */}
       <div className="bg-primary text-primary-foreground text-xs sm:text-sm">
         <div className="container flex items-center justify-between gap-3 py-2.5">
