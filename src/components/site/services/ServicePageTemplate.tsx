@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { lazy } from "react";
+import { lazy, useState } from "react";
 import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,61 @@ const Icon = ({ name, className }: { name?: string; className?: string }) => {
   if (!Cmp) return <Sparkles className={className} />;
   return <Cmp className={className} />;
 };
+
+const PricingParagraphBlock = ({ data }: { data: import("@/data/serviceContentDefaults").ServicePricingParagraph }) => {
+  const fallback = data.paragraph ?? "";
+  const tabs = data.tabs.length
+    ? data.tabs
+    : [{ id: "_only", label: data.titleAccent || "Pricing", paragraph: fallback }];
+  const [active, setActive] = useState(tabs[0].id);
+  const current = tabs.find((t) => t.id === active) ?? tabs[0];
+  const body = current.paragraph || fallback;
+  if (!body && !data.title && !data.titleAccent) return null;
+  return (
+    <section key="pricingParagraph" className="py-20">
+      <div className="container max-w-4xl">
+        {(data.title || data.titleAccent) && (
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground text-center">
+            {data.title}{" "}
+            {data.titleAccent && (
+              <span className="text-gradient-accent">{data.titleAccent}</span>
+            )}
+          </h2>
+        )}
+        {tabs.length > 1 && (
+          <div className="mt-8 flex flex-wrap justify-center gap-2">
+            {tabs.map((tab) => {
+              const isActive = tab.id === active;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActive(tab.id)}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
+                    isActive
+                      ? "bg-accent text-accent-foreground border-transparent shadow-card"
+                      : "bg-card text-muted-foreground border-border/60 hover:text-foreground hover:border-accent/50"
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {body && (
+          <div className="mt-8 bg-card border border-border/40 rounded-2xl p-6 sm:p-8 shadow-card">
+            <p className="text-base sm:text-lg leading-relaxed text-muted-foreground whitespace-pre-line">
+              {body}
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
 
 const merge = (a: ServiceContent, b?: Partial<ServiceContent>): ServiceContent => {
   if (!b) return a;
