@@ -202,12 +202,26 @@ export const defaultServiceContent: Record<string, ServiceContent> = {
       title: "Our",
       titleAccent: "SEO Values",
       tabs: [
-        { id: "t1", label: "SEO Pricing" },
-        { id: "t2", label: "Reporting" },
-        { id: "t3", label: "Accountability" },
+        {
+          id: "t1",
+          label: "SEO Pricing",
+          paragraph:
+            "Our SEO packages are customized for your goals. We definitely don't offer the cheapest services out there, but we do offer the most value for your money. Many factors determine the SEO pricing. For example, the SEO pricing in Bangladesh is not the same as the SEO pricing in the USA. The price also depends on your current keyword positions, the nature of keywords, the landing page strategy, business location, and many more. Our SEO packages cost starts from $500/month in the BD market for small businesses and goes up from there for medium and large businesses.",
+        },
+        {
+          id: "t2",
+          label: "Reporting",
+          paragraph:
+            "Every month you'll receive a clear, jargon-free report covering keyword movements, organic traffic, top landing pages, leads or revenue from organic search, and the work we shipped that month. No vanity metrics — just the numbers tied to business growth, plus a short summary of what's next.",
+        },
+        {
+          id: "t3",
+          label: "Accountability",
+          paragraph:
+            "You'll always know what we're working on and why. Each engagement has a documented roadmap, weekly check-ins, and a single point of contact. If a tactic isn't moving the needle, we tell you, change course, and adjust the plan — your wins are how we measure ours.",
+        },
       ],
-      paragraph:
-        "Our SEO packages are customized for your goals. We definitely don't offer the cheapest services out there, but we do offer the most value for your money. Many factors determine the SEO pricing. For example, the SEO pricing in Bangladesh is not the same as the SEO pricing in the USA. The price also depends on your current keyword positions, the nature of keywords, the landing page strategy, business location, and many more. Our SEO packages cost starts from $500/month in the BD market for small businesses and goes up from there for medium and large businesses.",
+
     },
     ctaHeadline: "Ready to outrank your competition?",
     ctaBlurb: "Get a free SEO audit — no commitment, no jargon. Just clear next steps.",
