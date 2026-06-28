@@ -377,7 +377,7 @@ export const SeoBlock = ({
 const AdminDashboard = () => {
   const {
     isAuthed, logout, posts, addPost, updatePost, deletePost,
-    content, updateContent, visits,
+    content, updateContent, visits, visitsPrev,
     seo, updateSeo, appearance, updateAppearance, fontChoices, saveAllNow,
     contact, updateContact, regenerateSitemap, buildSitemap,
     portfolio, addPortfolioItem, updatePortfolioItem, deletePortfolioItem,
@@ -2056,22 +2056,33 @@ const AdminDashboard = () => {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {(() => {
-                const todayVisits = visitSeries.length ? visitSeries[visitSeries.length - 1].visits : 0;
-                const todayLeads = leads.filter((l) => l.createdAt > Date.now() - 86400000).length;
+                const now = Date.now();
+                const leads30 = leads.filter((l) => l.createdAt > now - 30 * 86400000).length;
+                const leads60 = leads.filter((l) => l.createdAt > now - 60 * 86400000).length;
+                const leadsPrev = Math.max(0, leads60 - leads30);
+                const todayLeads = leads.filter((l) => l.createdAt > now - 86400000).length;
+                const trend = (cur: number, prev: number) => {
+                  if (!prev) return cur > 0 ? "+100%" : "";
+                  const pct = ((cur - prev) / prev) * 100;
+                  return `${pct >= 0 ? "+" : ""}${pct.toFixed(1)}%`;
+                };
+                const conv = visits > 0 ? (leads30 / visits) * 100 : 0;
+                const convPrev = visitsPrev > 0 ? (leadsPrev / visitsPrev) * 100 : 0;
                 return [
-                  { icon: Users, label: "Visitors (30d)", value: visits.toLocaleString(), trend: "+12.4%" },
-                  { icon: Eye, label: "Page views (today)", value: Math.round(todayVisits * 2.7).toLocaleString(), trend: "+8.1%" },
-                  { icon: MousePointerClick, label: "Conversions (30d)", value: leads.filter((l) => l.createdAt > Date.now() - 30 * 86400000).length.toString(), trend: "+22%" },
-                  { icon: FileText, label: "New leads (today)", value: todayLeads.toString(), trend: "" },
+                  { icon: Users, label: "Visitors (last 30d)", value: visits.toLocaleString(), sub: `Prev 30d: ${visitsPrev.toLocaleString()}`, trend: trend(visits, visitsPrev) },
+                  { icon: Eye, label: "New leads (today)", value: todayLeads.toString(), sub: `Last 30d: ${leads30}`, trend: "" },
+                  { icon: MousePointerClick, label: "Conversions (30d)", value: leads30.toString(), sub: `Prev 30d: ${leadsPrev}`, trend: trend(leads30, leadsPrev) },
+                  { icon: TrendingUp, label: "Conversion rate", value: `${conv.toFixed(2)}%`, sub: `Prev: ${convPrev.toFixed(2)}%`, trend: trend(conv, convPrev) },
                 ];
               })().map((s) => (
                 <Card key={s.label} className="p-5">
                   <div className="flex items-center justify-between">
                     <div className="h-10 w-10 rounded-xl bg-accent/10 text-accent grid place-items-center"><s.icon className="h-5 w-5" /></div>
-                    {s.trend && <span className="text-xs font-semibold text-accent">{s.trend}</span>}
+                    {s.trend && <span className={`text-xs font-semibold ${s.trend.startsWith("-") ? "text-destructive" : "text-accent"}`}>{s.trend}</span>}
                   </div>
                   <p className="mt-3 text-2xl font-extrabold">{s.value}</p>
                   <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+                  {s.sub && <p className="text-[11px] text-muted-foreground/70 mt-0.5">{s.sub}</p>}
                 </Card>
               ))}
             </div>
@@ -2079,7 +2090,7 @@ const AdminDashboard = () => {
             <div className="grid gap-4">
               <Card className="p-5">
                 <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
-                  <h3 className="font-bold">Visitors — last 14 days</h3>
+                  <h3 className="font-bold">Visitors — last 15 days</h3>
                   <Button variant="outline" size="sm" onClick={() => generateSeoReport()}>
                     <Download className="h-4 w-4" /> Monthly SEO report (PDF)
                   </Button>
