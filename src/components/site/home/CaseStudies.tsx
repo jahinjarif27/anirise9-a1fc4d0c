@@ -18,8 +18,11 @@ export const CaseStudies = () => {
           <p className="mt-3 text-muted-foreground">Snapshots of recent work where visibility turned into measurable business growth.</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {caseStudies.map((c) => (
-            <Link to={`/${caseStudiesSlug}/${c.id}`} key={c.id} className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-smooth border border-border/40 flex flex-col">
+          {caseStudies.map((c) => {
+            const tail = seo.pageSeo?.[`case:${c.id}`]?.slug?.trim() || c.id;
+            return (
+            <Link to={`/${caseStudiesSlug}/${tail}`} key={c.id} className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-smooth border border-border/40 flex flex-col">
+
               {c.image && (
                 <div className="aspect-video lg:aspect-[16/9] overflow-hidden bg-secondary max-h-48 lg:max-h-44">
                   <img src={c.image} alt={c.imageAlt || c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" />
