@@ -1137,6 +1137,7 @@ type AdminCtx = {
   updateAppearance: (a: Partial<Appearance>) => void;
   fontChoices: readonly string[];
   visits: number;
+  visitsPrev: number;
   visitSeries: { day: string; visits: number }[];
   leads: Lead[];
   addLead: (l: Omit<Lead, "id" | "createdAt">) => Promise<void>;
@@ -1236,6 +1237,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [visits, setVisits] = useState(0);
+  const [visitsPrev, setVisitsPrev] = useState(0);
   const [visitSeries, setVisitSeries] = useState<{ day: string; visits: number }[]>([]);
   const [homeBlocks, setHomeBlocks] = useState<HomeBlocks>(defaultHomeBlocks);
   const [homeFaqs, setHomeFaqs] = useState<FaqItem[]>([]);
@@ -1286,7 +1288,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     const [leadsR, reviewsR, visitsR] = await Promise.all([
       adminCall("leads_list"),
       adminCall("reviews_list"),
-      adminCall("visits_list", { sinceDays: 30 }),
+      adminCall("visits_list", { sinceDays: 60 }),
     ]);
     if (leadsR.ok && Array.isArray(leadsR.data)) setLeads(leadsR.data.map(fromDbLead));
     if (reviewsR.ok && Array.isArray(reviewsR.data)) {
@@ -1298,12 +1300,23 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     }
     if (visitsR.ok && Array.isArray(visitsR.data)) {
       const rows = visitsR.data;
-      const uniqueIds = new Set<string>();
-      rows.forEach((v: any, i: number) => uniqueIds.add(v.visitor_id || `legacy-${i}`));
-      setVisits(uniqueIds.size);
+      const now = Date.now();
+      const cur = new Set<string>();
+      const prev = new Set<string>();
+      rows.forEach((v: any, i: number) => {
+        const id = v.visitor_id || `legacy-${i}`;
+        const ts = new Date(v.created_at).getTime();
+        const ageDays = (now - ts) / 86400000;
+        if (ageDays <= 30) cur.add(id);
+        else if (ageDays <= 60) prev.add(id);
+      });
+      setVisits(cur.size);
+      setVisitsPrev(prev.size);
+
+      // Build 15-day bucket series (today and 14 prior days)
       const buckets: Record<string, Set<string>> = {};
-      for (let i = 13; i >= 0; i--) {
-        const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+      for (let i = 14; i >= 0; i--) {
+        const d = new Date(now - i * 86400000).toISOString().slice(0, 10);
         buckets[d] = new Set();
       }
       rows.forEach((v: any, i: number) => {
@@ -1311,6 +1324,15 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         if (d in buckets) buckets[d].add(v.visitor_id || `legacy-${i}`);
       });
       setVisitSeries(Object.entries(buckets).map(([day, set]) => ({ day: day.slice(5), visits: set.size })));
+
+      // Snapshot the previous-month total so it remains available across sessions
+      try {
+        const key = "anirise_visits_history";
+        const monthKey = new Date().toISOString().slice(0, 7);
+        const raw = JSON.parse(localStorage.getItem(key) || "{}");
+        raw[monthKey] = cur.size;
+        localStorage.setItem(key, JSON.stringify(raw));
+      } catch {}
     }
   };
 
@@ -1319,7 +1341,10 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   // ---------------------------------------------------------------
   useEffect(() => {
     let alive = true;
+    // Safety net: never let the loader hang forever (e.g. offline / network stall)
+    const failSafe = setTimeout(() => { if (alive) setLoading(false); }, 6000);
     (async () => {
+      try {
       // Public-readable tables only. leads + all-reviews + visits load after admin login.
       const [settingsRes, postsRes, reviewsRes] = await Promise.all([
         supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
