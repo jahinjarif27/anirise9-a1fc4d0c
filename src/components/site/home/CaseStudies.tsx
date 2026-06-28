@@ -39,7 +39,9 @@ export const CaseStudies = () => {
                 </span>
               </div>
             </Link>
-          ))}
+            );
+          })}
+
         </div>
       </div>
       <SectionNote id="caseStudies" />
