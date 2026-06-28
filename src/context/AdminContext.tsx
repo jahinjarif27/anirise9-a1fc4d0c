@@ -1448,8 +1448,14 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setTimeout(() => { hydrated.current = true; }, 0);
+      } catch (e) {
+        console.warn("[admin] initial load failed:", e);
+      } finally {
+        clearTimeout(failSafe);
+        if (alive) setLoading(false);
+      }
     })();
-    return () => { alive = false; };
+    return () => { alive = false; clearTimeout(failSafe); };
   }, []);
 
   // ---------------------------------------------------------------
@@ -1902,7 +1908,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         updatePageSeo,
         appearance, updateAppearance,
         fontChoices: FONT_CHOICES,
-        visits, visitSeries,
+        visits, visitsPrev, visitSeries,
         leads, addLead, deleteLead, clearLeads, pruneOldLeads,
         reviews, addReview, approveReview, deleteReview,
         homeBlocks, setHomeBlock,
